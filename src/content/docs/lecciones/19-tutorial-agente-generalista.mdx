@@ -1,15 +1,204 @@
 ---
 title: "Lección 21 — Tutorial opcional: montar un agente generalista"
-description: "Práctica guiada opcional para desplegar un agente local autónomo."
+description: "Guía práctica paso a paso para instalar, blindar, conectar a Telegram y desinstalar un agente autónomo siempre activo."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Terminal from '../../../components/ui/Terminal.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import Herbario from '../../../components/ui/Herbario.astro';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L19**, orden en el itinerario: **21**).
+import ChecklistDespliegue from '../../../components/widgets/checklist-despliegue/ChecklistDespliegue.tsx';
+import SimuladorFlujoDaemon from '../../../components/widgets/simulador-flujo-daemon/SimuladorFlujoDaemon.tsx';
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+<Verificado
+  fecha="2026-03"
+  fuente="https://github.com/NousResearch/hermes-agent"
+  nota="Documentación oficial de Hermes Agent (Nous Research): soporte para Python 3.11+, integración nativa con bots de Telegram, lista blanca de usuarios autorizados y compatibilidad con Ollama."
+/>
 
 ## Objetivo de la lección
-Práctica guiada opcional para desplegar un agente local autónomo.
+Aprender a instalar, configurar y supervisar un agente personal autónomo en segundo plano (Hermes Agent) dentro de un entorno estrictamente aislado de tu Mac, conectándolo de forma segura a tu propio canal privado de Telegram, garantizando un coste de cero euros y sabiendo cómo apagarlo o desinstalarlo limpiamente en cualquier instante.
+
+---
+
+## 1. Antes de empezar: La filosofía del "terrario cerrado"
+
+En la Lección 18 conocimos los agentes generalistas: asistentes que viven en segundo plano las 24 horas. 
+
+Como advertimos entonces, **un agente autónomo jamás debe desplegarse con permisos globales en tu Mac de trabajo diario**. Para experimentar con total serenidad, aplicaremos la regla del **terrario cerrado**:
+- Vivirá confinado en una única carpeta aislada con su propio entorno virtual de Python (`~/Agente-Hermes/`).
+- No tendrá acceso a tus carpetas personales ni a tus documentos bancarios.
+- Su único canal de comunicación con el mundo exterior será un **bot privado de Telegram protegido por una lista blanca**: si un desconocido le escribe, la pasarela ignora el mensaje de raíz.
+- Como motor de inteligencia usaremos **Ollama en local**, garantizando que no se escape ni un céntimo de gasto ni un solo byte de información fuera de tu máquina.
+
+Observa cómo respira un servicio en segundo plano a lo largo de su ciclo de vida:
+
+<SimuladorFlujoDaemon client:visible />
+
+---
+
+## 2. El checklist de despliegue con progreso guardado
+
+Sigue este itinerario paso a paso. A medida que marques las casillas, tu progreso quedará guardado automáticamente en la memoria de tu navegador en este Mac:
+
+<ChecklistDespliegue client:visible />
+
+---
+
+## 3. Guía paso a paso en tu Mac
+
+Vamos a realizar el despliegue práctico utilizando la aplicación **Terminal**:
+
+<Pasos>
+  <Paso numero={1} titulo="Crea el entorno virtual aislado">
+    Abre la **Terminal** y prepara la cámara de aislamiento:
+
+    ```bash
+    mkdir -p ~/Agente-Hermes && cd ~/Agente-Hermes
+    python3 -m venv .venv
+    source .venv/bin/activate
+    ```
+
+    Comprueba que el prompt muestra `(.venv)`. Todo lo que instalemos a partir de ahora quedará confinado exclusivamente a esta carpeta.
+  </Paso>
+
+  <Paso numero={2} titulo="Instala el paquete oficial de Hermes Agent">
+    Instala la biblioteca del agente desde el repositorio verificado:
+
+    ```bash
+    pip install hermes-agent
+    ```
+  </Paso>
+
+  <Paso numero={3} titulo="Crea tu bot privado en Telegram">
+    No necesitas pagar nada. Abre tu aplicación **Telegram** en el iPhone o Mac:
+    1. Busca el usuario oficial `@BotFather` (con la marca azul de verificación).
+    2. Pulsa en iniciar y escribe el comando `/newbot`.
+    3. Ponle un nombre amable (por ejemplo: `Mi Asistente Botánico`).
+    4. Elige un nombre de usuario que termine en `bot` (por ejemplo: `mi_hermes_campo_bot`).
+    5. BotFather te responderá con un código secreto largo llamado **Token de API HTTP**. Cópialo.
+  </Paso>
+
+  <Paso numero={4} titulo="Averigua tu ID numérico de Telegram para la lista blanca">
+    Para que nadie más pueda darle órdenes a tu bot:
+    1. En Telegram, busca el bot oficial `@userinfobot` y pulsa iniciar.
+    2. Te dirá tu número de identificación personal (un número como `123456789`).
+  </Paso>
+
+  <Paso numero={5} titulo="Configura el archivo de variables secretas (.env)">
+    Dentro de tu carpeta `~/Agente-Hermes`, crea el archivo de configuración con tus claves privadas:
+
+    ```bash
+    cat << 'EOF' > .env
+    # Proveedor de IA: Ollama local (Coste 0€)
+    MODEL_PROVIDER="ollama"
+    MODEL_NAME="llama3.2"
+    OLLAMA_BASE_URL="http://localhost:11434"
+
+    # Canal Telegram
+    TELEGRAM_BOT_TOKEN="pega_aqui_el_token_de_botfather"
+    TELEGRAM_ALLOWED_USERS="pega_aqui_tu_id_numerico"
+    EOF
+    ```
+
+    Abre el archivo con `nano .env` o TextEdit y sustituye los textos entre comillas por tu token y tu ID real.
+  </Paso>
+
+  <Paso numero={6} titulo="Lanza tu asistente en modo interactivo">
+    Asegúrate de que Ollama está en marcha en tu Mac y ejecuta:
+
+    ```bash
+    hermes gateway run
+    ```
+
+    Verás en la terminal que la pasarela se conecta a Telegram. Abre tu chat con tu nuevo bot en el móvil y envíale un mensaje: *"Hola, anota que hoy vi florecer el primer quejigo"*.
+    
+    Observa cómo el agente responde a tu teléfono y guarda la observación en su diario de notas local.
+  </Paso>
+</Pasos>
+
+---
+
+## 4. El protocolo de apagado y desinstalación limpia
+
+La verdadera maestría técnica no consiste en saber encender cosas, sino en **saber apagarlas y devolver el sistema a su estado inmaculado original**:
+
+### Cómo detener el agente al instante
+En la ventana de la Terminal donde está corriendo el comando, pulsa la combinación de teclas:
+```bash
+Ctrl + C
+```
+El proceso se interrumpirá de inmediato y el bot dejará de responder mensajes.
+
+### Cómo desinstalarlo sin dejar ningún residuo en tu Mac
+Si en cualquier momento decides que ya has terminado el experimento y no deseas conservar el agente:
+
+<Terminal
+  comandos={[
+    { comando: "deactivate", explicacion: "Desactiva el entorno virtual de Python (.venv)." },
+    { comando: "rm -rf ~/Agente-Hermes", explicacion: "ELIMINACIÓN TOTAL LIMPIA: borra la carpeta aislada con todas sus dependencias y claves sin tocar nada del resto de tu Mac." }
+  ]}
+/>
+
+<Analogia titulo="El terrario del botánico y el herbario cerrado">
+Montar un agente generalista autónomo es como aclimatar un ejemplar botánico exótico traído de una expedición lejana:
+- No lo plantas directamente en el huerto abierto donde podría convertirse en una especie invasora incontrolable.
+- Lo cultivas dentro de un **terrario acristalado de laboratorio** (el entorno virtual `.venv` y la carpeta acotada), con una compuerta con candado cuya única llave la tienes tú en el bolsillo (la lista blanca con tu ID de Telegram).
+
+**Dónde se rompe la analogía:** Una planta exótica puede marchitarse si olvidas regarla; un proceso de software en segundo plano no se marchita: si lo configuras para conectarse a una API de pago comercial sin fijar un límite de crédito, seguirá consumiendo llamadas en bucle mientras el ordenador esté encendido. Por eso usar el motor local de Ollama es la red de seguridad definitiva para experimentar con coste cero.
+</Analogia>
+
+---
+
+## 5. Reto final: La semana de prueba desatendida
+
+<Reto titulo="Una pequeña tarea fiel durante siete días">
+Si decides mantener tu asistente activo durante una semana en tu Mac de prácticas:
+
+1. **La tarea de campo:** Pídele que cada mañana a una hora fija (o cada vez que le envíes una foto desde el móvil) te devuelva una ficha resumida y la añada a un archivo semanal `observaciones_semana.md`.
+2. **La auditoría del domingo:** Al cabo de siete días, abre la carpeta `~/Agente-Hermes/` y revisa:
+   - ¿Ha consumido recursos de forma estable?
+   - ¿Ha respondido con precisión a tus notas sin inventar datos?
+   - ¿Te ha resultado verdaderamente útil o prefieres abrir la terminal solo cuando lo necesitas?
+3. **La decisión consciente:** Concluye el reto apagando el proceso o decidiendo si quieres conservarlo como tu compañero digital habitual de campo.
+</Reto>
+
+---
+
+## 6. Resumen y herbario de conceptos
+
+- Un agente generalista siempre activo debe confinarse en un **entorno aislado (*virtual environment*)** para no comprometer el sistema operativo principal.
+- La **lista blanca (*whitelist*)** es la salvaguarda de acceso crítica: garantiza que solo tu cuenta de Telegram personal puede enviar órdenes al agente.
+- Conectar el agente a un **motor local como Ollama** blinda la privacidad y elimina por completo el riesgo de costes imprevistos de API.
+- Todo proyecto de automatización debe dominar el **interruptor de apagado (`Ctrl + C`)** y la **desinstalación limpia en un solo paso (`rm -rf`)**.
+
+<Herbario
+  terminos={[
+    {
+      termino: "Entorno virtual (Virtual Environment / venv)",
+      definicion: "Directorio aislado de Python que contiene su propio ejecutable e instalaciones de bibliotecas independientes, impidiendo conflictos con las herramientas del sistema operativo.",
+      analogia: "Una maceta individual en un vivero: las raíces de la planta crecen en su propio sustrato sin enredarse con las plantas vecinas."
+    },
+    {
+      termino: "Whitelist (Lista blanca de usuarios)",
+      definicion: "Mecanismo de seguridad que rechaza de forma predeterminada cualquier petición salvo aquellas que procedan de identificadores explícitamente autorizados.",
+      analogia: "La lista de invitados en la puerta de un congreso botánico: si tu nombre no está en la hoja del conserje, no cruzas el umbral."
+    },
+    {
+      termino: "BotFather",
+      definicion: "Bot oficial de la plataforma Telegram utilizado para registrar nuevos bots, administrar sus credenciales de acceso y generar tokens criptográficos de API.",
+      analogia: "El registro oficial de variedades vegetales donde se inscribe formalmente un nuevo cultivar y se le otorga su número de registro de patente."
+    },
+    {
+      termino: "Desinstalación limpia (Clean teardown)",
+      definicion: "Procedimiento de borrado de una aplicación que elimina la totalidad de sus archivos y configuraciones sin dejar restos ni alterar el resto del ordenador.",
+      analogia: "Recoger una tienda de campaña de montaña dejando el suelo exactamente como estaba, sin un solo residuo ni huella en el pasto."
+    }
+  ]}
+/>
