@@ -1,15 +1,201 @@
 ---
 title: "Lección 19 — Automatización y proyecto final"
-description: "Diseño e implementación de un proyecto integral propio."
+description: "Diseña, construye y documenta tu propio proyecto útil de automatización o fabricación física en tu Mac."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Terminal from '../../../components/ui/Terminal.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import Herbario from '../../../components/ui/Herbario.astro';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L17**, orden en el itinerario: **19**).
+import FichaProyecto from '../../../components/widgets/ficha-proyecto/FichaProyecto.tsx';
+import ChecklistSeguridadProyecto from '../../../components/widgets/checklist-seguridad-proyecto/ChecklistSeguridadProyecto.tsx';
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+<Verificado
+  fecha="2026-03"
+  fuente="https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPSystemStartup/Chapters/CreatingLaunchdJobs.html"
+  nota="Mecanismos estándar de automatización de tareas en macOS (Launchd y crontab en Apple Silicon) y directrices de ingeniería de contexto con AGENTS.md."
+/>
 
 ## Objetivo de la lección
-Diseño e implementación de un proyecto integral propio.
+Diseñar, construir y documentar tu propio proyecto final asistido por inteligencia artificial —sea una automatización de tareas en tu Mac o una pieza física paramétrica para impresión 3D—, asegurando que cuente con aislamiento estricto, verificación de resultados y un interruptor de apagado inmediato.
+
+---
+
+## 1. El criterio de oro: ¿Qué merece la pena automatizar?
+
+A lo largo de este curso has adquirido superpoderes técnicos: sabes cómo razona un modelo probabilístico, cómo inspeccionar carpetas en la Terminal de Mac, cómo conectar herramientas con MCP, cómo pedir mediante parches (*diff*) y cómo modelar en 3D con FreeCAD.
+
+Con tantas posibilidades, la tentación habitual es intentar automatizarlo todo. Sin embargo, en la ingeniería del software existe una regla de oro: **solo merece la pena automatizar lo que cumple al menos dos de estas tres condiciones**:
+
+1. **Es repetitivo y tedioso:** una tarea que haces semanalmente y te roba media hora de clics mecánicos (como renombrar fotos o extraer fechas de hojas de cálculo).
+2. **Es propenso al despiste humano:** tareas donde el cansancio te hace olvidar una tilde o saltarte una fila importante.
+3. **Las reglas están claras:** el resultado correcto se puede describir sin ambigüedad matemática (*"si la fecha es 03/05, conviértela a 2026-05-03"*).
+
+Si una tarea requiere juicio estético sutil o empatía personal (como responder cartas a amigos o elegir qué fotos de tus nietos te gustan más), **no la automatices**: hazla tú mismo y disfruta de ella.
+
+---
+
+## 2. El método de cinco pasos para un proyecto sólido
+
+Construir un proyecto de IA que no se rompa a la semana siguiente exige seguir un método metódico:
+
+```text
+[1. Definir Problema] ──> [2. Entradas/Salidas] ──> [3. Red de Seguridad] ──> [4. Iterar con Agente] ──> [5. Documentar y Apagar]
+```
+
+1. **El problema en una frase:** Si no puedes resumir qué resuelve tu proyecto en una sola oración, el encargo es demasiado vago para un agente.
+2. **Entradas y salidas claras (I/O):** Define con precisión matemática qué archivos entran (ej: PDFs en `~/Descargas`) y qué archivos deben salir (ej: tabla Markdown en `~/Notas`).
+3. **Red de seguridad previa:** Aplica lo aprendido en la Lección 13: crea la carpeta acotada (*sandbox*) y haz una foto fija con Git (`git init` y `git commit`).
+4. **Construcción iterativa:** No le pidas todo el programa de golpe. Pídele al agente primero que lea los datos, luego que haga una prueba sobre dos ejemplos, y finalmente que procese el lote completo.
+5. **Documentación y el interruptor de apagado:** Escribe en la raíz un `README.md` y un `AGENTS.md` explicando cómo funciona y cuál es el comando exacto para detenerlo.
+
+---
+
+## 3. Diseña tu ficha de proyecto interactiva
+
+Utiliza este diseñador interactivo para elegir una de las cuatro ideas preparadas (o redactar tu propia propuesta) y descarga el archivo `PROYECTO.md` directamente en tu Mac:
+
+<FichaProyecto client:visible />
+
+---
+
+## 4. De la ejecución manual a la tarea programada (`launchd` y `cron`)
+
+Cuando tu script o proyecto funcione perfectamente de manera manual, puedes dar el salto opcional a que se ejecute **a intervalos regulares sin que tengas que acordarte**:
+
+En macOS dispones de dos herramientas nativas de reloj:
+- **`crontab` (el estándar clásico de Unix):** Permite programar comandos sencillos escribiendo una línea en la terminal (por ejemplo, `0 7 * * * python3 ~/alerta_clima.py` para ejecutarse todos los días a las 07:00 AM).
+- **`launchd` (el motor nativo de macOS):** Diseñado por Apple para gestionar servicios en segundo plano mediante archivos de configuración en `~/Library/LaunchAgents/`. Tiene la ventaja de que, si tu Mac estaba en reposo a la hora programada, puede ejecutar la tarea inmediatamente al despertar.
+
+### El Interruptor de Apagado (*Kill Switch*)
+Cualquier proceso automático debe tener un botón de parada instantáneo:
+- Si es un comando manual en terminal: pulsa **`Ctrl + C`**.
+- Si es una tarea de `launchd`: desactívala con `launchctl unload ~/Library/LaunchAgents/mi_tarea.plist`.
+- Si es una tarea de cron: escribe `crontab -e` y borra la línea.
+
+---
+
+## 5. El Checklist de seguridad previa
+
+Antes de dejar que tu proyecto procese archivos reales o se ejecute desatendido, pasa este examen de control:
+
+<ChecklistSeguridadProyecto client:visible />
+
+<Analogia titulo="El riego por goteo en el vivero botánico">
+Automatizar un proyecto personal con un agente es exactamente igual que instalar un **sistema de riego por goteo automatizado** en un invernadero:
+- Te libera de tener que acudir con la regadera a las 7 de la mañana todos los días, suministrando el agua justa con un programador horario.
+
+**Dónde se rompe la analogía:** Si una tubería de riego se rompe, el suelo se encharca visiblemente y el agua hace ruido: te das cuenta al instante. Un script o agente defectuoso en un ordenador puede fallar silenciosamente en segundo plano (por ejemplo, acumulando archivos duplicados invisibles o consumiendo memoria) sin emitir ningún sonido. Por eso la revisión periódica y los archivos de registro (*logs*) son el equivalente indispensable al manómetro de presión de las tuberías.
+</Analogia>
+
+---
+
+## 6. Práctica en tu Mac: Construye tu proyecto final paso a paso
+
+Vamos a levantar tu proyecto final en una carpeta limpia de tu Mac. Puedes elegir la idea que prefieras (organizar fotos, alertar del clima o el soporte 3D de viales de la Lección 17):
+
+<Pasos>
+  <Paso numero={1} titulo="Crea la carpeta de tu proyecto final">
+    Abre la **Terminal** de tu Mac y crea el directorio de trabajo donde vivirá tu creación:
+
+    ```bash
+    mkdir -p ~/Proyecto-Final-IA && cd ~/Proyecto-Final-IA
+    ```
+  </Paso>
+
+  <Paso numero={2} titulo="Guarda tu ficha de instrucciones (AGENTS.md)">
+    Descarga desde el interactivo superior tu archivo `PROYECTO.md` o créalo pegando este comando en la terminal:
+
+    ```bash
+    cat << 'EOF' > AGENTS.md
+    # REGLAS DEL PROYECTO
+    1. Trabajar exclusivamente dentro de esta carpeta.
+    2. No borrar ningún archivo original: generar copias o archivos con prefijo _resultado.
+    3. Explicar cada cambio en la terminal antes de escribir en disco.
+    EOF
+    ```
+  </Paso>
+
+  <Paso numero={3} titulo="Activa la red inmutable de Git">
+    Guarda la instantánea fundacional de tu proyecto:
+
+    ```bash
+    git init
+    git add .
+    git commit -m "Fundación del proyecto final"
+    ```
+  </Paso>
+
+  <Paso numero={4} titulo="Invoca a tu agente y construye la primera versión">
+    Abre tu agente de código favorito (por ejemplo, `opencode` o un script guiado por tu chat web) y encárgale el primer paso elemental. 
+    
+    Inspecciona las diferencias con `git diff` antes de dar tu visto bueno.
+  </Paso>
+
+  <Paso numero={5} titulo="Documenta el interruptor de apagado en el README">
+    Crea un archivo `README.md` que resuma para tu yo del futuro cómo usar el proyecto y cómo detenerlo:
+
+    ```bash
+    echo "# Mi Proyecto Final" > README.md
+    echo "Para detener cualquier ejecución: pulsar Ctrl + C en Terminal." >> README.md
+    git add README.md && git commit -m "Documentación e interruptor de apagado"
+    ```
+  </Paso>
+</Pasos>
+
+---
+
+## 7. Reto final: La presentación del proyecto
+
+<Reto titulo="Defiende tu proyecto ante el tribunal de naturalistas">
+Una vez que hayas construido tu proyecto personal (sea una herramienta de datos o una pieza física impresa en 3D), redacta una breve ficha de presentación respondiendo a estas cuatro preguntas fundamentales:
+
+1. **¿Qué problema resuelve en tu día a día?**
+   - Describe con orgullo la molestia concreta o necesidad de campo que ahora queda resuelta.
+2. **¿Qué red de seguridad le has colocado?**
+   - Explica cómo garantizas que tus archivos originales están a salvo (carpeta acotada, copias de seguridad o foto fija en Git).
+3. **¿Cómo compruebas que el resultado es correcto?**
+   - ¿Qué prueba o inspección visual realizas para asegurarte de que el modelo no ha alucinado ni omitido datos?
+4. **¿Cuál es el interruptor de apagado (*Kill Switch*)?**
+   - Escribe el comando exacto o la acción física para detener el proceso en menos de 5 segundos si algo saliera mal.
+</Reto>
+
+---
+
+## 8. Resumen y herbario de conceptos
+
+- Automatizar solo tiene sentido cuando una tarea es **repetitiva, propensa al despiste humano y con reglas objetivas claras**.
+- El ciclo de un proyecto bien diseñado incluye: **Definir el problema en una frase → Acotar entradas y salidas → Poner red de seguridad → Construir iterativamente → Documentar**.
+- Un proyecto profesional en macOS siempre incluye un **interruptor de apagado (*Kill Switch*)** transparente y documentado en el `README.md`.
+- Para tareas periódicas en el Mac, utilidades nativas como **`launchd`** o **`cron`** permiten la ejecución desatendida sin gastar energía innecesaria.
+
+<Herbario
+  terminos={[
+    {
+      termino: "Entradas y Salidas (I/O - Inputs/Outputs)",
+      definicion: "Los datos exactos que requiere un programa para comenzar su ejecución (entradas) y el resultado estructurado final que debe producir (salidas).",
+      analogia: "El balance de materia en un ecosistema: los nutrientes y agua que absorbe la raíz (entradas) frente al oxígeno y biomasa que produce la fotosíntesis (salidas)."
+    },
+    {
+      termino: "Kill Switch (Interruptor de parada de emergencia)",
+      definicion: "Mecanismo o comando garantizado para interrumpir de manera inmediata e incondicional la ejecución de un proceso o agente en segundo plano.",
+      analogia: "La seta roja de parada de emergencia en una desbrozadora o la llave general de paso del agua en un laboratorio de química."
+    },
+    {
+      termino: "Launchd",
+      definicion: "Sistema de inicio y administración de servicios y tareas programadas nativo de Apple en macOS que sustituye y amplía las capacidades tradicionales de cron.",
+      analogia: "El director de guardia del laboratorio que se encarga de encender la calefacción y conectar los registradores de datos a la hora prevista."
+    },
+    {
+      termino: "Ficha técnica de proyecto (Project Brief)",
+      definicion: "Documento conciso que resume el objetivo, alcance, restricciones de seguridad y herramientas de una solución técnica antes de escribir el código.",
+      analogia: "La memoria descriptiva o cuaderno de protocolo que se presenta para solicitar autorización antes de iniciar una campaña de anillamiento científico."
+    }
+  ]}
+/>
