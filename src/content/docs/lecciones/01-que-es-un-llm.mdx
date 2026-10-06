@@ -1,15 +1,243 @@
 ---
-title: "Lección 01 — ¿Qué es un LLM y qué son los tokens?"
-description: "Comprender qué hace un modelo de lenguaje y cómo trocea las palabras."
+title: "01. ¿Qué es un LLM y qué son los tokens?"
+description: "Comprende qué hace realmente un modelo de lenguaje, cómo trocea las palabras en unidades numéricas y por qué tropieza al contar letras."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Herbario from '../../../components/ui/Herbario.astro';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import Tokenizador from '../../../components/widgets/tokenizador/Tokenizador.tsx';
+import GeneradorTokens from '../../../components/widgets/generador-tokens/GeneradorTokens.tsx';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L01**, orden en el itinerario: **1**).
+<Herbario
+  numero="01"
+  bloque="Bloque 1 · Fundamentos y modelos"
+  duracion="45–60 min"
+  requisitos="Ninguno (tu navegador habitual en el Mac)"
+/>
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+> **Objetivo de la sesión:** Entender que un modelo de lenguaje no "piensa" conceptos abstractos ni lee letras sueltas, sino que es un potente calculador estadístico que predice la siguiente pieza de texto (<Termino def="Trozo mínimo de texto que el modelo procesa y predice numéricamente.">token</Termino>) a partir de las anteriores.
 
-## Objetivo de la lección
-Comprender qué hace un modelo de lenguaje y cómo trocea las palabras.
+---
+
+## 1. El gran autocompletador
+
+Cuando usas ChatGPT o Claude en tu Mac y le haces una pregunta sobre botánica, historia o una receta, parece que al otro lado hay alguien reflexionando. La pantalla muestra frases fluidas, coherentes y bien redactadas.
+
+Sin embargo, por dentro ocurre algo mucho más mecánico y fascinante: **el modelo predice la siguiente pieza de texto**.
+
+Imagina el teclado predictivo de tu iPhone cuando empiezas una frase como *"Mañana por la mañana voy a..."* y te sugiere *"desayunar"*, *"salir"* o *"trabajar"*. Un **LLM** (*Large Language Model* o gran modelo de lenguaje) hace en esencia lo mismo, pero a una escala colosal:
+1. Lee todo lo que has escrito hasta el momento.
+2. Consulta una gigantesca red matemática entrenada con miles de millones de páginas de texto.
+3. Calcula qué fragmento de texto tiene más probabilidad estadística de continuar la secuencia.
+4. Añade ese fragmento a la conversación y repite el proceso para el siguiente.
+
+No escribe un párrafo entero de golpe; lo construye pieza a pieza, en una cadena continua de probabilidades.
+
+---
+
+## 2. Ni letras ni palabras: bienvenidos al mundo de los tokens
+
+Si los modelos procesan texto, cabría pensar que leen letras individuales (como nosotros al aprender el abecedario) o palabras completas del diccionario. En la práctica, ninguna de las dos opciones funciona bien en computación:
+
+- **Si leyeran letra a letra:** procesar un libro requeriría millones de pasos individuales. Las relaciones entre ideas lejanas se diluirían y el consumo de memoria sería astronómico.
+- **Si leyeran palabra por palabra:** el vocabulario tendría que incluir millones de entradas para abarcar conjugaciones verbales, plurales, errores tipográficos, tecnicismos botánicos y palabras compuestas. Si apareciese un término nuevo, el modelo no sabría qué hacer.
+
+La solución que idearon los investigadores se llama **BPE** (*Byte Pair Encoding*) y consiste en trocear el lenguaje en piezas intermedias llamadas **tokens**:
+
+<Callout tipo="nota" titulo="¿Qué es exactamente un token?">
+Un token es una porción de texto frecuente. En palabras comunes en español o inglés, un token suele coincidir con una palabra entera (como <code>casa</code> o <code>árbol</code>). En palabras más largas, técnicas o poco comunes, se fragmenta en raíces, prefijos y sufijos (por ejemplo, <code>des-</code>, <code>oxirri-</code>, <code>bonucleico</code>).
+</Callout>
+
+Los modelos modernos manejan un vocabulario cerrado de entre 100.000 y 200.000 tokens posibles <Verificado fecha="2026-10" fuente="https://platform.openai.com/tokenizer" nota="Vocabulario de tokenización BPE en OpenAI o200k_base" />. Cada uno de esos tokens tiene asignado un **número entero único**.
+
+Para la máquina, la frase *"El roble pierde sus hojas"* no son letras sobre un papel, sino una lista numérica: `[1420, 48312, 19203, 3102, 28114]`.
+
+<Analogia
+  conceptoBiologico="El código genético y los tripletes de ARN"
+  titulo="De bases nitrogenadas a codones con significado"
+>
+  En el núcleo de una célula, la información del ADN está escrita con cuatro bases: adenina (A), timina (T), citosina (C) y guanina (G). Sin embargo, cuando el ribosoma traduce el ARN mensajero a proteínas, no lee las bases de una en una. Las lee agrupadas en **codones de tres letras** (como `AUG`, `CCG` o `UAA`). 
+
+  Cada triplete representa un aminoácido concreto o una orden de parada. Agrupar las letras individuales en bloques funcionales permite sintetizar estructuras complejas de manera compacta y eficiente.
+
+  Los tokens son los codones de la inteligencia artificial: paquetes de caracteres que condensan significado suficiente para que la maquinaria matemática los procese con fluidez.
+
+  <div slot="limite">
+    En biología celular, el código genético es universal y estricto: tres nucleótidos son siempre un aminoácido exacto. En la IA, la tokenización es estadística y cambia según el modelo: Claude trocea una frase de forma sutilmente distinta a ChatGPT o a un modelo local como Llama, porque cada creador diseña su propio diccionario de tokens.
+  </div>
+</Analogia>
+
+---
+
+## 3. Laboratorio interactivo: El visor de tokens
+
+Comprueba tú mismo cómo ve el texto un modelo de lenguaje. En este instrumento puedes escribir cualquier frase o probar los botones de ejemplo para comparar cómo se trocea el español, el inglés o una línea de código:
+
+<Tokenizador client:visible />
+
+<Callout tipo="ojo" titulo="Fíjate en los espacios">
+Observa en el visor que los espacios en blanco (representados como <code>␣</code>) casi siempre van unidos al inicio de la siguiente palabra. Para el modelo, la palabra <code>árbol</code> no es el mismo token que <code>␣árbol</code> (con un espacio delante). Cada variante tiene su propio identificador numérico.
+</Callout>
+
+---
+
+## 4. El enigma de contar letras (y por qué tropieza la IA)
+
+Seguramente habrás oído hablar de este experimento clásico: si le preguntas a ChatGPT cuántas veces aparece la letra **r** en la palabra **ferrocarril**, es muy probable que se equivoque y diga dos o cuatro, o que titubee.
+
+Ahora que conoces los tokens, entiendes el motivo:
+- Cuando tú lees *ferrocarril*, tus ojos ven las letras individuales: `f - e - r - r - o - c - a - r - r - i - l`.
+- El modelo, en cambio, recibe la secuencia de tokens que acabas de ver en el visor: `[855, 27212, 1614, 311]`, correspondientes a `fer`, `roc`, `arr`, `il`.
+
+**El modelo no ve las letras sueltas.** Para él, `arr` es un bloque indivisible con el número `1614`. Intentar contar las letras de memoria estadística sobre ese bloque es como si a un botánico le pidieran determinar al tacto el número exacto de estambres de una flor sellada dentro de una caja de madera sin abrirla.
+
+---
+
+## 5. Animación: Generación token a token
+
+Veamos ahora la otra cara de la moneda: cómo el modelo aprovecha estos tokens para construir una respuesta. 
+
+En esta animación puedes reproducir, pausar o avanzar paso a paso para observar cómo en cada instante se evalúa el vocabulario, se calculan las probabilidades de los candidatos y se selecciona el siguiente eslabón:
+
+<GeneradorTokens client:visible />
+
+<Callout tipo="truco" titulo="¿Por qué la misma pregunta da respuestas distintas?">
+En la animación verás que el modelo no siempre elige el token con el 100% de probabilidad. En aplicaciones reales existe un parámetro (llamado <strong>temperatura</strong>) que le permite a veces elegir el segundo o tercer candidato más probable. Eso aporta variedad y creatividad a las respuestas, en lugar de repetir siempre la misma opción robótica.
+</Callout>
+
+---
+
+## 6. La ventana de contexto: la mesa de trabajo del modelo
+
+Todo modelo de lenguaje tiene un límite físico en su memoria inmediata: la llamada **ventana de contexto**.
+
+Piensa en ella como la mesa de observación de un naturalista:
+- En la mesa caben tu pregunta, las instrucciones iniciales y todo lo que habéis hablado en la sesión actual.
+- Si la conversación es muy larga y se llena la mesa, los folios más antiguos tienen que retirarse: el modelo "olvida" lo que se dijo al principio de una charla extensa.
+
+Los modelos modernos ofrecen ventanas de contexto muy amplias (desde 128.000 tokens hasta más de 1 millón en modelos avanzados) <Verificado fecha="2026-10" fuente="https://platform.openai.com/docs/models" nota="Capacidades de contexto en modelos de OpenAI" />. Eso equivale a cientos de páginas de texto en una sola sesión.
+
+---
+
+## 7. Práctica en tu Mac: La prueba del conteo
+
+Es hora de comprobar esto en tu propio equipo con las herramientas que ya utilizas:
+
+<Pasos titulo="Práctica 01: Observar los puntos ciegos de la tokenización">
+  <Paso
+    numero={1}
+    id="l01-p1"
+    titulo="Abre tu navegador y entra en ChatGPT o Claude"
+    esperado="Tendrás delante la caja de texto habitual para enviar un mensaje."
+    siFalla="Si no tienes la sesión iniciada, entra en chatgpt.com o claude.ai con tu cuenta habitual."
+  >
+    Abre una conversación nueva y vacía para asegurarte de que no hay contexto previo de otras preguntas.
+  </Paso>
+
+  <Paso
+    numero={2}
+    id="l01-p2"
+    titulo="Hazle una pregunta trampa de conteo directo"
+    esperado="El modelo probablemente responderá de forma dubitativa, afirmando una cantidad incorrecta de letras (por ejemplo, diciendo que hay 2 o 4 letras 'r')."
+    siFalla="Si el modelo acierta por casualidad (a veces los modelos más recientes tienen respuestas memorizadas para palabras comunes), prueba con 'desoxirribonucleico' preguntando por la letra 'i'."
+  >
+    Escribe exactamente esto:
+    > *"¿Cuántas veces aparece la letra 'r' en la palabra 'ferrocarril'? Responde únicamente con el número."*
+  </Paso>
+
+  <Paso
+    numero={3}
+    id="l01-p3"
+    titulo="Ayúdale obligándole a trocear en letras individuales"
+    esperado="El modelo escribirá f-e-r-r-o-c-a-r-r-i-l y ahora sí contará con precisión las 4 letras 'r'."
+    siFalla="Insiste pidiéndole que numere cada letra en una línea separada."
+  >
+    En la misma conversación, envía este segundo mensaje:
+    > *"Ahora escribe la palabra separando cada letra con un guion (por ejemplo c-a-s-a) y luego cuenta las letras 'r'."*
+  </Paso>
+
+  <Paso
+    numero={4}
+    id="l01-p4"
+    titulo="Comprende la diferencia en tu cuaderno de notas"
+    esperado="Al obligarle a escribir guiones, cada letra se convirtió en su propio token individual, permitiéndole 'ver' lo que antes estaba empaquetado."
+    siFalla="Vuelve al visor interactivo de esta lección y prueba a escribir 'f-e-r-r-o' para ver cómo cambia la lista de tokens."
+  >
+    Fíjate en el truco: al forzar los guiones, el tokenizador no pudo agrupar `arr` en un solo número. Tuvo que emitir cada letra por separado, resolviendo su punto ciego.
+  </Paso>
+</Pasos>
+
+---
+
+## 8. Reto de laboratorio
+
+<Reto
+  numero="01"
+  titulo="La predicción del botánico"
+  resultadoEsperado="Comprobarás que la frase en español ocupa aproximadamente entre un 15% y un 30% más de tokens que su equivalente en inglés, debido a la mayor presencia de flexiones de género, número y artículos."
+  pista="Copia la frase en español en el visor interactivo de la sección 3 y anota el número de tokens. Luego prueba la versión en inglés."
+>
+  Compara estas dos frases en el visor de tokens de esta lección:
+
+  - **Opción A (Español):** *"El haya común (Fagus sylvatica) es un árbol caducifolio de la familia de las fagáceas."*
+  - **Opción B (Inglés):** *"The European beech (Fagus sylvatica) is a deciduous tree of the beech family."*
+
+  **Tu misión:**
+  1. Anota cuántos tokens consume cada una.
+  2. ¿Cuál requiere más tokens a pesar de decir exactamente lo mismo?
+  3. Explica en dos o tres frases por qué esto influye en el coste y en la velocidad cuando usamos modelos de inteligencia artificial en español.
+</Reto>
+
+---
+
+## 9. Lo esencial para llevarte al campo
+
+1. **Un LLM no razona como un humano:** Es una máquina de predicción estadística que calcula qué pieza de texto continúa con mayor coherencia a partir de todo lo anterior.
+2. **Los tokens son los codones del texto:** El texto no se lee en letras ni en palabras fijas, sino en fragmentos estadísticos identificados por números enteros.
+3. **Los puntos ciegos tienen explicación técnica:** Las dificultades para contar letras, invertir palabras o rimar surgen de que las letras individuales quedan ocultas dentro de los tokens.
+4. **El contexto es finito:** Cada modelo tiene una ventana de trabajo medible en tokens; todo lo que entra y sale de esa ventana consume capacidad.
+
+---
+
+## 10. Glosario de la sesión
+
+<dl class="glosario-lista">
+  <dt><strong>Token</strong></dt>
+  <dd>Fracción mínima de texto (palabra, trozo de palabra o signo de puntuación) a la que un modelo asigna un número identificador para procesarla matemáticamente.</dd>
+
+  <dt><strong>Tokenización (BPE)</strong></dt>
+  <dd>Algoritmo de codificación por pares de bytes (<em>Byte Pair Encoding</em>) que analiza textos masivos y crea un vocabulario de fragmentos frecuentes para trocear cualquier frase de manera eficiente.</dd>
+
+  <dt><strong>LLM (Large Language Model)</strong></dt>
+  <dd>Modelo de lenguaje de gran escala entrenado con miles de millones de parámetros para predecir y generar texto coherente en lenguaje natural.</dd>
+
+  <dt><strong>Ventana de contexto</strong></dt>
+  <dd>Memoria de trabajo inmediata de un modelo: el número máximo de tokens que puede tener presentes simultáneamente en una misma conversación.</dd>
+</dl>
+
+<style>{`
+  .glosario-lista {
+    margin: 1.5rem 0;
+    line-height: 1.6;
+  }
+
+  .glosario-lista dt {
+    color: var(--musgo);
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    margin-top: 1rem;
+  }
+
+  .glosario-lista dd {
+    margin-left: 0;
+    color: var(--tinta);
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+  }
+`}</style>

@@ -8,3 +8,5 @@ export { default as Verificado } from './Verificado.astro';
 export { default as Termino } from './Termino.astro';
 export { default as GlosarioIndice } from './GlosarioIndice.astro';
 export { default as ProgresoCurso } from './ProgresoCurso.astro';
+export { default as Herbario } from './Herbario.astro';
+
