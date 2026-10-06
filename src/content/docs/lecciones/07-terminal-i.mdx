@@ -1,15 +1,194 @@
 ---
 title: "Lección 08 — Terminal I: perder el miedo"
-description: "Aprender a moverse por carpetas y ficheros desde la consola sin peligro."
+description: "Aprender a moverse por el sistema de archivos de tu Mac desde la consola con total seguridad."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Terminal from '../../../components/ui/Terminal.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import Herbario from '../../../components/ui/Herbario.astro';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L07**, orden en el itinerario: **8**).
+import TerminalSimulada from '../../../components/widgets/terminal-simulada/TerminalSimulada.tsx';
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+<Verificado
+  fecha="2026-03"
+  fuente="https://support.apple.com/es-es/guide/terminal/welcome/mac"
+  nota="Guía oficial de Apple sobre la aplicación Terminal y el intérprete de comandos zsh en macOS."
+/>
 
 ## Objetivo de la lección
-Aprender a moverse por carpetas y ficheros desde la consola sin peligro.
+Aprender a orientarte y moverte por los archivos de tu Mac utilizando la ventana de la Terminal, perdiendo el miedo a la pantalla negra y dominando las reglas de seguridad indispensables.
+
+---
+
+## 1. La Terminal no es más que el Finder por escrito
+
+Para casi cualquier usuario de Mac, el ordenador se maneja a través de iconos, carpetas azules y ventanas que se abren haciendo doble clic con el ratón: el **Finder**.
+
+Sin embargo, detrás de esa interfaz gráfica vive un sistema operativo de base Unix increíblemente robusto y potente. La **Terminal** no es una máquina secreta para informáticos de película: **es exactamente el mismo Finder de tu Mac, pero manejado mediante palabras en lugar de clics**.
+- Cuando en el Finder haces doble clic en una carpeta para abrirla, en la terminal escribes: `cd Carpeta`.
+- Cuando en el Finder miras qué archivos hay en una ventana, en la terminal escribes: `ls`.
+- Cuando en el Finder creas una *Nueva carpeta*, en la terminal escribes: `mkdir Nombre`.
+
+<Analogia
+  concepto="El Finder frente a la Terminal"
+  metafora="La morfología externa de una planta frente a un corte histológico bajo el microscopio"
+  limite="En la botánica viva, el microscopio revela células vegetales y cloroplastos orgánicos en movimiento. En macOS, la terminal es un intérprete de texto plano puramente determinista que ejecuta llamadas al núcleo Unix del sistema operativo sin capas cosméticas intermedias."
+>
+En el campo, reconoces un haya a simple vista por la corteza lisa y gris plateada de su tronco (como el Finder: una experiencia visual clara e inmediata). 
+
+Pero si tomas una muestra de su leño y la observas bajo la lente del microscopio, ves los vasos conductores de xilema y el parénquima celular: la estructura real sobre la que se sostiene el árbol. La terminal es ese microscopio: elimina las animaciones decorativas y te permite hablar directamente con el motor de tu ordenador.
+</Analogia>
+
+---
+
+## 2. Los cuatro puntos cardinales de la navegación
+
+En la terminal no hay un cursor parpadeante sobre una página en blanco: **siempre estás físicamente dentro de una carpeta concreta de tu disco duro** (lo que se conoce como el *Directorio de Trabajo Actual*).
+
+Para no perderte jamás, solo necesitas recordar estos conceptos:
+
+1. **`pwd` (*Print Working Directory*):** Tu brújula. Te dice exactamente en qué carpeta estás metido ahora mismo.
+2. **`ls` (*List*):** Tus ojos. Muestra la lista de archivos y subcarpetas que conviven contigo en ese lugar.
+3. **`cd` (*Change Directory*):** Tus piernas. Te traslada a otra carpeta (por ejemplo, `cd Documentos`).
+4. **La casita del usuario (`~` / virgulilla):** En macOS, el símbolo `~` representa tu carpeta personal de inicio (`/Users/tu_nombre`), donde guardas tus Documentos, Descargas, Fotos y Escritorio.
+5. **Ir hacia atrás (`cd ..`):** Los dos puntos `..` significan siempre *«la carpeta que está un nivel por encima»*.
+
+---
+
+## 3. Laboratorio interactivo: Tu primera terminal de entrenamiento
+
+Antes de abrir la terminal real de tu Mac, practica en este simulador en memoria donde nada puede romperse ni borrarse por error:
+
+<TerminalSimulada client:visible />
+
+<Callout tipo="tip" titulo="Los 3 superpoderes de supervivencia en la Terminal">
+Cualquier persona que use la terminal a diario recurre a estos tres trucos miles de veces:
+1. **La tecla Tabulador (`Tab`):** Empieza a escribir las primeras dos letras del nombre de una carpeta (ej. `cd Doc`) y pulsa `Tab`. La terminal completará el nombre entero automáticamente. ¡Así nunca cometerás una falta de ortografía!
+2. **La Flecha Arriba (`↑`):** Recupera el último comando que escribiste para no tener que teclearlo otra vez.
+3. **El freno de emergencia (`Ctrl + C`):** Si un programa se queda colgado o muestra texto sin parar, mantén pulsada la tecla `Control` y pulsa `C`. Abortará el proceso al instante.
+</Callout>
+
+---
+
+## 4. Reglas de oro para crear y borrar con seguridad
+
+Manipular archivos con comandos es rapidísimo, pero exige responsabilidad:
+
+### Crear carpetas (`mkdir`) y leer archivos (`cat`)
+Para crear una carpeta basta con indicar su nombre:
+<Terminal
+  comando="mkdir cuaderno-botanica"
+  explicacion="Crea una nueva carpeta vacía en el directorio actual con el nombre indicado."
+/>
+
+Para leer el contenido de un archivo de texto directamente en pantalla sin abrir ninguna aplicación pesada:
+<Terminal
+  comando="cat informe-flora.txt"
+  explicacion="Imprime en la pantalla el texto completo contenido dentro del fichero informe-flora.txt."
+/>
+
+### ⚠️ El comando más peligroso: `rm` (Remove)
+
+En el Finder, cuando arrastras un archivo a la Papelera, este permanece guardado allí y puedes recuperarlo haciendo clic derecho y pulsando *«Sacar de la papelera»*.
+
+**En la Terminal NO hay papelera de reciclaje:**
+<Callout tipo="peligro" titulo="Atención crítica con el comando rm">
+Cuando ejecutas `rm archivo.txt`, el archivo desaparece del disco duro en ese mismo milisegundo de forma **definitiva e irrecuperable**.
+- **Regla preventiva:** Antes de borrar nada con `rm archivo.txt`, haz siempre primero un `ls archivo.txt` para comprobar con tus propios ojos que el nombre apunta exactamente a lo que deseas eliminar.
+- **Jamás ejecutes `rm -rf`** seguido de una barra diagonal `/` o un asterisco `*` si no entiendes al 100% en qué carpeta estás ubicado.
+</Callout>
+
+---
+
+## Práctica en tu Mac: Crear tu espacio de trabajo real
+
+Ahora que has practicado en el simulador seguro, vamos a abrir la Terminal real de tu ordenador para crear la carpeta donde guardaremos los proyectos de este curso:
+
+<Pasos>
+  <Paso numero={1} titulo="Abre la aplicación Terminal">
+    En el teclado de tu Mac, pulsa **Comando + Barra espaciadora** (`Cmd + Espacio`) para abrir la búsqueda de Spotlight.
+    Escribe `Terminal` y pulsa la tecla **Enter**.
+    Se abrirá una pequeña ventana con fondo blanco o negro y una línea parecida a: `tu_nombre@MacBook ~ %`.
+  </Paso>
+  <Paso numero={2} titulo="Comprueba tu ubicación inicial">
+    Escribe en la terminal el comando:
+    <Terminal comando="pwd" explicacion="Debería mostrar algo como /Users/tu_nombre, confirmando que estás en tu carpeta de usuario." />
+  </Paso>
+  <Paso numero={3} titulo="Crea la carpeta del curso">
+    Escribe el siguiente comando para crear una carpeta dedicada:
+    <Terminal comando="mkdir curso-ia-practicas" explicacion="Crea la carpeta de laboratorio dentro de tu espacio personal." />
+  </Paso>
+  <Paso numero={4} titulo="Entra en la carpeta recién creada">
+    Entra dentro de ella utilizando el autocompletado con la tecla Tabulador:
+    <Terminal comando="cd curso-ia-practicas" explicacion="Te sitúa dentro de la carpeta que acabas de crear." />
+    Comprueba con `pwd` que la ruta ha cambiado.
+  </Paso>
+  <Paso numero={5} titulo="Verifícalo en el Finder visual">
+    Abre tu Finder habitual con el ratón y entra en tu carpeta de Inicio. ¡Verás allí tu flamante carpeta `curso-ia-practicas` recién creada! Ambas ventanas son las dos caras de la misma moneda.
+  </Paso>
+</Pasos>
+
+---
+
+## Reto final: La reorganización del herbario
+
+<Reto
+  titulo="Misión de campo: Ordena el directorio revuelto"
+  dificultad="media"
+  tiempo="15 min"
+>
+Imagina que dentro de tu carpeta de trabajo tienes cinco archivos sueltos y desordenados:
+- `haya_comun.txt`
+- `haya_corteza.jpg`
+- `roble_albar.txt`
+- `roble_hoja.jpg`
+- `resumen_anual.pdf`
+
+**Tu misión:**
+Escribe en una libreta o en tu cuaderno de notas la secuencia exacta de **4 comandos de terminal** que tendrías que ejecutar para:
+1. Crear una carpeta llamada `textos` y otra llamada `imagenes`.
+2. Mover todos los archivos `.txt` a la carpeta `textos`.
+3. Mover todos los archivos `.jpg` a la carpeta `imagenes`.
+4. Comprobar desde la terminal el contenido de la carpeta `textos` para confirmar que los dos archivos están en su sitio.
+
+*(Pista: recuerda que el comando `mv origen destino` sirve para mover archivos de un lugar a otro).*
+</Reto>
+
+---
+
+## Resumen y glosario botánico-digital
+
+<Herbario
+  items={[
+    {
+      termino: "Shell / zsh",
+      definicion: "El programa intérprete de órdenes que se ejecuta dentro de la Terminal de macOS. Lee los comandos que escribes y los traduce en instrucciones para el sistema."
+    },
+    {
+      termino: "pwd",
+      definicion: "Acrónimo de 'Print Working Directory'. Muestra en pantalla la ruta completa de la carpeta en la que te encuentras en este momento."
+    },
+    {
+      termino: "ls",
+      definicion: "Comando para listar los archivos y subcarpetas que contiene el directorio actual. Con la opción 'ls -l' muestra detalles de tamaño y fecha."
+    },
+    {
+      termino: "cd",
+      definicion: "Acrónimo de 'Change Directory'. Permite navegar de una carpeta a otra. 'cd ..' sube un nivel hacia la carpeta contenedora."
+    },
+    {
+      termino: "mkdir",
+      definicion: "Comando para crear una nueva carpeta o directorio en la ruta actual."
+    },
+    {
+      termino: "rm",
+      definicion: "Comando para borrar archivos de forma inmediata y definitiva, sin pasar por la papelera de reciclaje de macOS."
+    }
+  ]}
+/>
