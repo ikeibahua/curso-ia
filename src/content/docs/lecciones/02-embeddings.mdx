@@ -1,15 +1,226 @@
 ---
-title: "Lección 02 — Embeddings: el mapa del significado"
-description: "Cómo la máquina sitúa los conceptos en un espacio de significados."
+title: "02. Embeddings: el mapa del significado"
+description: "Descubre cómo los modelos representan las ideas como coordenadas en un espacio multidimensional y cómo medir la cercanía entre conceptos."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Herbario from '../../../components/ui/Herbario.astro';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import MapaEmbeddings from '../../../components/widgets/mapa-embeddings/MapaEmbeddings.tsx';
+import SimilitudSemantica from '../../../components/widgets/similitud-semantica/SimilitudSemantica.tsx';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L02**, orden en el itinerario: **2**).
+<Herbario
+  numero="02"
+  bloque="Bloque 1 · Fundamentos y modelos"
+  duracion="60–75 min"
+  requisitos="Lección 01 (haber entendido los tokens)"
+/>
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+> **Objetivo de la sesión:** Entender qué es un <Termino def="Lista ordenada de números (vector) que sitúa una palabra o frase en un mapa multidimensional según su significado.">embedding</Termino>: una lista de coordenadas numéricas que sitúa cada palabra o frase en un mapa geométrico donde los conceptos afines quedan ubicados unos cerca de otros.
 
-## Objetivo de la lección
-Cómo la máquina sitúa los conceptos en un espacio de significados.
+---
+
+## 1. El dilema de los números sin alma
+
+En la lección anterior descubrimos que la máquina trocea nuestro texto en números enteros: `[855, 27212, 1614, 311]`.
+
+Pero esos números de token tienen un problema fundamental: **son etiquetas arbitrarias**. El token de *perro* podría ser el `3450` y el de *lobo* el `98124`, mientras que el `3451` podría ser la palabra *tostadora*. Para un ordenador, el número 3450 está al lado del 3451, pero *perro* y *tostadora* no tienen nada que ver en el mundo real.
+
+¿Cómo sabe el modelo que un roble tiene que ver con una encina, o que un bosque alberga pájaros y no transistores?
+
+La respuesta es una de las ideas más elegantes de toda la informática moderna: **los embeddings** (del inglés *to embed*, incrustar). En lugar de asignarle a cada palabra un simple número de lista, le asignamos una posición en un **mapa de significados**.
+
+---
+
+## 2. Coordenadas en un espacio de significado
+
+Imagina que quieres catalogar especies de árboles en un gráfico sencillo de dos ejes:
+- **Eje horizontal (X):** Tipo de hoja, desde hoja ancha caduca (-1) hasta aguja perenne (+1).
+- **Eje vertical (Y):** Clima preferido, desde frío montañoso (+1) hasta calor mediterráneo (-1).
+
+En ese plano de dos dimensiones, el *roble* y el *haya* caerán muy juntos en la zona de hoja caduca y clima templado. El *pino albar* quedará en otra esquina. La distancia física en el papel representará afinidad botánica real.
+
+Un **embedding** hace exactamente eso, pero en lugar de 2 ejes utiliza **cientos o miles de dimensiones simultáneas**.
+
+<Callout tipo="nota" titulo="¿Cuántas dimensiones tiene un modelo real?">
+Los modelos de embeddings actuales (como los de OpenAI, Mistral o Cohere) utilizan vectores de <strong>1.536 hasta 3.072 dimensiones</strong> <Verificado fecha="2026-10" fuente="https://platform.openai.com/docs/guides/embeddings" nota="Especificaciones oficiales de modelos text-embedding-3" />. Cada una de esas dimensiones representa una propiedad abstracta aprendida automáticamente durante el entrenamiento.
+</Callout>
+
+<Analogia
+  conceptoBiologico="El hipervolumen del nicho ecológico de Hutchinson"
+  titulo="De variables ambientales a coordenadas semánticas"
+>
+  En 1957, el ecólogo británico G. Evelyn Hutchinson definió el nicho ecológico como un **"hipervolumen de n dimensiones"**. Para situar a una especie en el ecosistema, no basta con saber dónde vive: necesitas medir su rango de tolerancia a la temperatura, la humedad relativa, la acidez del suelo, la disponibilidad de fósforo y el tamaño de las semillas de las que se alimenta.
+
+  Cada factor ambiental es una dimensión geométrica. Si dos especies ocupan coordenadas casi idénticas en ese hipervolumen, tienen nichos superpuestos y compiten por los mismos recursos.
+
+  Un embedding funciona exactamente bajo el mismo principio: es el "nicho ecológico" de una palabra dentro del ecosistema del lenguaje humano.
+
+  <div slot="limite">
+    En ecología, cada eje tiene un significado físico directo que puedes medir con un termómetro o un medidor de pH. En una red neuronal, las 1.536 dimensiones son latentes y estadísticas: una dimensión no mide "grado de vegetal" de forma aislada, sino combinaciones complejas de patrones que el algoritmo descubrió al procesar millones de libros.
+  </div>
+</Analogia>
+
+---
+
+## 3. ¿De dónde salen estas coordenadas?
+
+Nadie se sienta a rellenar a mano 1.500 números para cada palabra del diccionario. Los embeddings **se aprenden por contexto**.
+
+La regla de oro la formuló el lingüista John Rupert Firth en los años 50: *"Conocerás a una palabra por la compañía que frecuenta"*.
+
+Durante meses de entrenamiento informático, la máquina observa millones de frases. Descubre que palabras como *clorofila*, *fotosíntesis*, *hoja* y *estoma* suelen aparecer rodeadas por las mismas familias de frases. El algoritmo ajusta poco a poco sus coordenadas hasta que todas ellas quedan agrupadas en el mismo vecindario geométrico.
+
+---
+
+## 4. Laboratorio interactivo: El mapa de 2 dimensiones
+
+En este instrumento interactivo hemos proyectado un conjunto de conceptos en un plano 2D simplificado. Haz clic en cualquier término para consultar su ficha y descubrir quiénes son sus **vecinos más cercanos** en el espacio semántico:
+
+<MapaEmbeddings client:visible />
+
+<Callout tipo="ojo" titulo="La geometría del significado: Rey − Hombre + Mujer">
+Prueba a pulsar en el botón <strong>"Rey − Hombre + Mujer ≈ Reina"</strong> en la barra superior del mapa. En 2013, los investigadores de Google descubrieron que la distancia y dirección que separa a <em>hombre</em> de <em>mujer</em> es prácticamente idéntica a la que separa a <em>rey</em> de <em>reina</em>, o a <em>ciervo</em> de <em>cierva</em>. Al restar el vector masculino y sumar el femenino, el punto resultante apunta directamente a la palabra femenina equivalente.
+</Callout>
+
+---
+
+## 5. Medir la distancia: La similitud coseno
+
+¿Cómo decide el ordenador si dos textos se parecen? No mide la distancia en centímetros ni cuenta las letras que coinciden: mide el **ángulo entre sus flechas vectoriales**.
+
+Imagina dos flechas que parten desde el centro:
+- Si apuntan exactamente en la misma dirección (ángulo 0°), la **similitud coseno es del 100% (valor 1.0)**.
+- Si forman un ángulo recto (90°, sin relación alguna), la similitud es del **0%**.
+- Si apuntan en direcciones opuestas, la similitud es negativa (-1.0).
+
+Lo extraordinario de esta técnica es que **no le importa la longitud de las frases ni las palabras exactas empleadas**. Compara conceptos:
+
+<SimilitudSemantica client:visible />
+
+<Callout tipo="truco" titulo="Fíjate en el 'par trampa'">
+Prueba el botón del <em>par trampa</em> en el widget anterior (*"El zorro cazó a la liebre"* frente a *"La liebre cazó al zorro"*). Tienen un 90% de palabras idénticas, pero la inversión del rol de presa y depredador hace que el modelo baje la similitud. El modelo no se deja engañar por la coincidencia superficial de palabras.
+</Callout>
+
+---
+
+## 6. ¿Para qué se usan los embeddings en la vida real?
+
+Entender los embeddings es la llave maestra para comprender casi todas las aplicaciones modernas de IA:
+
+1. **Búsqueda semántica:** Puedes buscar en una biblioteca digital *"métodos de reproducción de coníferas"* y encontrar documentos que hablan de *"estróbilos y diseminación de piñones en pináceas"*, aunque no contengan la palabra "método" ni "reproducción".
+2. **Memoria y RAG (Recuperación Aumentada):** En la Lección 14 aprenderás a darle a un modelo tus propios archivos de notas y apuntes botánicos. El modelo usa embeddings para buscar al instante los fragmentos relevantes de tus PDFs antes de redactar su respuesta.
+3. **Clasificación automática:** Agrupar miles de correos, facturas o artículos científicos en carpetas temáticas sin necesidad de leerlos uno a uno.
+
+---
+
+## 7. Práctica en tu Mac: Búsqueda por concepto
+
+Comprueba la diferencia entre buscar palabras y buscar significados en tu propio equipo:
+
+<Pasos titulo="Práctica 02: Experimentar con la búsqueda semántica">
+  <Paso
+    numero={1}
+    id="l02-p1"
+    titulo="Abre la app Notas o la búsqueda de Spotlight en tu Mac"
+    esperado="Tendrás delante el buscador habitual del sistema operativo macOS."
+    siFalla="Pulsa 'Cmd + Barra espaciadora' para invocar Spotlight en mitad de la pantalla."
+  >
+    Spotlight en macOS históricamente utilizaba coincidencia exacta de texto (búsqueda léxica tradicional).
+  </Paso>
+
+  <Paso
+    numero={2}
+    id="l02-p2"
+    titulo="Prueba una búsqueda léxica frente a una semántica en tu chat web"
+    esperado="El modelo reconocerá la especie vegetal inmediatamente sin que hayas nombrado la palabra 'roble'."
+    siFalla="Asegúrate de no incluir el nombre común ni el científico en tu pregunta."
+  >
+    Abre ChatGPT o Claude y escribe una descripción botánica pura sin mencionar el árbol:
+    > *"Busco un árbol caducifolio autóctono de la cornisa cantábrica, de corteza grisácea, fruto en bellota con cúpula escamosa y hojas lobuladas. ¿De qué especie se trata?"*
+  </Paso>
+
+  <Paso
+    numero={3}
+    id="l02-p3"
+    titulo="Observa la magia del vector de significado"
+    esperado="El modelo responderá con precisión: Quercus robur (roble común o carballo) o Quercus petraea."
+    siFalla="Pídele que detalle los rasgos clave que utilizó para deducirlo."
+  >
+    El modelo situó las características de tu descripción en el vecindario del hiperespacio donde habitan las fagáceas y extrajo la especie más afín geométricamente.
+  </Paso>
+</Pasos>
+
+---
+
+## 8. Reto de laboratorio
+
+<Reto
+  numero="02"
+  titulo="Caza de sinónimos y el par engañoso"
+  resultadoEsperado="Habrás demostrado que frases con vocabulario totalmente disjunto pueden tener afinidades superiores al 80%, y que dos frases con casi las mismas palabras pueden diferir sustancialmente si cambia el sentido lógico."
+  pista="Utiliza el goniómetro semántico de la sección 5. Escribe un par de frases sobre meteorología o botánica cambiando todos los términos por sinónimos cultos."
+>
+  En el comparador de la sección 5, escribe dos frases redactadas por ti que cumplan estas condiciones:
+
+  1. **El par invisible:** Dos frases que digan lo mismo sin compartir ninguna palabra principal (por ejemplo, una con lenguaje técnico de cuaderno de campo y otra con lenguaje coloquial). Comprueba que su similitud sea superior al **75%**.
+  2. **El par engañoso:** Dos frases que compartan casi todas las palabras, pero donde una pequeña negación o cambio de sujeto invierta el resultado.
+
+  Anota en tu libreta las dos parejas y explica por qué la similitud angular refleja mejor la intención humana que una simple búsqueda por palabras clave en Google.
+</Reto>
+
+---
+
+## 9. Lo esencial para llevarte al campo
+
+1. **Un embedding es una dirección en un mapa:** Transforma palabras y frases en una lista de coordenadas (vectores) donde la cercanía espacial equivale a cercanía de significado.
+2. **Dimensiones ocultas:** Los modelos usan miles de ejes numéricos aprendidos durante el entrenamiento observando millones de contextos naturales.
+3. **Similitud por ángulo, no por tamaño:** La similitud coseno mide la dirección hacia la que apunta la idea, ignorando si la frase es larga o corta.
+4. **Es el cimiento de la IA aplicada:** Sin embeddings no existiría la búsqueda semántica, la clasificación inteligente ni los sistemas para consultar nuestros propios documentos (RAG).
+
+---
+
+## 10. Glosario de la sesión
+
+<dl class="glosario-lista">
+  <dt><strong>Embedding</strong></dt>
+  <dd>Representación numérica vectorial de un concepto, palabra o frase dentro de un espacio continuo multidimensional.</dd>
+
+  <dt><strong>Vector</strong></dt>
+  <dd>Lista ordenada de números reales (por ejemplo, <code>[0.24, -0.81, 0.05, ...]</code>) que señala una posición y una dirección en un espacio geométrico.</dd>
+
+  <dt><strong>Similitud Coseno</strong></dt>
+  <dd>Métrica matemática que evalúa el coseno del ángulo formado por dos vectores. Varía entre -1 y 1 (expresado comúnmente de 0% a 100% de afinidad).</dd>
+
+  <dt><strong>Espacio Latente (Hiperespacio)</strong></dt>
+  <dd>Espacio matemático abstracto de cientos o miles de dimensiones donde la red neuronal organiza las relaciones conceptuales que ha aprendido.</dd>
+
+  <dt><strong>Búsqueda Semántica</strong></dt>
+  <dd>Método de recuperación de información que busca documentos por el significado de la consulta y no por la coincidencia literal de las palabras tecleadas.</dd>
+</dl>
+
+<style>{`
+  .glosario-lista {
+    margin: 1.5rem 0;
+    line-height: 1.6;
+  }
+
+  .glosario-lista dt {
+    color: var(--musgo);
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    margin-top: 1rem;
+  }
+
+  .glosario-lista dd {
+    margin-left: 0;
+    color: var(--tinta);
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+  }
+`}</style>

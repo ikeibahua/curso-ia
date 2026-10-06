@@ -9,3 +9,4 @@ Muestra de forma visual e intuitiva la naturaleza probabilística de un LLM: có
 ## Controles de animación
 - Cumple con la pauta de accesibilidad: incluye botones para **Reproducir**, **Pausar**, **Avanzar paso a paso** y **Repetir**.
 - Respeto a `prefers-reduced-motion`: no ejecuta animaciones en bucle forzado y permite el control manual en todo momento.
+

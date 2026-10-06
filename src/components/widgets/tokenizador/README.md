@@ -12,3 +12,4 @@ Permite al alumno escribir cualquier texto y ver en tiempo real cómo el algorit
 - El resultado no depende exclusivamente del color: cada token muestra su ID numérico y bordes delimitadores.
 - Todos los botones y campos cuentan con etiquetas accesibles.
 - Los espacios en blanco se representan de forma visible para entender que forman parte del token.
+
