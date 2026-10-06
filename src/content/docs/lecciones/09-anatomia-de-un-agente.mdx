@@ -1,15 +1,203 @@
 ---
-title: "Lección 10 — Anatomía de un agente"
-description: "Del modelo pasivo al agente que planifica, ejecuta acciones y observa resultados."
+title: "Lección 10 — Anatomía de un agente: el bucle observar–decidir–actuar"
+description: "Cómo un modelo de lenguaje pasa de responder texto a planificar acciones, usar herramientas y corregirse a sí mismo."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Terminal from '../../../components/ui/Terminal.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import Herbario from '../../../components/ui/Herbario.astro';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L09**, orden en el itinerario: **10**).
+import BucleAgente from '../../../components/widgets/bucle-agente/BucleAgente.tsx';
+import AgenteJuguete from '../../../components/widgets/agente-juguete/AgenteJuguete.tsx';
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+<Verificado
+  fecha="2026-03"
+  fuente="https://docs.anthropic.com/en/docs/build-with-claude/tool-use"
+  nota="Especificación oficial del protocolo de uso de herramientas (Tool Use / Function Calling) de Anthropic y OpenAI."
+/>
 
 ## Objetivo de la lección
-Del modelo pasivo al agente que planifica, ejecuta acciones y observa resultados.
+Entender qué diferencia a un chat pasivo de un agente activo y cómo funciona el bucle cognitivo de observar, razonar, invocar herramientas mediante texto estructurado y recibir resultados del entorno.
+
+---
+
+## 1. De la biblioteca al trabajo de campo: ¿Qué es un agente?
+
+Hasta este momento del curso, hemos interactuado con modelos de lenguaje en modo **chat pasivo**: tú escribes una pregunta, el modelo predice la mejor continuación estadística y la conversación se detiene a la espera de tu siguiente mensaje. El modelo es como un botánico encerrado en una biblioteca sin ventanas: sabe mucho de teoría, pero no puede asomarse a ver el jardín ni tocar una sola planta.
+
+Un **agente de inteligencia artificial** rompe esa barrera. 
+
+Un agente es un modelo de lenguaje al que conectamos las manos y los ojos a través de **herramientas informáticas** (leer archivos, buscar en internet, ejecutar cálculos o guardar documentos). En lugar de limitarse a hablar, el modelo recibe un objetivo amplio y se pone a trabajar de forma autónoma siguiendo un bucle continuo.
+
+<Analogia
+  concepto="El bucle del agente (Observar → Razonar → Actuar)"
+  metafora="El arco reflejo sensoriomotor y la propiocepción en un animal vertebrado"
+  limite="En un ser vivo, los receptores sensoriales y las fibras musculares actúan de forma analógica, continua y electroquímica en tiempo real. En un agente de software, el proceso es discreto: ocurre a trompicones mediante turnos sucesivos de generación de texto y bloques JSON que el ordenador interpreta uno tras otro."
+>
+Cuando un pájaro carpintero busca larvas en el tronco de un pino:
+1. **Observa:** Da golpecitos en la corteza y escucha la resonancia acústica del leño.
+2. **Razona:** Interpreta el eco: *«aquí dentro hay una cavidad hueca con movimiento»*.
+3. **Actúa:** Hunde su pico y abre una hendidura en la madera.
+4. **Retroalimentación:** Observa el interior de la grieta. Si encuentra la larva, la tarea termina; si no, modula su posición y repite el ciclo en el nudo contiguo.
+
+Un agente digital hace exactamente lo mismo con tu ordenador: observa tu petición, decide qué herramienta necesita, la invoca, mira lo que la herramienta devuelve y repite el ciclo hasta resolver el problema.
+</Analogia>
+
+---
+
+## 2. El corazón del agente: El Bucle Autónomo
+
+Recorre este esquema interactivo para ver qué ocurre entre bastidores cuando le pides a un agente que organice una carpeta de archivos botánicos:
+
+<BucleAgente client:visible />
+
+---
+
+## 3. El truco técnico: ¿Cómo «hace cosas» un modelo si solo escupe texto?
+
+Mucha gente cree que un agente tiene una mano robótica invisible que mueve el ratón de su Mac. La realidad técnica es mucho más elegante y sencilla: **Function Calling (Uso de herramientas)**.
+
+El modelo de lenguaje **jamás toca directamente tu disco duro ni internet**. Lo único que hace es escribir texto en formato estructurado (**JSON**):
+
+1. Nosotros le decimos en sus instrucciones del sistema: *«Tienes a tu disposición una herramienta llamada `leer_archivo(ruta)`»*.
+2. Cuando el modelo se da cuenta de que necesita leer un archivo, en vez de escribir un párrafo normal, emite un bloque técnico:
+```json
+{
+  "herramienta": "leer_archivo",
+  "parametros": {
+    "ruta": "inventario_robles.txt"
+  }
+}
+```
+3. El programa que controla la terminal (el intermediario) intercepta ese JSON, abre el archivo real en macOS, lee su texto y se lo pega al modelo en su ventana de contexto diciendo: *«Aquí tienes el contenido que pediste»*.
+4. El modelo lee el contenido y decide el siguiente paso.
+
+---
+
+## 4. Laboratorio: Equipa la mochila de tu agente
+
+Un agente no es omnisciente. Sus capacidades dependen exclusivamente de qué herramientas tenga activadas en su entorno. Experimenta con diferentes misiones botánicas:
+
+<AgenteJuguete client:visible />
+
+<Callout tipo="advertencia" titulo="Cuándo un agente es una mala idea">
+No todas las tareas deben resolverse con un agente autónomo:
+- **Tareas lineales simples:** Si solo quieres resumir una página de texto, un agente es matar moscas a cañonazos; tardará diez veces más y gastará diez veces más tokens.
+- **Efecto bola de nieve (acumulación de errores):** Si el agente toma una mala decisión en el paso 2, el paso 3 se basará en datos erróneos y para el paso 6 estará completamente desorientado.
+- **Supervisión humana obligatoria (*Human-in-the-loop*):** Un buen agente debe pedir confirmación expresa antes de ejecutar acciones destructivas (borrar carpetas, enviar correos o modificar bases de datos).
+</Callout>
+
+---
+
+## Práctica en tu Mac: Un agente real en 30 líneas de Python
+
+En tu Mac ya viene instalado Python de serie. Vamos a crear un script mínimo y completamente transparente que implementa este bucle con una herramienta real de inspección de carpetas, sin necesidad de pagar suscripciones ni usar claves de API externas:
+
+<Pasos>
+  <Paso numero={1} titulo="Entra en tu carpeta de prácticas">
+    Abre la Terminal y entra en tu directorio de trabajo:
+    <Terminal comando="cd ~/curso-ia-practicas" explicacion="Te sitúa en la carpeta creada en la lección anterior." />
+  </Paso>
+  <Paso numero={2} titulo="Crea un pequeño archivo de script con nano">
+    Abre el editor de texto de la terminal tecleando:
+    <Terminal comando="nano mini_agente.py" explicacion="Abre el editor nano para escribir un nuevo programa en Python." />
+  </Paso>
+  <Paso numero={3} titulo="Pega el código del agente simulado">
+    Copia y pega este código limpio y didáctico dentro de nano:
+
+```python
+import os
+
+# 1. Definición de la herramienta que el agente puede usar
+def herramienta_listar(carpeta):
+    """Inspecciona los archivos reales que hay en una carpeta."""
+    try:
+        return os.listdir(carpeta)
+    except Exception as e:
+        return f"Error al abrir: {e}"
+
+# 2. El bucle del agente
+def bucle_del_agente(mision):
+    print(f"🎯 Misión recibida: {mision}")
+    
+    # Paso 1: Razonamiento
+    print("🧠 Razonando: Para cumplir la misión debo inspeccionar la carpeta actual...")
+    
+    # Paso 2: Acción (Llamada a la herramienta)
+    print("⚙️ Ejecutando herramienta: listar_archivos('.')")
+    archivos = herramienta_listar(".")
+    
+    # Paso 3: Observación del resultado
+    print(f"📥 Observación: He encontrado {len(archivos)} elementos:")
+    for f in archivos:
+        print(f"   - {f}")
+        
+    # Paso 4: Conclusión final
+    print("🏁 Misión completada: Informe generado con éxito.")
+
+# Ejecución de prueba
+if __name__ == "__main__":
+    bucle_del_agente("Revisar los archivos de mi carpeta de prácticas")
+```
+  </Paso>
+  <Paso numero={4} titulo="Guarda y ejecuta el script">
+    En nano: pulsa **Control + O** y luego **Enter** para guardar. Después pulsa **Control + X** para salir.
+    Ahora ejecuta tu script con Python:
+    <Terminal comando="python3 mini_agente.py" explicacion="Ejecuta el script y muestra el ciclo de vida del agente en pantalla." />
+    Verás cómo el programa razona, ejecuta la herramienta sobre tu disco duro real y te entrega la respuesta.
+  </Paso>
+</Pasos>
+
+---
+
+## Reto final: Ampliar la caja de herramientas
+
+<Reto
+  titulo="Añade la herramienta 'contar_palabras'"
+  dificultad="media"
+  tiempo="15 min"
+>
+Abre tu chat habitual (ChatGPT o Claude web) y pídele ayuda con este enunciado:
+
+*«Tengo este script en Python que implementa el bucle de un agente con una herramienta para listar carpetas. Quiero añadirle una segunda herramienta llamada `leer_y_contar(nombre_archivo)` que abra un archivo de texto y me diga cuántas palabras tiene. ¿Cómo modificarías el script para que el agente use ambas herramientas en secuencia?»*
+
+Observa el código que te devuelve:
+1. Comprueba cómo define la nueva función de herramienta.
+2. Identifica en qué momento del bucle el agente decide invocar la segunda herramienta tras haber usado la primera.
+3. Copia el cambio en tu archivo `mini_agente.py` y pruébalo con una nota de prueba.
+</Reto>
+
+---
+
+## Resumen y glosario botánico-digital
+
+<Herbario
+  items={[
+    {
+      termino: "Agente de IA",
+      definicion: "Sistema autónomo guiado por un modelo de lenguaje que planifica secuencias de acciones, invoca herramientas externas y evalúa los resultados hasta alcanzar un objetivo."
+    },
+    {
+      termino: "Bucle cognitivo (Agent Loop)",
+      definicion: "Ciclo iterativo de cuatro fases: Observar el estado → Razonar el siguiente paso → Actuar con una herramienta → Observar la respuesta del entorno."
+    },
+    {
+      termino: "Function Calling / Tool Use",
+      definicion: "Capacidad de un modelo para generar texto estructurado en JSON indicando qué función externa desea invocar y con qué parámetros exactos."
+    },
+    {
+      termino: "Human-in-the-loop",
+      definicion: "Principio de diseño de seguridad que exige la supervisión y aprobación expresa de una persona antes de que el agente ejecute acciones irreversibles o de alto impacto."
+    },
+    {
+      termino: "JSON",
+      definicion: "Formato estándar de texto para intercambiar datos estructurados entre programas mediante parejas de clave y valor (ej. {\"nombre\": \"valor\"})."
+    }
+  ]}
+/>
