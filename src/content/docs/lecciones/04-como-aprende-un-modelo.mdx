@@ -1,15 +1,187 @@
 ---
 title: "Lección 04 — Cómo aprende un modelo"
-description: "Preentrenamiento, ajuste fino y qué significa que un modelo aprenda."
+description: "Preentrenamiento, ajuste fino, descenso de gradiente y por qué alucinan los modelos."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Terminal from '../../../components/ui/Terminal.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import Herbario from '../../../components/ui/Herbario.astro';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L04**, orden en el itinerario: **4**).
+import DescensoGradiente from '../../../components/widgets/descenso-gradiente/DescensoGradiente.tsx';
+import LineaTemporalEntrenamiento from '../../../components/widgets/linea-temporal-entrenamiento/LineaTemporalEntrenamiento.tsx';
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+<Verificado
+  fecha="2026-03"
+  fuente="https://arxiv.org/abs/2203.02155"
+  nota="Fases de entrenamiento de modelos modernos (Pre-training, SFT y RLHF documentadas en Ouyang et al. y metodologías de refuerzo post-entrenamiento en modelos de razonamiento)."
+/>
 
 ## Objetivo de la lección
-Preentrenamiento, ajuste fino y qué significa que un modelo aprenda.
+Distinguir con precisión las fases de gestación de un modelo (preentrenamiento, ajuste fino, alineamiento y razonamiento) y comprender la mecánica matemática del descenso de gradiente para saber por qué los modelos alucinan o tienen conocimientos congelados.
+
+---
+
+## 1. ¿Qué significa realmente que una máquina «aprenda»?
+
+Cuando decimos que un biólogo aprende a clasificar líquenes, nos referimos a que observa ejemplares de campo, sintetiza pautas visuales y formula hipótesis conceptuales en su memoria viva.
+
+En una red neuronal artificial, «aprender» significa algo mucho más mecánico y terrenal: **ajustar paulatinamente miles de millones de tornillos numéricos (llamados pesos o parámetros) hasta que el error matemático entre lo que la red predice y la realidad sea lo más bajo posible**.
+
+Al principio, antes de entrenar, todos esos tornillos tienen números completamente aleatorios. Si le pides al modelo que prediga la siguiente palabra tras *«El roble albar es un...»*, responderá ruido sin sentido (*«trompeta helicóptero azul»*).
+
+Para corregirlo, se utiliza una brújula matemática llamada **Función de Pérdida** (*Loss Function*) y un método de optimización universal: el **Descenso de Gradiente**.
+
+<Analogia
+  concepto="El Descenso de Gradiente"
+  metafora="Una bola pesada rodando por la ladera de una montaña cubierta de niebla densa"
+  limite="En un valle geográfico real estás en 3 dimensiones y la gravedad física tira de la masa hacia abajo por inercia. En una red neuronal el espacio tiene entre 7.000 millones y más de un billón de dimensiones, no hay inercia física y cada paso se calcula mediante derivadas matemáticas exactas (retropropagación de errores) sobre millones de ejemplos a la vez."
+>
+Imagina que estás en la cima de una colina en una tarde de niebla espesa. No puedes ver el pueblo que está en el fondo del valle, pero puedes sentir con los pies la inclinación del suelo bajo tus botas.
+
+Si quieres bajar al valle, el procedimiento más seguro es dar un paso en la dirección en la que el suelo desciende con mayor pendiente. Das un paso, vuelves a comprobar la inclinación del terreno y das otro. Tarde o temprano, llegarás a la vaguada más baja. Eso es exactamente el descenso de gradiente.
+</Analogia>
+
+---
+
+## 2. Simulador interactivo: Descenso de Gradiente
+
+En este laboratorio interactivo puedes ver cómo la optimización matemática reduce el error y ajusta la función del modelo a mediciones botánicas reales de campo (crecimiento de brotes a lo largo del tiempo):
+
+<DescensoGradiente client:visible />
+
+<Callout tipo="info" titulo="El secreto de la Tasa de Aprendizaje (Learning Rate)">
+Como habrás comprobado en el simulador:
+- Si el paso es **demasiado pequeño**, el entrenamiento tardará meses y consumirá una fortuna innecesaria en electricidad.
+- Si el paso es **demasiado grande**, la bola saldrá disparada, rebotará entre las paredes de la colina y el modelo sufrirá una **explosión del gradiente**, quedando inservible.
+El arte de los ingenieros consiste en calcular una tasa de aprendizaje que disminuya suavemente a medida que nos acercamos al fondo del valle.
+</Callout>
+
+---
+
+## 3. Las cuatro estaciones de un modelo de lenguaje
+
+Crear un modelo como ChatGPT o Claude no es un único proceso continuo, sino una cadena de producción en cuatro fases muy diferenciadas. Explora la línea temporal interactiva para ver cómo madura el sistema:
+
+<LineaTemporalEntrenamiento client:visible />
+
+<Analogia
+  concepto="Preentrenamiento vs Ajuste fino y Alineamiento"
+  metafora="La evolución del lobo salvaje frente a la domesticación del perro pastor"
+  limite="La selección biológica ocurre por mutaciones genéticas aleatorias y supervivencia reproductiva a lo largo de eones. El ajuste fino de un LLM no muta el ADN ni crea nuevas capacidades cognitivas: simplemente repondera pesos ya aprendidos en el preentrenamiento mediante supervisión humana directa."
+>
+- **El preentrenamiento** es como millones de años de evolución natural que dieron origen al lobo salvaje: tiene una vista privilegiada, olfato infalible, velocidad y mandíbulas fuertes (sabe todo sobre el lenguaje y la sintaxis humana), pero es arisco, impredecible y no atiende a razones humanas.
+- **El ajuste fino y el alineamiento** son los siglos de domesticación que transformaron al lobo en un border collie de pastoreo: no le das órganos nuevos, pero le enseñas a responder al silbato, sentarse a la orden y cuidar a las ovejas sin morderlas.
+</Analogia>
+
+---
+
+## 4. Por qué alucinan los modelos y qué es la fecha de corte
+
+Comprender cómo aprenden los modelos derriba de golpe los dos mayores mitos populares sobre la inteligencia artificial:
+
+### 1. El mito de la biblioteca: ¿por qué alucinan?
+Mucha gente cree erróneamente que un modelo consulta una gigantesca base de datos interna con artículos de Wikipedia o libros escaneados. **Eso es falso.**
+
+El modelo no tiene ningún texto guardado en su interior. Lo único que tiene son matrices de números (pesos) que reflejan qué palabras suelen acompañar a otras. Por eso, cuando le preguntas por un artículo científico muy específico, el modelo ensambla palabras que *suenan exactamente como un artículo científico real* (nombres en latín verosímiles, estructura impecable, revistas botánicas conocidas), aunque el artículo en cuestión **jamás haya existido**.
+
+No está mintiendo con malicia: está completando la secuencia estadística más armónica en su espacio vectorial.
+
+### 2. El conocimiento congelado (*Knowledge Cutoff*)
+Cuando la empresa finaliza el preentrenamiento (por ejemplo, en diciembre de 2024), **los pesos de la red se congelan y no cambian jamás**. 
+- El modelo no sabe qué pasó ayer, ni quién ganó el último premio Nobel, ni qué tiempo hace hoy en tu ciudad.
+- Si le preguntas por un evento posterior a su fecha de corte sin herramientas adicionales, o bien te dirá que lo desconoce, o bien inventará un desenlace plausible.
+
+<Callout tipo="tip" titulo="La medicina contra la alucinación: Búsqueda y Herramientas">
+Para evitar que el modelo trabaje «de memoria», las aplicaciones modernas le proporcionan **herramientas externas** (búsqueda web en tiempo real, lectores de documentos PDF o calculadoras). 
+En lugar de forzar al modelo a recordar datos numéricos congelados, el sistema busca la información en internet y se la pone en la ventana de contexto antes de responder. Estudiaremos este mecanismo en detalle en la <a href="/curso-ia/lecciones/10-tools-y-mcp/">Lección 10 (Tools y MCP)</a> y la <a href="/curso-ia/lecciones/14-rag-sobre-documentos-propios/">Lección 14 (RAG)</a>.
+</Callout>
+
+### Escepticismo ante los *Benchmarks*
+Verás habitualmente gráficos triunfales donde una empresa proclama que su nuevo modelo supera en un 3% a sus rivales en exámenes de biología o medicina (*MMLU*, *HumanEval*). 
+
+Míralos siempre con la prudencia de un científico de campo: se conoce como la **Ley de Goodhart**: *«Cuando una medida se convierte en un objetivo, deja de ser una buena medida»*. Si las preguntas de los exámenes se filtraron sin querer en los billones de páginas del preentrenamiento, el modelo no está razonando mejor: simplemente está recitando las respuestas del examen que ya memorizó.
+
+---
+
+## Práctica en tu Mac: la frontera del conocimiento congelado
+
+Vamos a poner a prueba la diferencia entre la memoria congelada del modelo y la búsqueda conectada a internet:
+
+<Pasos>
+  <Paso numero={1} titulo="Abre tu navegador habitual">
+    Entra en ChatGPT o Claude en tu Mac.
+  </Paso>
+  <Paso numero={2} titulo="Haz una pregunta de actualidad hiperlocal">
+    Pregúntale algo muy reciente o de ámbito estrictamente local de tu municipio que haya ocurrido en los últimos tres meses (por ejemplo: *«¿Qué exposición botánica o conferencias se inauguraron el mes pasado en el jardín botánico de mi provincia?»*).
+  </Paso>
+  <Paso numero={3} titulo="Observa si utiliza la herramienta de búsqueda">
+    Fíjate en la interfaz: ¿aparece un pequeño icono de globo terráqueo diciendo *«Buscando en la web...»* antes de emitir la respuesta?
+  </Paso>
+  <Paso numero={4} titulo="Fuerza al modelo a responder sin internet">
+    Añade a tu mensaje la indicación explícita: *«Responde exclusivamente con tu conocimiento interno congelado, sin buscar en la web»*.
+    Compara ambas respuestas: verás cómo en la segunda vacila, avisa de su fecha de corte o genera datos genéricos.
+  </Paso>
+</Pasos>
+
+---
+
+## Reto final: Diagnóstico de errores
+
+<Reto
+  titulo="El patólogo de la IA: clasifica estos 6 incidentes"
+  dificultad="media"
+  tiempo="15 min"
+>
+A continuación tienes 6 respuestas erróneas emitidas por distintos modelos de lenguaje. Clasifica cada una en una de estas tres categorías:
+- **[A] Alucinación por completación estadística**
+- **[B] Límite por fecha de corte de conocimiento**
+- **[C] Fallo de razonamiento lógico o aritmético**
+
+1. *«El artículo de Smith y cols. (2019) titulado 'Taxonomía molecular de Quercus humilis en los Pirineos' fue publicado en el volumen 45 de Annals of Botany»* (El artículo no existe en ninguna base de datos científica).
+2. *«El actual campeón del mundo de ajedrez tras el torneo disputado el mes pasado es Magnus Carlsen»* (El torneo se celebró después de que el modelo fuera entrenado).
+3. *«Tengo 3 manzanas. Me como una y compro dos. Ahora me quedan 5 manzanas.»*
+4. *«La hierba de San Juan (Hypericum perforatum) florece en el hemisferio norte exactamente a las 04:32 AM de la noche de San Juan.»*
+5. *«El presidente de Francia en 2028 es Emmanuel Macron.»*
+6. *«Una cuerda de 10 metros se corta en 3 trozos iguales. Cada trozo mide 3 metros y sobra 1 metro.»*
+
+Anota tu solución y razona brevemente por qué la búsqueda en internet soluciona el caso 2, pero no necesariamente el caso 3 ni el caso 6.
+</Reto>
+
+---
+
+## Resumen y glosario botánico-digital
+
+<Herbario
+  items={[
+    {
+      termino: "Preentrenamiento (Pre-training)",
+      definicion: "Fase más masiva y costosa del desarrollo de un LLM, donde el modelo aprende las pautas estadísticas del lenguaje prediciendo el siguiente token a lo largo de billones de palabras."
+    },
+    {
+      termino: "Descenso de gradiente (Gradient Descent)",
+      definicion: "Algoritmo de optimización que calcula la pendiente del error respecto a cada peso y ajusta los parámetros en la dirección contraria para minimizar las equivocaciones."
+    },
+    {
+      termino: "Ajuste Fino Supervisado (SFT)",
+      definicion: "Entrenamiento posterior con ejemplos de diálogo de alta calidad para convertir al modelo base en un asistente capaz de obedecer instrucciones."
+    },
+    {
+      termino: "RLHF / Alineamiento",
+      definicion: "Aprendizaje por refuerzo a partir de valoraciones humanas para inculcar límites de seguridad, honestidad y rechazo de peticiones dañinas."
+    },
+    {
+      termino: "Alucinación",
+      definicion: "Fenómeno por el cual el modelo genera con total seguridad hechos, citas o datos falsos que encajan estadísticamente en el texto pero no se corresponden con la realidad."
+    },
+    {
+      termino: "Fecha de corte (Cutoff)",
+      definicion: "Fecha límite en la que se recopilaron los datos con los que fue entrenado el modelo; cualquier hecho posterior resulta desconocido para sus pesos congelados."
+    }
+  ]}
+/>
