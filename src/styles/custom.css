@@ -143,7 +143,7 @@ h3 {
 }
 
 /* ==========================================================================
-   Barra lateral izquierda colapsable (Escritorio)
+   Barra lateral izquierda colapsable (Escritorio) y expansión de contenido
    ========================================================================== */
 @media (min-width: 50rem) {
   /* Transición suave para apertura y cierre */
@@ -159,6 +159,7 @@ h3 {
   /* Estado colapsado / oculto */
   html[data-sidebar-hidden='true'] {
     --sl-content-inline-start: 0rem !important;
+    --sl-content-width: 100% !important;
   }
 
   html[data-sidebar-hidden='true'] .sidebar-pane {
@@ -174,6 +175,29 @@ h3 {
   /* Adaptación de la cabecera cuando el menú está oculto */
   html[data-sidebar-hidden='true'] .header {
     --__sidebar-width: 0rem !important;
+  }
+
+  /* Expansión completa del contenido principal cuando el menú está oculto */
+  html[data-sidebar-hidden='true'] .main-pane {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+
+  html[data-sidebar-hidden='true'] .sl-container,
+  html[data-sidebar-hidden='true'] .main-pane .sl-container,
+  html[data-sidebar-hidden='true'] .content-panel .sl-container {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin-inline: 0 !important;
+  }
+
+  html[data-sidebar-hidden='true'] .content-panel {
+    padding-inline: clamp(1.5rem, 3.5vw, 3rem) !important;
+  }
+
+  html[data-sidebar-hidden='true'] .sl-markdown-content {
+    max-width: 100% !important;
   }
 }
 
@@ -217,12 +241,19 @@ h3 {
     flex: 1 1 auto !important;
   }
 
-  /* Centrado de lectura cómodo y equilibrado */
-  .main-pane {
+  /* Cuando el menú lateral izquierdo está oculto y hay TOC, main-pane ocupa todo el ancho restante */
+  html[data-sidebar-hidden='true'][data-has-toc] .main-pane {
+    width: calc(100% - var(--sl-toc-width)) !important;
+    max-width: calc(100% - var(--sl-toc-width)) !important;
+    flex: 1 1 calc(100% - var(--sl-toc-width)) !important;
+  }
+
+  /* Centrado de lectura equilibrado solo cuando el menú izquierdo está visible */
+  html:not([data-sidebar-hidden='true']) .main-pane {
     --sl-content-margin-inline: auto !important;
   }
 
-  .main-pane .sl-container {
+  html:not([data-sidebar-hidden='true']) .main-pane .sl-container {
     margin-inline: auto !important;
   }
 }
