@@ -1,0 +1,106 @@
+/* ==========================================================================
+   Cuaderno de Campo — Sistema de diseño para Curso de IA
+   ========================================================================== */
+
+/* Variables de tema y tokens */
+:root {
+  /* Tipografías */
+  --sl-font: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+  --sl-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-serif: 'Fraunces', Georgia, serif;
+
+  /* Tamaños base accesibles */
+  --sl-text-base: 1.125rem; /* 18px base */
+  --sl-line-height: 1.7;
+  --sl-content-width: 68ch;
+
+  /* Tokens por defecto (modo oscuro) */
+  --papel: #151B17;
+  --tinta: #E9E4D6;
+  --musgo: #7FB08F;
+  --terracota: #E08A62;
+  --ocre: #E3B965;
+  --agua: #7DB0CF;
+  --linea: #2C362F;
+
+  /* Mapeo a Starlight (Dark) */
+  --sl-color-bg: var(--papel);
+  --sl-color-bg-nav: #18201b;
+  --sl-color-bg-sidebar: #131915;
+  --sl-color-bg-inline-code: #1c2420;
+  --sl-color-hairline: var(--linea);
+  --sl-color-hairline-light: #232c25;
+  --sl-color-text: var(--tinta);
+  --sl-color-text-accent: var(--musgo);
+  --sl-color-accent-low: #1d3326;
+  --sl-color-accent: var(--musgo);
+  --sl-color-accent-high: #b8dec4;
+}
+
+/* Modo claro */
+[data-theme='light'] {
+  --papel: #F6F1E7;
+  --tinta: #1F2A24;
+  --musgo: #3F6B4F;
+  --terracota: #C4623A;
+  --ocre: #D9A441;
+  --agua: #3C6E8F;
+  --linea: #D8CFBC;
+
+  /* Mapeo a Starlight (Light) */
+  --sl-color-bg: var(--papel);
+  --sl-color-bg-nav: #eee8dc;
+  --sl-color-bg-sidebar: #f2ecdF;
+  --sl-color-bg-inline-code: #eae3d4;
+  --sl-color-hairline: var(--linea);
+  --sl-color-hairline-light: #e5dece;
+  --sl-color-text: var(--tinta);
+  --sl-color-text-accent: var(--musgo);
+  --sl-color-accent-low: #d6e8dc;
+  --sl-color-accent: var(--musgo);
+  --sl-color-accent-high: #24412f;
+}
+
+/* Tipografía de títulos con carácter editorial */
+h1, h2, h3, h4, h5, h6,
+.site-title,
+.hero-title {
+  font-family: var(--font-serif);
+  font-feature-settings: 'cv01' on, 'cv02' on;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+}
+
+h1 {
+  font-weight: 700;
+}
+
+/* Contenedor de lectura generoso y centrado */
+.sl-markdown-content {
+  font-size: var(--sl-text-base);
+  line-height: var(--sl-line-height);
+  color: var(--sl-color-text);
+}
+
+.sl-markdown-content p {
+  margin-bottom: 1.4em;
+}
+
+/* Enlaces con estilo cálido y accesible */
+.sl-markdown-content a {
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+/* Accesibilidad: Reducción de movimiento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
