@@ -1,15 +1,232 @@
 ---
 title: "Lección 13 — Agentes de programación y de escritorio I: uso real"
-description: "Herramientas de desarrollo asistido y cómo supervisar su trabajo paso a paso."
+description: "Cómo utilizar agentes de código y terminal para ordenar documentos, procesar datos y automatizar tareas en tu Mac con supervisión humana y red de seguridad."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Terminal from '../../../components/ui/Terminal.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import Herbario from '../../../components/ui/Herbario.astro';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L12**, orden en el itinerario: **13**).
+import SimuladorSesion from '../../../components/widgets/simulador-sesion/SimuladorSesion.tsx';
+import PlanAccionesDiff from '../../../components/widgets/plan-acciones-diff/PlanAccionesDiff.tsx';
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+<Verificado
+  fecha="2026-03"
+  fuente="https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview"
+  nota="Herramientas CLI de agentes (Claude Code, OpenCode y Aider): modo interactivo, solicitud de permisos para herramientas de lectura/escritura y control de versiones mediante Git."
+/>
 
 ## Objetivo de la lección
-Herramientas de desarrollo asistido y cómo supervisar su trabajo paso a paso.
+Aprender a delegar tareas reales en tu Mac (organizar archivos dispersos, depurar tablas de datos y transformar documentos) a un agente de programación o terminal, manteniendo siempre el control mediante aprobaciones explícitas y una red de seguridad infalible para deshacer cualquier cambio.
+
+---
+
+## 1. Más allá de programar: el agente como ayudante de laboratorio
+
+Cuando se habla de herramientas como **Claude Code**, **OpenCode** o **Aider**, es fácil pensar: *"Esto es para ingenieros de software que construyen aplicaciones, no para mí"*.
+
+Es un error común. Para un investigador o naturalista, estos agentes son en realidad **ayudantes técnicos incansables para el escritorio**:
+- **Ordenar colecciones:** si tienes 200 fotografías botánicas o PDFs escaneados con nombres caóticos, el agente puede leer las fechas y contenidos y clasificarlos en carpetas temáticas.
+- **Procesar y limpiar tablas:** si tus hojas de cálculo tienen fechas en formatos mezclados (unas en estilo europeo, otras en inglés) o nombres científicos con tildes rotas, el agente escribe y ejecuta en segundos un pequeño script interno para normalizarlas.
+- **Convertir formatos masivos:** transformar 50 notas sueltas en tablas Markdown o generar resúmenes comparativos sin que tengas que aprender la sintaxis de ningún lenguaje de programación.
+
+El agente escribe código, sí; pero tú no necesitas leerlo ni mantenerlo. Tu labor no es la de programador, sino la de **director o investigador principal**: tú defines el objetivo, fijas las restricciones y validas el resultado.
+
+---
+
+## 2. El flujo sagrado: Pedir → Planificar → Revisar → Aceptar
+
+Jamás se le dan las llaves del ordenador a un agente sin supervisión. Un flujo de trabajo riguroso se divide siempre en tres fases nítidas:
+
+1. **Plan:** el agente analiza el problema y redacta una propuesta de pasos a seguir. En esta fase no toca ningún archivo de tu disco.
+2. **Acciones:** el agente solicita permisos para invocar herramientas concretas (`leer_archivo`, `crear_carpeta`, `escribir_parche`).
+3. **Diferencias (*diff*):** el agente te muestra con exactitud quirúrgica qué líneas desaparecen (en rojo con signo `-`) y qué líneas nuevas entran (en verde con signo `+`).
+
+Explora en el siguiente interactivo cómo se desglosa este ciclo ante un caso real: normalizar fechas heterogéneas en un cuaderno de avistamiento de mariposas:
+
+<PlanAccionesDiff client:visible />
+
+---
+
+## 3. Permisos, supervisión y la regla de la carpeta acotada
+
+Para trabajar con tranquilidad absoluta, existen dos reglas de oro que nunca debes romper:
+
+<Callout tipo="peligro" titulo="La regla de oro: la carpeta acotada (Sandbox)">
+Nunca abras un agente de terminal en tu carpeta de inicio (`~`) ni en la raíz de tu Mac. 
+
+Trabaja **siempre dentro de una carpeta concreta** (por ejemplo, `~/Documentos/Proyecto-Orquideas/`). De este modo, aunque el modelo cometiera una equivocación garrafal, el radio de alcance de sus herramientas queda estrictamente confinado a esa habitación.
+</Callout>
+
+Además de la carpeta acotada, el agente funciona con **supervisión humana continua** (*Human-in-the-loop*). Ante cada comando con impacto (como mover archivos o, especialmente, borrar con `rm`), el agente se detiene y te pide autorización explícita.
+
+Pruébalo tú mismo en este simulador de sesión: asume el rol del supervisor y decide qué apruebas y qué detienes ante dos escenarios prácticos:
+
+<SimuladorSesion client:visible />
+
+---
+
+## 4. Tu red de seguridad: cómo deshacer sin pánico
+
+¿Qué ocurre si apruebas un cambio y el resultado no es lo que esperabas? No hay motivo para el estrés si cuentas con una red de seguridad antes de arrancar. Existen tres niveles de protección en tu Mac:
+
+### Nivel 1: El duplicado manual en Finder (5 segundos)
+Antes de pedirle al agente que procese una carpeta, selecciónala en el Finder de macOS y pulsa `Cmd + D` (Duplicar). Tendrás al instante una copia exacta (ej: `Muestras copia`). Si algo sale mal, borras la carpeta modificada y vuelves a la copia.
+
+### Nivel 2: Time Machine
+Si tienes activada la copia de seguridad de Time Machine en tu Mac, macOS realiza además instantáneas locales periódicas de las que puedes recuperar versiones anteriores de cualquier archivo.
+
+### Nivel 3: Git mínimo en 10 minutos (la red invisible del profesional)
+No necesitas ser informático para aprovechar el mejor sistema de control de versiones del mundo. Con solo cuatro comandos en la Terminal de Mac, tienes un botón de "deshacer mágico":
+
+<Terminal
+  comandos={[
+    { comando: "git init", explicacion: "Inicializa la red de seguridad dentro de tu carpeta actual." },
+    { comando: "git add . && git commit -m \"Foto fija antes del agente\"", explicacion: "Saca una 'fotografía' inmutable de todos tus archivos en su estado perfecto actual." },
+    { comando: "git diff", explicacion: "Muestra la radiografía exacta de lo que el agente ha cambiado (en verde lo nuevo, en rojo lo eliminado)." },
+    { comando: "git restore .", explicacion: "EL BOTÓN DE DESHACER: descarta al instante cualquier cambio no deseado y devuelve la carpeta entera a la foto fija anterior." }
+  ]}
+/>
+
+---
+
+## 5. El arte del buen encargo: cómo pedir para no lamentar
+
+Los fallos de un agente rara vez se deben a que el modelo no sepa procesar datos; suelen originarse en encargos ambiguos o sin restricciones.
+
+Aplica siempre este esquema al redactar tu mensaje:
+1. **Contexto y objetivo:** qué hay en la carpeta y qué quieres conseguir.
+2. **Restricción explícita de seguridad:** *"No borres los archivos originales; genera copias con sufijo _nuevo"*.
+3. **Formato esperado:** da un ejemplo concreto del antes y el después.
+4. **Elección de modelo y esfuerzo de razonamiento (criterio L05 / L20):**
+   - Para renombrar archivos siguiendo una regla simple: modelo rápido y ligero con razonamiento bajo.
+   - Para reconciliar taxonomías botánicas dudosas o tablas con incongruencias: modelo avanzado con nivel de razonamiento alto (*thinking*) para que contraste fuentes antes de decidir.
+
+<Analogia titulo="El ayudante de laboratorio y el cuaderno de campo">
+Trabajar con un agente es exactamente igual que recibir en tu estación biológica a un becario recién graduado con una energía desbordante:
+
+- Si le dices *"organiza las muestras de la mesa y haz espacio"*, es muy probable que tire a la papelera sobres con semillas que él creía que eran basura.
+- Si en cambio le dices: *"Toma estos 15 pliegos de herbario. Comprueba la etiqueta, colócalos en la balda B ordenados por familia y no tires absolutamente nada a la papelera; cualquier papel sobrante déjalo en la caja de descartes"*, el trabajo será impecable.
+
+**Dónde se rompe la analogía:** Un estudiante humano tiene sentido común sobre el mundo físico: si ve una araña viva sobre la mesa, no la pasará por la trituradora de papel para "ordenar". El agente no tiene ojos ni cuerpo: ejecuta comandos de texto al pie de la letra. Si no le prohíbes expresamente borrar, lo considerará una forma válida de "limpiar".
+</Analogia>
+
+---
+
+## 6. Práctica en tu Mac: crea tu laboratorio seguro
+
+Vamos a practicar en tu propia máquina. Crearemos una carpeta de pruebas con archivos simulados, activaremos la red de Git y probaremos el botón de deshacer.
+
+<Pasos>
+  <Paso numero={1} titulo="Crea una carpeta de pruebas en tu Mac">
+    Abre la aplicación **Terminal** en tu Mac y escribe este comando para crear y entrar en una carpeta limpia:
+
+    ```bash
+    mkdir -p ~/laboratorio-agente && cd ~/laboratorio-agente
+    ```
+  </Paso>
+
+  <Paso numero={2} titulo="Genera dos archivos de muestra">
+    Crea dos ficheros de prueba con unas pocas líneas de texto:
+
+    ```bash
+    echo "1,Quercus robur,Roble albar" > arboles.csv
+    echo "Notas de campo provisionales de mayo" > notas.txt
+    ```
+
+    Comprueba que están ahí escribiendo `ls` (deberías ver `arboles.csv` y `notas.txt`).
+  </Paso>
+
+  <Paso numero={3} titulo="Activa la red de seguridad de Git">
+    Saca la primera fotografía de seguridad con Git:
+
+    ```bash
+    git init
+    git add .
+    git commit -m "Estado inicial perfecto"
+    ```
+
+    Deberías ver un mensaje indicando que se han guardado 2 archivos (*2 files changed*).
+  </Paso>
+
+  <Paso numero={4} titulo="Simula un error o modificación accidental">
+    Imagina que un agente (o tú por error) altera el contenido de tu tabla:
+
+    ```bash
+    echo "DATOS BORRADOS POR ERROR" > arboles.csv
+    ```
+
+    Comprueba qué ha pasado con `git diff`: verás en rojo tus líneas originales y en verde el texto incorrecto.
+  </Paso>
+
+  <Paso numero={5} titulo="Ejecuta el botón de deshacer mágico">
+    Restaura el archivo a su estado original intacto:
+
+    ```bash
+    git restore .
+    ```
+
+    Vuelve a leer el archivo con `cat arboles.csv`. Tus datos de robles han vuelto sanos y salvos, exactamente como estaban en la foto fija.
+  </Paso>
+</Pasos>
+
+---
+
+## 7. Reto final: El consultor de encargos
+
+<Reto titulo="Reescribe tres encargos peligrosos">
+A continuación tienes tres peticiones reales enviadas por usuarios descuidados a un agente. Identifica el peligro de cada una y reescríbela mentalmente (o en tus notas) aplicando las reglas de seguridad:
+
+1. **Encargo descuidado A:** *"Borrame todo lo que no sirva en mi carpeta de Descargas para liberar espacio en el disco."*
+   - *Peligro:* El agente no sabe qué "sirve" para ti; podría eliminar instaladores, recibos fiscales o PDFs pendientes de lectura con `rm`.
+   - *Versión segura:* *"Examina los archivos en `~/Descargas`. Lista en un documento de texto los archivos mayores de 100 MB y los archivos con extensión `.dmg` o `.pkg`. No borres nada; muéstrame primero la lista para que yo decida."*
+
+2. **Encargo descuidado B:** *"Modifica mi hoja de avistamientos para que todas las fechas tengan formato año-mes-día."*
+   - *Peligro:* Puede sobreescribir el archivo original directamente; si interpreta mal una fecha ambigua (como 04/05/2023, ¿4 de mayo o 5 de abril?), habrás perdido la fecha original.
+   - *Versión segura:* *"Lee `avistamientos.csv`. Crea un archivo nuevo llamado `avistamientos_iso.csv` donde las fechas sigan el formato AAAA-MM-DD. Si encuentras fechas ambiguas donde el día y mes no se distingan con certeza, márcalas en una columna adicional de advertencias."*
+
+3. **Encargo descuidado C:** *"Tengo un montón de fotos en el escritorio, organízalas como veas mejor."*
+   - *Peligro:* Operar en el `~/Desktop` afecta a todo el entorno visible de tu Mac, y *"como veas mejor"* deja la taxonomía al azar del modelo.
+   - *Versión segura:* *"Crea una carpeta de trabajo llamada `~/Fotos-Organizadas/`. Copia allí (sin mover ni borrar del origen) las fotos con extensión .jpg, organizándolas en subcarpetas por año y mes según la fecha de captura."*
+</Reto>
+
+---
+
+## 8. Resumen y herbario de conceptos
+
+- Los agentes de terminal y código no son solo para programadores: son asistentes ideales para ordenar documentos, clasificar imágenes botánicas y depurar datos.
+- El ciclo de trabajo profesional es **Pedir → Planificar → Revisar → Aceptar**. Nunca aceptes modificaciones a ciegas.
+- Opera siempre en una **carpeta acotada (*sandbox*)** para limitar el radio de acción de las herramientas.
+- Una sesión segura cuenta con una **red de seguridad**: duplicado manual (`Cmd + D`) o una foto fija con **Git** (`git init`, `git commit` y el salvavidas `git restore .`).
+- La radiografía de diferencias (**Diff**) te permite comprobar qué líneas se eliminan (rojo `-`) y cuáles se incorporan (verde `+`) antes de dar tu visto bueno.
+
+<Herbario
+  terminos={[
+    {
+      termino: "Diff (Diferencias)",
+      definicion: "Representación visual comparativa que contrasta el estado anterior y el nuevo de un archivo de texto. Muestra en rojo con '-' lo suprimido y en verde con '+' lo añadido.",
+      analogia: "Como comparar dos fotografías de la misma cuadrícula de vegetación tomadas con un año de diferencia para marcar qué especies han brotado y cuáles han desaparecido."
+    },
+    {
+      termino: "Sandbox (Carpeta acotada)",
+      definicion: "Directorio de trabajo aislado donde se confina la ejecución del agente para evitar que toque archivos de sistema o documentos personales ajenos a la tarea.",
+      analogia: "Una placa de Petri o una cámara de aislamiento en un laboratorio: lo que ocurra dentro no contamina el resto de la sala."
+    },
+    {
+      termino: "Human-in-the-loop (Humano al mando)",
+      definicion: "Modelo de interacción donde la máquina propone un plan o una herramienta, pero requiere la autorización consciente de una persona antes de ejecutar acciones de escritura o borrado.",
+      analogia: "El director de tesis que revisa y firma el protocolo de muestreo propuesto por su estudiante antes de que este salga a recolectar ejemplares."
+    },
+    {
+      termino: "Git restore (Restauración)",
+      definicion: "Comando del sistema de control de versiones Git que descarta inmediatamente las modificaciones no confirmadas de una carpeta y las devuelve a la última instantánea guardada.",
+      analogia: "Un botón biológico de reinicio o 'código genético original' que regenera el tejido exactamente como estaba antes de sufrir una alteración."
+    }
+  ]}
+/>
