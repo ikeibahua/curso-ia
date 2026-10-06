@@ -25,6 +25,15 @@ export default defineConfig({
         '@fontsource/jetbrains-mono/latin.css',
         './src/styles/custom.css',
       ],
+      head: [
+        {
+          tag: 'script',
+          content: `(function(){try{if(localStorage.getItem('curso-ia:sidebar-hidden')==='true'&&window.innerWidth>=800){document.documentElement.dataset.sidebarHidden='true';}}catch(e){}})();`,
+        },
+      ],
+      components: {
+        SiteTitle: './src/components/starlight/SiteTitle.astro',
+      },
       sidebar: [
         {
           label: 'Sistema de diseño',

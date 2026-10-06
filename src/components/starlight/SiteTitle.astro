@@ -1,0 +1,25 @@
+---
+/**
+ * Override de SiteTitle para Astro Starlight.
+ * Sitúa el botón de alternar el menú lateral izquierdo justo antes del título del sitio,
+ * manteniéndolo visible y accesible en todo momento en la barra de navegación superior.
+ */
+import type { ComponentProps } from 'astro/types';
+import DefaultSiteTitle from '@astrojs/starlight/components/SiteTitle.astro';
+import SidebarToggle from './SidebarToggle.astro';
+
+type Props = ComponentProps<typeof DefaultSiteTitle>;
+---
+
+<div class="site-title-container sl-flex">
+  <SidebarToggle />
+  <DefaultSiteTitle {...Astro.props} />
+</div>
+
+<style>
+  .site-title-container {
+    align-items: center;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+</style>

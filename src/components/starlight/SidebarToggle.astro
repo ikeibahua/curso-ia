@@ -1,0 +1,194 @@
+---
+/**
+ * SidebarToggle.astro
+ * Botón accesible para alternar (mostrar/ocultar) el menú lateral izquierdo
+ * con el índice general del curso en pantallas de escritorio.
+ *
+ * Características:
+ * - Atajo de teclado: ⌘B en macOS, Ctrl+B en Windows/Linux.
+ * - Persistencia del estado en localStorage.
+ * - Sincronización inmediata de atributos ARIA y etiquetas.
+ * - Estética Cuaderno de Campo (tonos cálidos, borde sutil, foco accesible).
+ */
+---
+
+<button
+  id="starlight__sidebar-toggle"
+  class="sidebar-toggle-btn"
+  type="button"
+  aria-label="Ocultar menú lateral"
+  aria-controls="starlight__sidebar"
+  aria-expanded="true"
+  title="Ocultar menú lateral (⌘B / Ctrl+B)"
+>
+  <span class="icon-container" aria-hidden="true">
+    <svg
+      class="sidebar-icon"
+      xmlns="http://www.w3.org/2000/svg"
+      width="19"
+      height="19"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <!-- Marco exterior -->
+      <rect width="18" height="18" x="3" y="3" rx="3" />
+      <!-- Barra vertical divisoria -->
+      <path d="M9 3v18" />
+      <!-- Flecha indicadora de colapso/expansión -->
+      <path class="sidebar-arrow" d="m14 10-2 2 2 2" stroke-width="2" />
+    </svg>
+  </span>
+  <span class="sr-only">Alternar menú lateral del curso</span>
+</button>
+
+<script>
+  function initSidebarToggle() {
+    const toggleBtn = document.getElementById('starlight__sidebar-toggle') as HTMLButtonElement | null;
+    if (!toggleBtn) return;
+    const btn = toggleBtn;
+
+    const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
+    const shortcutLabel = isMac ? '⌘B' : 'Ctrl+B';
+
+    function updateState(isHidden: boolean, shouldSave = true) {
+      if (isHidden) {
+        document.documentElement.dataset.sidebarHidden = 'true';
+        btn.setAttribute('aria-expanded', 'false');
+        btn.setAttribute('aria-label', `Mostrar menú lateral (${shortcutLabel})`);
+        btn.setAttribute('title', `Mostrar menú lateral (${shortcutLabel})`);
+      } else {
+        delete document.documentElement.dataset.sidebarHidden;
+        btn.setAttribute('aria-expanded', 'true');
+        btn.setAttribute('aria-label', `Ocultar menú lateral (${shortcutLabel})`);
+        btn.setAttribute('title', `Ocultar menú lateral (${shortcutLabel})`);
+      }
+
+      if (shouldSave) {
+        try {
+          localStorage.setItem('curso-ia:sidebar-hidden', isHidden ? 'true' : 'false');
+        } catch (_) {}
+      }
+
+      // Notificar a componentes o visualizadores interactivos (por si necesitan redibujarse)
+      window.dispatchEvent(new CustomEvent('curso:sidebar-toggle', { detail: { hidden: isHidden } }));
+    }
+
+    // Inicializar estado actual desde el atributo de html (establecido por el script inline de head)
+    const initialHidden = document.documentElement.dataset.sidebarHidden === 'true';
+    updateState(initialHidden, false);
+
+    // Click handler
+    toggleBtn.addEventListener('click', () => {
+      const currentlyHidden = document.documentElement.dataset.sidebarHidden === 'true';
+      updateState(!currentlyHidden);
+    });
+
+    // Atajo de teclado global: ⌘B / Ctrl+B
+    window.addEventListener('keydown', (e: KeyboardEvent) => {
+      // Ignorar si el foco está en un campo de texto o elemento editable
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable ||
+          target.closest('.pagefind-ui'))
+      ) {
+        return;
+      }
+
+      const modifier = isMac ? e.metaKey : e.ctrlKey;
+      if (modifier && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        const currentlyHidden = document.documentElement.dataset.sidebarHidden === 'true';
+        updateState(!currentlyHidden);
+      }
+    });
+  }
+
+  // Ejecutar al cargar la página y en transiciones de navegación si las hay
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSidebarToggle);
+  } else {
+    initSidebarToggle();
+  }
+
+  document.addEventListener('astro:page-load', initSidebarToggle);
+</script>
+
+<style>
+  .sidebar-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.15rem;
+    height: 2.15rem;
+    padding: 0;
+    margin-inline-end: 0.35rem;
+    background-color: var(--superficie);
+    border: 1px solid var(--linea);
+    border-radius: 6px;
+    color: var(--tinta-secundaria);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease,
+      transform 0.1s ease;
+  }
+
+  .sidebar-toggle-btn:hover {
+    background-color: var(--superficie-elevada);
+    border-color: var(--musgo-borde);
+    color: var(--musgo);
+  }
+
+  .sidebar-toggle-btn:active {
+    transform: scale(0.96);
+  }
+
+  .sidebar-toggle-btn:focus-visible {
+    outline: 2px solid var(--musgo) !important;
+    outline-offset: 2px !important;
+  }
+
+  .icon-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sidebar-icon {
+    display: block;
+  }
+
+  .sidebar-arrow {
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: 13px 12px;
+  }
+
+  /* Cuando el menú está oculto, la flecha gira hacia la derecha para indicar "abrir" */
+  :global(html[data-sidebar-hidden='true']) .sidebar-arrow {
+    transform: rotate(180deg);
+  }
+
+  /* En móviles (< 50rem), Starlight ya incluye su botón nativo desplegable */
+  @media (max-width: 49.99rem) {
+    .sidebar-toggle-btn {
+      display: none !important;
+    }
+  }
+
+  /* Reducción de movimiento */
+  @media (prefers-reduced-motion: reduce) {
+    .sidebar-toggle-btn,
+    .sidebar-arrow {
+      transition: none !important;
+    }
+  }
+</style>

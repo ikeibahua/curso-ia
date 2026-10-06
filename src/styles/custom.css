@@ -13,6 +13,7 @@
   --sl-text-base: 1.125rem; /* 18px base */
   --sl-line-height: 1.7;
   --sl-content-width: 68ch;
+  --sl-toc-width: 13.5rem; /* Ancho compacto para el índice de la lección */
 
   /* Paleta Cuaderno de Campo (Dark) */
   --papel: #151B17;
@@ -139,6 +140,136 @@ h3 {
 :focus-visible {
   outline: 2px solid var(--musgo) !important;
   outline-offset: 3px !important;
+}
+
+/* ==========================================================================
+   Barra lateral izquierda colapsable (Escritorio)
+   ========================================================================== */
+@media (min-width: 50rem) {
+  /* Transición suave para apertura y cierre */
+  .sidebar-pane {
+    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.24s ease !important;
+    will-change: transform;
+  }
+
+  .main-frame {
+    transition: padding-inline-start 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  /* Estado colapsado / oculto */
+  html[data-sidebar-hidden='true'] {
+    --sl-content-inline-start: 0rem !important;
+  }
+
+  html[data-sidebar-hidden='true'] .sidebar-pane {
+    transform: translateX(-100%) !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  html[data-sidebar-hidden='true'] .main-frame {
+    padding-inline-start: 0rem !important;
+  }
+
+  /* Adaptación de la cabecera cuando el menú está oculto */
+  html[data-sidebar-hidden='true'] .header {
+    --__sidebar-width: 0rem !important;
+  }
+}
+
+/* ==========================================================================
+   Índice de la lección actual (TOC derecho compacto)
+   ========================================================================== */
+@media (min-width: 72rem) {
+  /* Columna derecha compacta con ancho acotado */
+  .right-sidebar-container {
+    order: 2 !important;
+    position: relative !important;
+    width: var(--sl-toc-width) !important;
+    min-width: var(--sl-toc-width) !important;
+    max-width: var(--sl-toc-width) !important;
+    flex: 0 0 var(--sl-toc-width) !important;
+  }
+
+  .right-sidebar {
+    width: var(--sl-toc-width) !important;
+    max-width: var(--sl-toc-width) !important;
+    inset-inline-end: 0 !important;
+    inset-inline-start: auto !important;
+    border-inline-start: 1px solid var(--linea) !important;
+    background-color: var(--sl-color-bg-sidebar) !important;
+  }
+
+  .right-sidebar-panel {
+    padding: 1.25rem 0.65rem 2rem 0.65rem !important;
+  }
+
+  .right-sidebar-panel .sl-container {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* El panel principal aprovecha el espacio disponible */
+  [data-has-toc] .main-pane {
+    order: 1 !important;
+    width: calc(100% - var(--sl-toc-width)) !important;
+    max-width: calc(100% - var(--sl-toc-width)) !important;
+    flex: 1 1 auto !important;
+  }
+
+  /* Centrado de lectura cómodo y equilibrado */
+  .main-pane {
+    --sl-content-margin-inline: auto !important;
+  }
+
+  .main-pane .sl-container {
+    margin-inline: auto !important;
+  }
+}
+
+/* Encabezado del índice de la lección ("En esta página") */
+.right-sidebar-panel h2#starlight__on-this-page,
+.right-sidebar-panel h2 {
+  font-family: var(--sl-font) !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: var(--tinta-secundaria) !important;
+  margin-top: 0 !important;
+  margin-bottom: 0.5rem !important;
+  padding-bottom: 0.35rem !important;
+  border-bottom: 1px solid var(--linea) !important;
+}
+
+/* Lista de enlaces compacta del índice de la lección */
+.right-sidebar-panel starlight-toc nav ul {
+  gap: 0.1rem !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.right-sidebar-panel starlight-toc a {
+  --pad-inline: 0.35rem !important;
+  font-size: 0.8125rem !important;
+  line-height: 1.35 !important;
+  padding-block: 0.22rem !important;
+  padding-inline: calc(0.65rem * var(--depth, 0) + var(--pad-inline)) var(--pad-inline) !important;
+  color: var(--tinta-secundaria) !important;
+  border-radius: 4px !important;
+  text-decoration: none !important;
+  transition: color 0.15s ease, background-color 0.15s ease !important;
+}
+
+.right-sidebar-panel starlight-toc a:hover {
+  color: var(--musgo) !important;
+  background-color: var(--musgo-suave) !important;
+}
+
+.right-sidebar-panel starlight-toc a[aria-current='true'] {
+  color: var(--musgo) !important;
+  font-weight: 600 !important;
+  background-color: var(--musgo-suave) !important;
 }
 
 /* Accesibilidad: Reducción de movimiento */
