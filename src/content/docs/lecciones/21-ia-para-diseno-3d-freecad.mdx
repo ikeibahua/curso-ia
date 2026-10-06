@@ -1,15 +1,201 @@
 ---
 title: "Lección 17 — IA para diseño 3D: de Tinkercad a FreeCAD con MCP"
-description: "Modelado paramétrico asistido por IA para imprimir piezas reales."
+description: "Modelado paramétrico asistido por IA: de una idea y un calibre a piezas reales impresas en 3D."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Terminal from '../../../components/ui/Terminal.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import Herbario from '../../../components/ui/Herbario.astro';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L21**, orden en el itinerario: **17**).
+import Visor3dParametrico from '../../../components/widgets/visor-3d-parametrico/Visor3dParametrico.tsx';
+import FlujoDiseno3d from '../../../components/widgets/flujo-diseno-3d/FlujoDiseno3d.tsx';
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+<Verificado
+  fecha="2026-03"
+  fuente="https://www.freecad.org"
+  nota="FreeCAD versión oficial 1.0 (arquitectura unificada de bancos de trabajo, consola Python 3 y ecosistema de servidores MCP como neka-nat/freecad-mcp y Robust MCP Bridge)."
+/>
 
 ## Objetivo de la lección
-Modelado paramétrico asistido por IA para imprimir piezas reales.
+Aprender a diseñar piezas reales para impresión 3D mediante modelado paramétrico asistido por inteligencia artificial en FreeCAD, dominando tanto la vía directa con scripts en Python como la conexión autónoma mediante el protocolo MCP, sin depender de interfaces gráficas complejas y asegurando que las piezas encajen en el mundo físico.
+
+---
+
+## 1. El salto cualitativo: De Tinkercad al Modelado Paramétrico
+
+Muchos aficionados a la impresión 3D comienzan en **Tinkercad**: un entorno web fantástico donde colocas cubos y cilindros sobre una cuadrícula, los huecas y los agrupas. 
+
+Sin embargo, Tinkercad tiene un "techo de cristal" evidente: si diseñas un soporte para 3 tubos de ensayo y más adelante compras tubos 2 milímetros más gruesos, tienes que desagrupar toda la figura, estirar piezas a ojo y rehacer los alineamientos a mano.
+
+Aquí es donde entra **FreeCAD y el modelado paramétrico**:
+- Una pieza no es una escultura de plastilina estática; es una **fórmula geométrica**: *"Un bloque de ancho X, con N agujeros de diámetro D separados equitativamente a una distancia Y"*.
+- Si cambias el diámetro del tubo de 16 a 18 mm, no redibujas nada: **cambias un solo número** y el modelo entero se recalcula en décimas de segundo.
+
+### ¿Por qué la IA y el diseño paramétrico son la pareja perfecta?
+A los modelos de lenguaje se les da mal "dibujar con el ratón en una pantalla", pero son extraordinarios **generando código estructurado y fórmulas matemáticas**. 
+
+En lugar de pelearte con los menús interminables de FreeCAD, tú describes la pieza con tus palabras y tus medidas tomadas con un calibre, y el modelo escribe el script de Python que construye la pieza tridimensional exacta.
+
+Experimenta qué significa el modelado paramétrico en este visor en tiempo real:
+
+<Visor3dParametrico client:visible />
+
+---
+
+## 2. Lo que la IA hace de maravilla (y sus tropiezos frecuentes)
+
+Para no frustrarte en el taller, conviene tener una foto honesta de las capacidades reales de los modelos actuales:
+
+### Lo que la IA resuelve con brillantez:
+1. **Piezas utilitarias y funcionales:** soportes para herramientas de campo, gradillas para viales de semillas, adaptadores para tubos de riego, cajas a medida con tapa deslizante o enganches para lupas.
+2. **Generación de scripts limpios en FreeCAD:** escribe el código de la biblioteca `Part` o `PartDesign` sin que tengas que aprenderte la documentación técnica de Python.
+3. **Cálculo de repeticiones simétricas:** calcular el espaciado matemático exacto para que 4 o 6 cavidades queden perfectamente centradas en una base.
+
+### Lo que la IA suele hacer mal (y debes vigilar siempre):
+- **Omitir restricciones geométricas:** en pruebas documentadas con modelos de lenguaje, al pedir un soporte con tres orificios y un rebaje lateral, el modelo a veces generaba el bloque sólido y "olvidaba" la resta del rebaje en el código final.
+- **Ignorar las tolerancias del mundo real:** el modelo suele restar un cilindro de 16.0 mm exactos para un tubo de 16.0 mm. En la realidad física, el filamento caliente se expande al enfriarse; si no añades una holgura de **+0.3 mm**, el tubo jamás entrará.
+- **Falta de conciencia de la orientación en la cama:** el modelo puede diseñar una pieza que requiere soportes imposibles de retirar si no se rota 90 grados al imprimir.
+
+<Callout tipo="peligro" titulo="La regla de oro del taller">
+**Nunca envíes un archivo generado por IA a la impresora sin abrirlo en el laminador y medirlo.** 
+El filamento y el tiempo de máquina cuestan dinero; una verificación visual de 30 segundos con la herramienta de regla de tu laminador te ahorrará impresiones fallidas.
+</Callout>
+
+---
+
+## 3. El protocolo de fabricación: De la idea a la cama de impresión
+
+Fabricar una pieza física con IA sigue cinco etapas rigurosas. Explora el flujo completo, el checklist de imprimibilidad y la comparativa de herramientas en esta guía interactiva:
+
+<FlujoDiseno3d client:visible />
+
+---
+
+## 4. MCP para CAD: El ciclo de inspección visual "Ver e Iterar"
+
+En la Lección 10 descubrimos el protocolo **MCP (Model Context Protocol)**. Aplicado a FreeCAD, MCP abre una frontera revolucionaria:
+
+En lugar de copiar y pegar código a mano:
+1. El servidor MCP expone herramientas de FreeCAD hacia el cliente de IA (como Claude Desktop u OpenCode): `crear_objeto`, `modificar_dimensiones`, `capturar_vista_3d` y `exportar_stl`.
+2. El agente crea la pieza, ejecuta una función interna que saca una **foto o renderizado de la vista isométrica de FreeCAD** y se la envía a sí mismo en el siguiente turno.
+3. El modelo "ve" la pieza tridimensional resultante en su ventana de contexto. Si detecta que una pared quedó demasiado fina o que un chaflán interfiere con un agujero, **corrige el parámetro y vuelve a generar el sólido automáticamente**.
+
+### Seguridad con servidores MCP de FreeCAD (conexión con L15)
+Como advertimos en la Lección 16 sobre seguridad:
+- Varios servidores de la comunidad (como `freecad-mcp`) permiten al agente ejecutar scripts de Python dentro del proceso de FreeCAD.
+- Eso significa que el agente tiene acceso a crear o leer archivos en tu máquina.
+- **Buenas prácticas:** inicia el servidor MCP solo cuando vayas a modelar, trabaja en una carpeta acotada (`~/Proyectos-3D/`) y cierra la conexión al terminar la sesión.
+
+---
+
+## 5. Práctica en tu Mac: Las dos rutas de trabajo
+
+Puedes trabajar de dos formas: la **Ruta A (gratuita, directa y universal)** y la **Ruta B (avanzada con MCP)**. Empezaremos por la Ruta A, que no requiere instalar ningún puente adicional:
+
+### Ruta A (Sin MCP, con chat web y la consola de FreeCAD)
+
+<Pasos>
+  <Paso numero={1} titulo="Abre FreeCAD en tu Mac">
+    Descarga e instala la versión oficial gratuita de **FreeCAD 1.0** para macOS (si aún no la tienes, descárgala desde `freecad.org` en su versión para procesadores Apple Silicon).
+  </Paso>
+
+  <Paso numero={2} titulo="Activa la consola de Python integrada">
+    Abre FreeCAD. En la barra superior de menús, haz clic en:
+    `Ver` → `Paneles` → activa la casilla **Consola de Python**.
+
+    Verás aparecer un panel inferior con el símbolo `>>>`. Aquí puedes comunicarte directamente con el motor geométrico de FreeCAD.
+  </Paso>
+
+  <Paso numero={3} titulo="Pide un encargo paramétrico a tu modelo de chat">
+    Entra en tu chat habitual (Claude, ChatGPT o local en OpenCode) y escribe este encargo estructurado:
+
+    ```text
+    Escribe un script de Python puro para FreeCAD 1.0 que construya un soporte 
+    para 3 viales cilíndricos de semillas. 
+    Medidas:
+    - Base rectangular: ancho 90 mm, profundidad 40 mm, altura 30 mm.
+    - 3 orificios cilíndricos pasantes de 16.4 mm de diámetro (16 mm de tubo + 0.4 mm de holgura).
+    - Los orificios deben estar uniformemente distribuidos a lo largo del eje X y centrados en Y.
+    - Usa exclusivamente el módulo Part de FreeCAD y asegúrate de llamar a doc.recompute().
+    ```
+  </Paso>
+
+  <Paso numero={4} titulo="Pega el código en la consola y observa el milagro">
+    Copia el código que te devuelva el modelo (o utiliza el código generado por nuestro interactivo anterior) y pégalo en la consola de Python de FreeCAD pulsando `Intro`.
+    
+    Verás cómo aparece instantáneamente la pieza tridimensional sólida en tu espacio de trabajo.
+  </Paso>
+
+  <Paso numero={5} titulo="Exporta el archivo para tu impresora">
+    En el panel izquierdo de FreeCAD (*Árbol del documento*), haz clic sobre la pieza creada para que quede seleccionada (en color verde). Luego pulsa:
+    `Archivo` → `Exportar...` → y elige el formato **STL Mesh (*.stl)** o **3MF (*.3mf)**.
+  </Paso>
+</Pasos>
+
+---
+
+### Ruta B (Opcional: Conexión mediante Servidor MCP)
+
+Si deseas probar la experiencia asistida completa donde el agente opera dentro de FreeCAD:
+1. Abre el gestor de complementos de FreeCAD: `Herramientas` → `Gestor de complementos` (*Addon Manager*).
+2. Busca e instala el complemento de conexión MCP (como *Robust MCP Bridge* o el workbench `freecad-mcp` verificado de la comunidad).
+3. Añade la configuración del servidor en el archivo de configuración de tu cliente de IA (`claude_desktop_config.json` u OpenCode).
+4. El agente podrá entonces crear piezas directamente y recibir capturas de pantalla de la cámara 3D para ajustar las medidas de forma autónoma.
+
+---
+
+## 6. Reto final: El soporte personalizado de laboratorio
+
+<Reto titulo="Diseña tu primer organizador con variación paramétrica">
+Aplica el ciclo completo de diseño 3D para resolver una necesidad real de tu escritorio o espacio de trabajo:
+
+1. **La medición:** Toma un objeto físico que quieras organizar (por ejemplo, tres lápices gruesos de campo, dos memorias USB o un juego de pinzas y lupa). Mide con una regla o calibre su anchura, grosor y altura.
+2. **El encargo con holgura:** Redacta el prompt pidiéndole al modelo el script de FreeCAD, asegurándote de incluir una tolerancia de **+0.3 mm** en las cavidades para que el objeto no entre forzado.
+3. **Inspección de imprimibilidad:** Pasa el checklist de 5 puntos: ¿tiene voladizos mayores de 45°?, ¿las paredes miden más de 2 mm?
+4. **La prueba del parámetro:** Una vez que tengas la pieza en pantalla, **cambia un solo número en el código** (por ejemplo, pasa de 3 a 4 alojamientos, o sube la altura 10 mm) y vuelve a ejecutarlo. Comprueba la satisfacción de ver cómo toda la estructura se adapta sin redibujar nada a mano.
+</Reto>
+
+---
+
+## 7. Resumen y herbario de conceptos
+
+- El **modelado paramétrico** define la geometría mediante fórmulas y cotas numéricas; modificar una pieza consiste en alterar variables, no en rehacer dibujos a mano.
+- La inteligencia artificial encaja a la perfección con FreeCAD porque puede **traducir descripciones en lenguaje natural a código Python ejecutable**.
+- Los modelos no tienen tacto ni experiencia física: recuerda siempre verificar las **tolerancias de dilatación (+0.3 mm)** y la **regla de los 45° en voladizos**.
+- Mediante el protocolo **MCP**, un agente puede no solo crear geometría, sino "ver" capturas del modelo 3D e iterar hasta lograr la pieza deseada.
+
+<Herbario
+  terminos={[
+    {
+      termino: "Modelado Paramétrico",
+      definicion: "Método de diseño asistido por ordenador (CAD) donde las formas geométricas están gobernadas por parámetros, variables matemáticas y restricciones dimensionales.",
+      analogia: "Una clave dicotómica botánica o una fórmula alométrica: modificas el diámetro del tronco y la fórmula recalcula la altura y la biomasa de las ramas de forma proporcional."
+    },
+    {
+      termino: "STL / 3MF",
+      definicion: "Formatos estándar de archivo para fabricación aditiva que describen la superficie exterior de un objeto 3D mediante una malla de pequeños triángulos interconectados.",
+      analogia: "El exoesqueleto de quitina de un artrópodo: una coraza poligonal continua que encierra y define la forma del cuerpo sin detallar los órganos internos."
+    },
+    {
+      termino: "Laminador (Slicer)",
+      definicion: "Programa de ordenador que corta un modelo 3D en capas horizontales microscópicas y genera las instrucciones de coordenadas mecánicas (G-code) que sigue la boquilla de la impresora.",
+      analogia: "Un microtomo de laboratorio histológico: corta una muestra de tejido biológico en láminas ultrafinas de pocas micras para poder colocarlas bajo el objetivo."
+    },
+    {
+      termino: "Voladizo (Overhang)",
+      definicion: "Parte de una pieza tridimensional que sobresale hacia el exterior en el aire sin material directo debajo en la capa inferior.",
+      analogia: "Una rama horizontal de un árbol o una seta en repisa en el tronco de un roble: desafía la gravedad y necesita anclarse firmemente a la base para no venirse abajo."
+    },
+    {
+      termino: "Tolerancia dimensional",
+      definicion: "Margen deliberado de holgura que se añade al modelar una cavidad para compensar la contracción térmica del plástico y las imprecisiones mecánicas de la boquilla.",
+      analogia: "El espacio que dejan los carpinteros en el marco de una puerta de madera para que pueda abrir y cerrar con suavidad cuando la madera se hincha con la humedad en invierno."
+    }
+  ]}
+/>
