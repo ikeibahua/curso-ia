@@ -1,15 +1,180 @@
 ---
 title: "Lección 12 — El mundo de los .md: instrucciones, skills y memoria"
-description: "Cómo programar agentes redactando instrucciones claras en Markdown."
+description: "Cómo programar y dirigir agentes redactando instrucciones claras y concisas en archivos Markdown."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Terminal from '../../../components/ui/Terminal.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import Herbario from '../../../components/ui/Herbario.astro';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L11**, orden en el itinerario: **12**).
+import EditorMarkdown from '../../../components/widgets/editor-markdown/EditorMarkdown.tsx';
+import MochilaContexto from '../../../components/widgets/mochila-contexto/MochilaContexto.tsx';
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+<Verificado
+  fecha="2026-03"
+  fuente="https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview"
+  nota="Estándares de la industria para archivos de instrucciones persistentes en la raíz de proyectos (AGENTS.md, CLAUDE.md y paquetes modulares de Skills)."
+/>
 
 ## Objetivo de la lección
-Cómo programar agentes redactando instrucciones claras en Markdown.
+Aprender a programar el comportamiento y la memoria de un agente de inteligencia artificial redactando directrices claras y concisas en archivos Markdown (`.md`), aplicando principios rigurosos de ingeniería de contexto.
+
+---
+
+## 1. El lenguaje que une a humanos y máquinas: Markdown
+
+En la informática tradicional, programar exigía aprender lenguajes con sintaxis rígidas (C, Java, Python). Pero con los modelos de lenguaje, el código que guía a tu asistente se escribe en tu propio idioma materno.
+
+Para que ese texto esté perfectamente estructurado sin ensuciarlo con formatos pesados de procesadores comerciales (como `.docx` o `.pages`), los agentes leen universalmente archivos **Markdown (`.md`)**:
+- Es texto plano puro: pesa solo unos pocos kilobytes.
+- Consume un número mínimo de tokens.
+- Se lee con total naturalidad con los ojos humanos y se traduce a encabezados, listas y jerarquías sin ambigüedad.
+
+Pruébalo en este editor interactivo en dos paneles:
+
+<EditorMarkdown client:visible />
+
+---
+
+## 2. Los archivos de instrucciones del proyecto (`AGENTS.md` / `CLAUDE.md`)
+
+Cuando trabajas en una carpeta de tu Mac con un agente moderno (como Claude Code, Cursor o herramientas de terminal), el agente realiza un paso previo antes de hacer nada: **busca si existe un archivo llamado `AGENTS.md` o `CLAUDE.md` en la raíz de la carpeta**.
+
+Si lo encuentra, lee sus directrices y las asume como sus reglas sagradas de conducta para toda la sesión:
+- **Rol y personalidad:** *«Eres un asistente de investigación botánica especializado en flora ibérica»*.
+- **Tono y formato:** *«Utiliza español de España y tuteo respetuoso. Escribe siempre los taxones en cursiva (ej. Fagus sylvatica)»*.
+- **Restricciones de seguridad:** *«Nunca borres archivos sin pedir confirmación explícita»*.
+
+<Analogia
+  concepto="El archivo AGENTS.md y las Skills modulares"
+  metafora="La primera página del cuaderno de campo y las claves dicotómicas del bolsillo"
+  limite="En un naturalista de campo, la experiencia y el conocimiento se integran en su memoria biológica viva. En un agente artificial no hay memoria viva entre sesiones: cada vez que abres una terminal, el modelo empieza en blanco y necesita que el archivo .md se inyecte en su ventana de contexto."
+>
+- **El `AGENTS.md`** es la primera página de tu cuaderno de campo donde anotas las convenciones fijas de tu expedición: qué sistema de coordenadas usarás, qué escala de abundancia de Braun-Blanquet aplicarás y qué abreviaturas utilizarás.
+- **Las Skills** son las pequeñas claves de bolsillo plastificadas: no llevas encima la enciclopedia de hongos de 8 tomos en cada paseo; solo sacas la clave dicotómica de setas del bolsillo cuando te encuentras con un ejemplar dudoso en el sotobosque.
+</Analogia>
+
+---
+
+## 3. La trampa del sobrepeso: Ingeniería de Contexto (*Context Engineering*)
+
+Muchos principiantes cometen un error fatal: creen que cuanto más texto le peguen al agente, más listo será. Copian manuales enteros de 50 páginas, reglamentos de empresa y listas infinitas de prohibiciones dentro de su archivo de instrucciones.
+
+**El resultado es catastrófico:**
+1. **El fenómeno «Lost in the Middle» (Amnesia en el medio):** Las investigaciones demuestran que los modelos atienden con gran lucidez al principio y al final de su ventana de contexto, pero tienden a pasar por alto o confundir instrucciones sepultadas en mitad de miles de párrafos.
+2. **Coste y lentitud:** Procesar 20.000 tokens en cada turno multiplica el tiempo de respuesta y agota tu cuota en pocos mensajes.
+
+Comprueba cómo cambia la salud del agente según los elementos que metas en su mochila:
+
+<MochilaContexto client:visible />
+
+<Callout tipo="tip" titulo="La regla de oro: concisión y modularidad">
+- Tu archivo `AGENTS.md` debe ser **corto, directo y libre de obviedades** (entre 15 y 40 líneas bien estructuradas bastan para el 95% de los proyectos).
+- Si necesitas conocimientos especializados para tareas puntuales, no los metas en el archivo principal: crea una carpeta `skills/` con archivos `.md` independientes que el agente solo abrirá cuando la misión lo requiera.
+</Callout>
+
+---
+
+## 4. La memoria persistente entre sesiones
+
+Un modelo de lenguaje no recuerda nada de lo que hablaste con él ayer si abres una sesión nueva. Sus pesos matemáticos están congelados.
+
+¿Cómo consiguen los agentes recordar tus preferencias a lo largo de los meses? Mediante **memoria en archivos**:
+1. Al final de una conversación fructífera, el agente escribe un breve resumen en un archivo de texto (por ejemplo, `memoria_proyecto.md`): *«El usuario prefiere las tablas ordenadas por altitud decreciente y ya ha revisado los hayedos del valle de Benasque»*.
+2. Al día siguiente, cuando inicias una nueva sesión, el agente lee ese archivo en su primer turno. Para ti la sensación es de continuidad perfecta, pero técnicamente es simplemente texto guardado en tu disco duro.
+
+---
+
+## Práctica en tu Mac: Redactar tu primer AGENTS.md
+
+Vamos a crear el archivo de instrucciones de tu propio laboratorio en tu Mac:
+
+<Pasos>
+  <Paso numero={1} titulo="Entra en tu carpeta de prácticas">
+    Abre la Terminal y entra en tu directorio:
+    <Terminal comando="cd ~/curso-ia-practicas" explicacion="Nos situamos en la carpeta de trabajo del curso." />
+  </Paso>
+  <Paso numero={2} titulo="Crea el archivo AGENTS.md con nano">
+    Abre el editor de texto:
+    <Terminal comando="nano AGENTS.md" explicacion="Abre nano para redactar tu archivo de instrucciones." />
+  </Paso>
+  <Paso numero={3} titulo="Escribe las directrices de tu cuaderno botánico">
+    Escribe el siguiente contenido conciso y estructurado:
+
+```markdown
+# AGENTS.md — Asistente de Campo
+
+## Rol
+Eres mi asistente de campo botánico. Me ayudas a organizar notas de excursiones, clasificar especies y redactar fichas técnicas.
+
+## Tono y Estilo
+- Español de España, tono cercano y riguroso.
+- Los nombres científicos en latín van siempre en cursiva (ej. *Fagus sylvatica*).
+- Respuestas directas: ve al grano y evita preámbulos ceremoniosos.
+
+## Reglas de Seguridad
+- No borres ni sobrescribas archivos sin mi confirmación previa.
+- Si dudas sobre una identificación, avísalo con una nota de advertencia.
+```
+  </Paso>
+  <Paso numero={4} titulo="Guarda el archivo">
+    Pulsa **Control + O** y **Enter** para guardar, y luego **Control + X** para salir.
+  </Paso>
+  <Paso numero={5} titulo="Pruébalo en tu chat habitual">
+    Abre ChatGPT o Claude en tu navegador, pega el contenido de tu `AGENTS.md` como primer mensaje y pídele una ficha sobre el tejo común (*Taxus baccata*). Comprueba cómo adopta inmediatamente las reglas de cursiva y concisión que le has fijado.
+  </Paso>
+</Pasos>
+
+---
+
+## Reto final: La poda del manual defectuoso
+
+<Reto
+  titulo="Poda este AGENTS.md monstruoso"
+  dificultad="media"
+  tiempo="15 min"
+>
+A continuación tienes un fragmento de un archivo de instrucciones pésimamente redactado por un usuario novato:
+
+```markdown
+Hola señor agente de inteligencia artificial. Te escribo esto porque quiero que seas muy amable, extraordinariamente simpático y que nunca jamás te enfades con nadie. Tienes que ser el mejor botánico del universo entero, sabiendo todo lo que se ha escrito desde los griegos antiguos hasta la actualidad. Quiero que me des respuestas larguísimas y muy detalladas con muchísima historia de cada planta, pero al mismo tiempo quiero que seas muy breve y no me hagas perder el tiempo con textos largos. Por cierto, mi perro se llama Toby y me gusta pasear por las tardes cuando no hace mucho frío. Además, tienes prohibido terminantemente equivocarte en nada de nada.
+```
+
+**Tu misión:**
+Identifica los 4 errores garrafales de este texto (contradicciones, datos irrelevantes, lenguaje inútil, órdenes imposibles) y reescribe este fragmento transformándolo en un bloque Markdown limpio, profesional y directo de **menos de 8 líneas**.
+</Reto>
+
+---
+
+## Resumen y glosario botánico-digital
+
+<Herbario
+  items={[
+    {
+      termino: "Markdown (.md)",
+      definicion: "Formato de texto plano con marcas sencillas de tipografía que los modelos de lenguaje interpretan de forma inmediata con un consumo mínimo de tokens."
+    },
+    {
+      termino: "AGENTS.md / CLAUDE.md",
+      definicion: "Archivo de texto situado en la raíz de un proyecto que define el rol, las convenciones de formato y las reglas operativas obligatorias para los agentes."
+    },
+    {
+      termino: "Skill (Habilidad)",
+      definicion: "Paquete modular de instrucciones especializadas y recursos en texto que el agente carga únicamente bajo demanda cuando la tarea lo requiere."
+    },
+    {
+      termino: "Context Engineering",
+      definicion: "Disciplina que diseña qué información exacta debe incluirse en la ventana de contexto de un modelo para maximizar su precisión y evitar la dispersión."
+    },
+    {
+      termino: "Lost in the Middle",
+      definicion: "Tendencia de los modelos de lenguaje a ignorar o degradar la atención sobre datos e instrucciones situados en la parte central de prompts muy extensos."
+    }
+  ]}
+/>
