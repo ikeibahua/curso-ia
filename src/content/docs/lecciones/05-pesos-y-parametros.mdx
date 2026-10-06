@@ -1,15 +1,185 @@
 ---
-title: "Lección 06 — Pesos y parámetros: qué significa 70B"
-description: "Qué es el tamaño de un modelo y qué cabe en la memoria de un ordenador."
+title: "Lección 06 — Pesos y parámetros: qué significa 7B o 70B"
+description: "Descubre qué es un parámetro, cómo calcular el tamaño en gigabytes de un modelo y qué cabe en tu Mac."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Terminal from '../../../components/ui/Terminal.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import Herbario from '../../../components/ui/Herbario.astro';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L05**, orden en el itinerario: **6**).
+import MiniRedPesos from '../../../components/widgets/mini-red-pesos/MiniRedPesos.tsx';
+import CalculadoraTamano from '../../../components/widgets/calculadora-tamano/CalculadoraTamano.tsx';
+import ComparadorTamanos from '../../../components/widgets/comparador-tamanos/ComparadorTamanos.tsx';
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+<Verificado
+  fecha="2026-03"
+  fuente="https://huggingface.co/docs/transformers/model_summary"
+  nota="Cálculo matemático de memoria por parámetro según precisión (FP16 a 2 bytes, INT4 a 0.5 bytes) y especificaciones técnicas oficiales de Llama 3.1 (Meta) y Qwen 2.5."
+/>
 
 ## Objetivo de la lección
-Qué es el tamaño de un modelo y qué cabe en la memoria de un ordenador.
+Comprender qué es un parámetro en una red neuronal, descifrar qué significan denominaciones como «7B» o «70B», y aprender a calcular con una sencilla multiplicación matemática cuántos gigabytes de memoria necesita un modelo para funcionar en tu ordenador.
+
+---
+
+## 1. ¿Qué es exactamente un «parámetro»?
+
+Cuando lees noticias sobre inteligencia artificial, es habitual ver titulares como *«El nuevo modelo cuenta con 70.000 millones de parámetros»*. A menudo se utiliza como sinónimo mágico de inteligencia, pero en realidad un parámetro es algo mucho más sencillo: **un simple número decimal que multiplica a otro**.
+
+En la <a href="/curso-ia/lecciones/04-como-aprende-un-modelo/">Lección 04</a> vimos que entrenar una red neuronal consiste en ajustar gradualmente los tornillos numéricos de cada conexión. Esos tornillos son los **pesos o parámetros** (denotados habitualmente con la letra $w$).
+
+Si la conexión entre dos neuronas tiene un peso de `+1.8`, la señal pasa con fuerza amplificada; si el peso es `-0.9`, la señal se frena o inhibe; si el peso es `0.0`, la conexión es completamente irrelevante.
+
+<Analogia
+  concepto="Los parámetros y pesos de una red"
+  metafora="La fuerza de las sinapsis químicas entre neuronas biológicas"
+  limite="Una sinapsis real modula vesículas de neurotransmisores (dopamina, serotonina, glutamato) con plasticidad hebbiana continua a lo largo del tiempo. En una red artificial no hay química ni tiempo: un peso es una cifra fija estática almacenada en una celda de memoria RAM que se multiplica durante un producto de matrices."
+>
+En el sistema nervioso de un ser vivo, dos neuronas no están pegadas: se comunican a través de una brecha sináptica. Cuando aprendes algo nuevo (por ejemplo, a reconocer el canto de una curruca capirotada), ciertas sinapsis refuerzan sus receptores químicos y otras los debilitan. 
+
+El nematodo *Caenorhabditis elegans* tiene exactamente 302 neuronas y unas 7.000 sinapsis. Un ratón común tiene unos 70 millones de neuronas. Los parámetros de un modelo artificial son el equivalente digital a la intensidad de esas conexiones.
+</Analogia>
+
+---
+
+## 2. Laboratorio: Tu propia mini red neuronal
+
+Para ver cómo 6 simples parámetros pueden tomar una decisión biológica, juega con los deslizadores de esta red en miniatura:
+
+<MiniRedPesos client:visible />
+
+---
+
+## 3. Descifrando las siglas: ¿Qué significa 7B, 14B o 70B?
+
+En el mundo anglosajón, la palabra *«billion»* no significa un billón hispano (un millón de millones), sino **mil millones** ($10^9$). Por tanto:
+- **1B** = 1.000 millones de parámetros.
+- **7B / 8B** = 7.000 u 8.000 millones de parámetros.
+- **70B** = 70.000 millones de parámetros.
+- **405B** = 405.000 millones de parámetros.
+
+### La fórmula de oro: ¿Cuánto pesa un modelo en gigabytes?
+
+Cada uno de esos miles de millones de números debe guardarse en el disco duro y, para que el modelo pueda contestar, **debe cargarse entero en la memoria RAM** de tu ordenador.
+
+¿Cuánto espacio ocupa cada número? Depende de la precisión matemática elegida:
+1. **Precisión FP16 (16 bits):** Cada número ocupa **2 bytes** en memoria. Es el formato estándar de entrenamiento.
+2. **Precisión cuantizada a 4 bits (INT4):** Cada número se comprime a solo **0,5 bytes** (medio byte).
+
+La fórmula matemática para saber cuánta memoria necesitas es tan simple como multiplicar:
+
+```text
+Tamaño en disco (GB) = Parámetros (en miles de millones) × Bytes por parámetro
+```
+
+Por ejemplo, para el célebre modelo **Llama 8B**:
+- A 16 bits (original): **8 × 2 = 16 GB** de memoria.
+- A 4 bits (comprimido): **8 × 0,5 = 4 GB** de memoria.
+
+Calcula cualquier combinación con la siguiente herramienta interactiva:
+
+<CalculadoraTamano client:visible />
+
+---
+
+## 4. El espectro de tamaños: De los modelos de bolsillo a los centros de datos
+
+Más grande no siempre significa mejor. Como en la naturaleza, un colibrí no es «peor» que un elefante: cada uno está adaptado a su nicho ecológico.
+
+<ComparadorTamanos client:visible />
+
+<Callout tipo="info" titulo="Rendimientos decrecientes: la ley no lineal">
+Doblar el número de parámetros no duplica la inteligencia. Pasar de 1B a 8B supone un salto cuántico (el modelo pasa de tartamudear a razonar con fluidez). Sin embargo, pasar de 70B a 405B requiere seis veces más electricidad y hardware para conseguir apenas una mejora del 5% o 10% en tareas especializadas.
+</Callout>
+
+### ¿Qué es un modelo MoE (Mezcla de Expertos)?
+Habrás oído hablar de modelos como *Mixtral* o *DeepSeek-V3*. Utilizan una técnica de arquitectura muy inteligente: tienen cientos de miles de millones de parámetros en total, pero para cada palabra solo activan una pequeña fracción (por ejemplo, 37B activos de 671B totales). Es como tener un hospital con 20 especialistas médicos, pero en cada consulta solo te atienden los dos médicos pertinentes.
+
+---
+
+## 5. Pesos abiertos frente a Código abierto
+
+No todos los modelos que te puedes descargar gratis son «código abierto» en sentido estricto:
+
+1. **Modelos Cerrados (Propietarios):** ChatGPT (GPT-4/Astra) o Claude (Sonnet/Opus). No puedes descargar sus pesos ni ver cómo están construidos; solo puedes enviarles texto a través de su web o su API pagando por uso.
+2. **Pesos Abiertos (*Open Weights*):** Modelos como **Llama de Meta**. Meta regala los archivos con los miles de millones de números para que cualquiera los descargue y ejecute en su propio ordenador sin pagar nada, pero su licencia impone condiciones comunitarias (por ejemplo, no usarlos para entrenar modelos rivales comerciales de más de 700 millones de usuarios).
+3. **Código Abierto estricto (*Open Source* / OSI):** Modelos como **OLMo** de AllenAI, donde la organización publica no solo los pesos, sino también el código exacto de entrenamiento y la receta completa de los datos utilizados.
+
+---
+
+## Práctica en tu Mac: Inspeccionar un modelo en Hugging Face
+
+Hugging Face es el mayor repositorio mundial de modelos abiertos (el equivalente botánico al Herbario de Kew o al Jardín Botánico de Madrid, pero de redes neuronales). Vamos a inspeccionar la ficha de un modelo real sin descargar nada:
+
+<Pasos>
+  <Paso numero={1} titulo="Entra en Hugging Face">
+    Abre tu navegador en el Mac y visita: <a href="https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct" target="_blank" rel="noreferrer">huggingface.co/meta-llama/Llama-3.1-8B-Instruct</a>.
+  </Paso>
+  <Paso numero={2} titulo="Localiza el número de parámetros y la licencia">
+    En la parte superior verás la etiqueta `8B` y en la columna derecha el bloque de **License** (verás `llama3.1`, indicando que es de pesos abiertos con licencia comunitaria).
+  </Paso>
+  <Paso numero={3} titulo="Abre la pestaña 'Files and versions'">
+    Haz clic en la pestaña **Files and versions** situada justo debajo del título del modelo.
+  </Paso>
+  <Paso numero={4} titulo="Comprueba el peso de los archivos reales">
+    Busca los archivos con extensión `.safetensors` (por ejemplo, `model-00001-of-00004.safetensors`).
+    Observa cómo la suma de esos cuatro archivos ronda exactamente los **16 GB**, confirmando la fórmula de **8B × 2 bytes = 16 GB** que hemos calculado hoy.
+  </Paso>
+</Pasos>
+
+---
+
+## Reto final: ¿Cabe en mi ordenador?
+
+<Reto
+  titulo="El cálculo del presupuesto de memoria"
+  dificultad="media"
+  tiempo="15 min"
+>
+Imagina que un compañero jubilado tiene un **MacBook Air con chip M2 y 16 GB de memoria unificada** y quiere saber qué modelos abiertos podrá ejecutar en local:
+
+1. **Pregunta 1:** ¿Cuánto ocuparía en memoria RAM un modelo de **8B a 16 bits**? ¿Cabe en su Mac de 16 GB teniendo en cuenta que el sistema operativo macOS necesita al menos 3 o 4 GB para funcionar?
+2. **Pregunta 2:** Si comprime ese mismo modelo de **8B a 4 bits (INT4)**, ¿cuántos gigabytes ocupará? ¿Cabe holgadamente ahora?
+3. **Pregunta 3:** Si se encapricha de un modelo de **70B a 4 bits**, ¿cuánta memoria RAM necesitaría como mínimo absoluto? ¿Cabría en su MacBook Air?
+
+Haz los cálculos a mano con la fórmula de la lección y redacta tu respuesta con la recomendación honesta que le darías.
+</Reto>
+
+---
+
+## Resumen y glosario botánico-digital
+
+<Herbario
+  items={[
+    {
+      termino: "Parámetro / Peso",
+      definicion: "Valor numérico decimal ajustable de una red neuronal que modula la fuerza con la que una señal viaja de una neurona a la siguiente."
+    },
+    {
+      termino: "B (Billion)",
+      definicion: "Abreviatura anglosajona para mil millones (10⁹). Un modelo 7B tiene siete mil millones de parámetros."
+    },
+    {
+      termino: "FP16 (Half Precision)",
+      definicion: "Formato numérico estándar de 16 bits donde cada parámetro ocupa exactamente 2 bytes en memoria."
+    },
+    {
+      termino: "Cuantización (INT4)",
+      definicion: "Técnica matemática de compresión que reduce el tamaño de cada peso a 4 bits (0,5 bytes), permitiendo que modelos grandes quepan en ordenadores personales."
+    },
+    {
+      termino: "Pesos abiertos (Open Weights)",
+      definicion: "Modelos cuyos archivos de parámetros numéricos se distribuyen públicamente para su descarga y ejecución local bajo licencias permisivas o comunitarias."
+    },
+    {
+      termino: "MoE (Mixture of Experts)",
+      definicion: "Arquitectura que divide la red en múltiples sub-redes especialistas, activando solo una fracción de los parámetros totales en cada token para ahorrar cómputo."
+    }
+  ]}
+/>
