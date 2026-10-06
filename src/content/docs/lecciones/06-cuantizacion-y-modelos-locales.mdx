@@ -1,15 +1,176 @@
 ---
-title: "Lección 07 — Cuantización y modelos en local"
-description: "Comprimir modelos para ejecutarlos de forma privada y autónoma en tu Mac."
+title: "Lección 07 — Cuantización y modelos en local: qué cabe en tu Mac"
+description: "Comprimir modelos mediante cuantización para ejecutarlos de forma privada, rápida y sin conexión en tu Mac."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Terminal from '../../../components/ui/Terminal.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import Herbario from '../../../components/ui/Herbario.astro';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L06**, orden en el itinerario: **7**).
+import SimuladorCuantizacion from '../../../components/widgets/simulador-cuantizacion/SimuladorCuantizacion.tsx';
+import CalculadoraMemoriaMac from '../../../components/widgets/calculadora-memoria-mac/CalculadoraMemoriaMac.tsx';
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+<Verificado
+  fecha="2026-03"
+  fuente="https://github.com/ggerganov/llama.cpp"
+  nota="Especificación del formato GGUF y métodos de cuantización k-quants (Q4_K_M) de llama.cpp, y requisitos de memoria unificada en chips Apple Silicon (M1 a M4)."
+/>
 
 ## Objetivo de la lección
-Comprimir modelos para ejecutarlos de forma privada y autónoma en tu Mac.
+Entender cómo la cuantización comprime los pesos de un modelo de 16 a 4 bits para que quepa en la memoria de tu Mac sin perder lucidez lingüística, y ejecutar tu primer modelo 100% privado y sin conexión a internet mediante una aplicación visual nativa.
+
+---
+
+## 1. El dilema de la memoria: ¿Por qué comprimir?
+
+En la <a href="/curso-ia/lecciones/05-pesos-y-parametros/">Lección 06</a> aprendimos la regla de oro: un modelo de 8.000 millones de parámetros (8B) a precisión estándar de 16 bits necesita **16 GB de memoria RAM** solo para almacenar sus números.
+
+Si tu Mac tiene 16 GB de RAM en total, y el sistema operativo macOS necesita 3 o 4 GB para gestionar tus ventanas, tus fotos y el navegador, el modelo no cabe. Si intentaras abrirlo, el ordenador se quedaría sin memoria física y empezaría a escribir desesperadamente en el disco duro (*swap*), haciendo que el modelo tarde un minuto entero en generar una sola palabra.
+
+¿La solución? Una técnica matemática prodigiosa llamada **Cuantización**.
+
+<Analogia
+  concepto="La Cuantización"
+  metafora="La visión periférica frente a la fóvea en el ojo de los vertebrados"
+  limite="En la retina biológica, la compresión es analógica y química: la fóvea concentra conos para el color y el detalle fino mientras que la periferia usa bastones de baja resolución para detectar movimiento ahorrando energía cerebral. En un modelo artificial, la cuantización es un redondeo aritmético digital que reduce la escala de números decimales de 16 bits a enteros de 4 bits."
+>
+Cuando miras el tronco de un abeto en el bosque, tu mirada central (la fóvea) capta cada grieta milimétrica de la corteza con máxima resolución. Sin embargo, por el rabillo del ojo (la visión periférica) solo percibes masas de sombra y movimiento general. 
+
+Tu cerebro no necesita procesar toda la escena a resolución fotográfica microscópica para saber qué hay alrededor. La cuantización hace lo mismo con una red neuronal: en lugar de almacenar cada peso con 16 decimales de precisión, los redondea a una regla más sencilla de 4 bits. El modelo ahorra un 75% de memoria y sigue entendiendo y redactando en perfecto castellano.
+</Analogia>
+
+---
+
+## 2. Simulador interactivo: De 16 a 4 bits
+
+Comprueba tú mismo cómo la reducción de bits discretiza la función matemática de la red y cómo afecta al tamaño de un modelo 8B:
+
+<SimuladorCuantizacion client:visible />
+
+<Callout tipo="info" titulo="El formato GGUF y el estándar Q4_K_M">
+En el mundo de los modelos locales, el formato más extendido y eficiente se llama **GGUF** (desarrollado por el proyecto de código abierto *llama.cpp*). 
+Dentro de este formato, verás nombres como **Q4_K_M** o **Q5_K_M**:
+- La **Q** significa *Quantized* (cuantizado).
+- El **4** indica que usa 4 bits de media por parámetro.
+- **K_M** (*K-quants Medium*) indica que los pesos más críticos de la red (la atención) se protegen con algo más de precisión mientras que el resto se comprime al máximo. Es el equilibrio perfecto.
+</Callout>
+
+---
+
+## 3. La ventaja secreta de tu Mac: La Memoria Unificada
+
+Si tienes un Mac moderno con procesador Apple Silicon (chip M1, M2, M3 o M4), posees una de las mejores máquinas del mundo para ejecutar inteligencia artificial personal.
+
+En un ordenador tradicional con Windows o Linux:
+- La tarjeta gráfica (GPU) tiene su propia memoria dedicada (por ejemplo, 8 GB de VRAM).
+- El procesador (CPU) tiene la memoria RAM normal (por ejemplo, 32 GB).
+- Si quieres que la tarjeta gráfica procese el modelo, estás limitado a esos 8 GB de VRAM; no puede usar fácilmente la memoria general porque el cable que las une es demasiado lento.
+
+En cambio, **en Apple Silicon la memoria es unificada**:
+- La CPU, la tarjeta gráfica y el motor neuronal comparten físicamente el mismo banco de memoria ultrarrápida.
+- Si tu Mac tiene 16 GB, 36 GB o 64 GB, **la tarjeta gráfica puede utilizar casi toda esa memoria directamente** para cargar modelos de IA a velocidades pasmosas.
+
+### ¿Qué modelo cabe exactamente en tu Mac?
+
+Usa la siguiente calculadora para seleccionar la configuración de tu equipo y ver el semáforo de compatibilidad:
+
+<CalculadoraMemoriaMac client:visible />
+
+---
+
+## 4. ¿Cuándo conviene lo local frente a la nube?
+
+Ejecutar modelos en tu propio Mac no sustituye a la nube; son dos herramientas complementarias en tu cuaderno de campo:
+
+| Aspecto | Modelo en tu Mac (Local) | Modelo en la Nube (ChatGPT / Claude) |
+|---|---|---|
+| **Privacidad** | **Total y absoluta (100%):** tus textos y fotos jamás salen de tu disco. | Los textos viajan a servidores de OpenAI o Anthropic. |
+| **Conexión** | Funciona en una cabaña de montaña en el Pirineo sin cobertura ni Wi-Fi. | Requiere conexión continua y estable a internet. |
+| **Coste** | **0 € para siempre:** descargas el archivo una vez y es tuyo sin cuotas. | Cuentas gratuitas con límites por hora o suscripciones de 20 €/mes. |
+| **Potencia máxima** | Limitado al tamaño que quepa en tu RAM (típicamente 3B u 8B). | Acceso a supermodelos de frontera (Opus, Astra, razonamiento profundo). |
+| **Velocidad** | Instantáneo y constante, sin colas de espera en horas punta. | Puede ralentizarse si los servidores mundiales están saturados. |
+
+---
+
+## Práctica en tu Mac: Instalar tu primer modelo con LM Studio
+
+Vamos a instalar una aplicación visual para macOS que te permitirá chatear con modelos locales sin escribir una sola línea de código en la terminal (la terminal la exploraremos a fondo a partir de la siguiente lección):
+
+<Pasos>
+  <Paso numero={1} titulo="Averigua la memoria exacta de tu Mac">
+    En la esquina superior izquierda de tu pantalla de Mac, haz clic en el icono de la manzana () y pulsa en **«Acerca de este Mac»**.
+    Anota qué chip tienes (ej. *Apple M2*) y cuánta memoria tiene (ej. *16 GB*).
+    {/* TODO(personalizar): Anotar el chip y memoria exactos del Mac del alumno cuando los confirme */}
+  </Paso>
+  <Paso numero={2} titulo="Descarga e instala LM Studio">
+    Abre Safari y entra en <a href="https://lmstudio.ai" target="_blank" rel="noreferrer">lmstudio.ai</a>.
+    Haz clic en el botón verde **«Download for Mac (Apple Silicon)»**.
+    Abre el archivo `.dmg` descargado y arrastra el icono de LM Studio a tu carpeta de Aplicaciones.
+  </Paso>
+  <Paso numero={3} titulo="Busca y descarga un modelo equilibrado">
+    Abre LM Studio en tu Mac:
+    1. En la barra de búsqueda superior, escribe: `Llama 3.2 3B` (si tienes 8 GB de RAM) o `Llama 3.1 8B` (si tienes 16 GB o más).
+    2. En los resultados, selecciona la versión oficial de Meta o de *bartowski* y haz clic en **Download** en la fila que indique **Q4_K_M** (pesa entre 2 y 5 GB).
+  </Paso>
+  <Paso numero={4} titulo="Prueba la conversación desconectando el Wi-Fi">
+    Una vez descargado:
+    1. Haz clic en el icono de chat (el bocadillo de conversación en el lateral izquierdo).
+    2. En el desplegable superior, selecciona el modelo que acabas de descargar.
+    3. **Desactiva el Wi-Fi de tu Mac** desde la barra de menús.
+    4. Escribe: *«Explícame brevemente el ciclo vital del musgo»*.
+    Comprueba cómo el modelo empieza a escribir inmediatamente a 20 o 30 tokens por segundo, de forma totalmente privada y autónoma en tu propio procesador.
+  </Paso>
+</Pasos>
+
+---
+
+## Reto final: El informe de recomendación
+
+<Reto
+  titulo="La receta de tu estación de trabajo"
+  dificultad="media"
+  tiempo="15 min"
+>
+Con los datos de tu propio Mac y lo aprendido en esta lección, redacta un breve informe de tres líneas contestando a estas preguntas:
+
+1. **¿Qué chip y cuánta memoria RAM unificada tiene tu equipo?**
+2. **¿Qué modelo concreto (nombre y número de parámetros) y qué nivel de cuantización (Q4, Q8...) has elegido para tu uso diario?**
+3. **¿Por qué has descartado una versión a 16 bits sin cuantizar y por qué has descartado un modelo de 70B?**
+
+Guarda esta receta: será la configuración de referencia que utilizaremos en el Bloque 2 y 3 para conectar herramientas y agentes locales.
+</Reto>
+
+---
+
+## Resumen y glosario botánico-digital
+
+<Herbario
+  items={[
+    {
+      termino: "Cuantización",
+      definicion: "Técnica de compresión que reduce el número de bits utilizados para representar cada parámetro numérico de la red (ej. de 16 bits a 4 bits), disminuyendo drásticamente el uso de memoria RAM."
+    },
+    {
+      termino: "Formato GGUF",
+      definicion: "Formato de archivo binario optimizado para almacenar modelos de lenguaje cuantizados y permitir su carga directa y ultrarrápida en memoria RAM/VRAM en arquitecturas domésticas."
+    },
+    {
+      termino: "Memoria Unificada",
+      definicion: "Arquitectura de hardware de Apple Silicon donde la CPU, la GPU y el motor neuronal comparten un único espacio físico de memoria de alta velocidad, permitiendo a la tarjeta gráfica utilizar decenas de gigabytes de RAM para IA."
+    },
+    {
+      termino: "Tokens por segundo (tok/s)",
+      definicion: "Métrica de velocidad de generación de un modelo. Una velocidad de 15 a 20 tok/s equivale a la velocidad de lectura humana confortable."
+    },
+    {
+      termino: "LM Studio",
+      definicion: "Aplicación de escritorio con interfaz gráfica intuitiva para descargar y ejecutar modelos abiertos en local sin necesidad de comandos de terminal."
+    }
+  ]}
+/>
