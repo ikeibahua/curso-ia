@@ -11,6 +11,7 @@ export default defineConfig({
       title: 'Cuaderno de campo: Inteligencia Artificial',
       description: 'Curso autodirigido y práctico de inteligencia artificial, modelos locales y agentes.',
       defaultLocale: 'root',
+      disable404Route: true,
       locales: {
         root: {
           label: 'Español',
