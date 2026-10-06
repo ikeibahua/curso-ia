@@ -1,15 +1,196 @@
 ---
 title: "Lección 03 — Transformers y atención, sin miedo"
-description: "El mecanismo que permite al modelo relacionar unas palabras con otras."
+description: "El mecanismo de autoatención que permite al modelo conectar palabras lejanas y desambiguar el contexto."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Terminal from '../../../components/ui/Terminal.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import Herbario from '../../../components/ui/Herbario.astro';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L03**, orden en el itinerario: **3**).
+import MapaAtencion from '../../../components/widgets/mapa-atencion/MapaAtencion.tsx';
+import SimuladorTemperatura from '../../../components/widgets/simulador-temperatura/SimuladorTemperatura.tsx';
+import FlujoCapas from '../../../components/widgets/flujo-capas/FlujoCapas.tsx';
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+<Verificado
+  fecha="2026-03"
+  fuente="https://arxiv.org/abs/1706.03762"
+  nota="Arquitectura Transformer descrita en 'Attention Is All You Need' (Vaswani et al.) y especificaciones vigentes de inferencia (logits, softmax, temperatura y top-p)."
+/>
 
 ## Objetivo de la lección
-El mecanismo que permite al modelo relacionar unas palabras con otras.
+Comprender cómo la arquitectura Transformer utiliza la «autoatención» para que cada palabra absorba el contexto de sus vecinas, desambiguando significados y modulando la creatividad de las respuestas mediante la temperatura.
+
+---
+
+## 1. El gran problema: las palabras aisladas no bastan
+
+En la <a href="/curso-ia/lecciones/02-embeddings/">Lección 02 (Embeddings)</a> vimos que podíamos convertir cualquier palabra en una coordenada en el espacio. La palabra «banco» tiene su propio punto fijo en el diccionario del modelo.
+
+Pero fíjate en estas dos oraciones:
+1. *«Fui al banco a ingresar mi pensión antes del cierre.»*
+2. *«Me senté en el banco de piedra a contemplar los robles.»*
+
+Si el modelo se limitase a buscar la coordenada estática de «banco», ambas frases empezarían con el mismísimo vector. ¿Cómo sabe el modelo que en la primera frase hablamos de una sucursal financiera y en la segunda de un mueble de jardín?
+
+Hasta 2017, los modelos procesaban el texto palabra a palabra de izquierda a derecha (redes recurrentes o LSTM), como quien lee una cinta perforada. Al llegar a la palabra número cincuenta, el recuerdo de las primeras palabras se había disipado o desdibujado.
+
+Todo cambió con la publicación del artículo científico *«Attention Is All You Need»* (Vaswani et al., 2017), que introdujo la arquitectura **Transformer**. Su hallazgo fundamental: no leas en fila india; pon todas las palabras sobre la mesa a la vez y permite que **cada palabra mire a todas las demás para enriquecer su significado**.
+
+<Analogia
+  concepto="El mecanismo de autoatención (Self-Attention)"
+  metafora="La bandada de estorninos (murmuración) en el cielo al atardecer"
+  limite="Una bandada reacciona a estímulos físicos continuos en tiempo real por pura proximidad tridimensional (unos 7 vecinos colindantes). En un Transformer no hay pájaros ni tiempo biológico: todas las palabras calculan de golpe un producto escalar matricial contra todas las demás posiciones, independientemente de lo lejos que estén en la página."
+>
+Imagina una bandada de miles de estorninos volando en perfecta sincronía. Ningún pájaro sigue a un líder supremo. Cada individuo modula su velocidad y rumbo prestando atención continua a sus compañeros. Si varios a la izquierda giran, el pájaro ajusta su vuelo.
+
+En el Transformer, cada palabra hace lo mismo: antes de decidir qué significa, proyecta su atención sobre toda la frase. «Banco» mira a su alrededor, detecta la presencia de «pensión» e «ingresar», y modula su vector hacia el significado financiero.
+</Analogia>
+
+---
+
+## 2. Mapa interactivo de autoatención
+
+El corazón del Transformer calcula para cada par de palabras un peso o porcentaje de afinidad: **¿cuánta atención debe prestar la palabra A a la palabra B?**
+
+En este visualizador interactivo puedes comprobar cómo se resuelve la polisemia y a qué palabras se dirigen las distintas «cabezas de atención»:
+
+<MapaAtencion client:visible />
+
+<Callout tipo="info" titulo="¿Por qué se llama 'multicabeza' (Multi-Head)?">
+Un modelo no tiene un solo mecanismo de atención, sino decenas de ellos trabajando en paralelo (por ejemplo, 32 o 64 cabezas por capa). 
+- Una cabeza se especializa en conectar **sujetos con sus verbos** («el lince» → «acechó»).
+- Otra rastrea **pronombres** («tenía» → ¿quién? → «el lince»).
+- Otra se fija en el **campo semántico general** («banco» + «ingresar» + «pensión»).
+</Callout>
+
+---
+
+## 3. El viaje completo por las capas del Transformer
+
+Un modelo de lenguaje moderno no aplica la atención una sola vez. Apila entre 32 y más de 100 bloques de capas idénticos. En cada piso del edificio, los conceptos se vuelven más abstractos.
+
+Recorre el siguiente esquema interactivo para ver qué ocurre desde que introduces tu frase hasta que el modelo emite la siguiente palabra:
+
+<FlujoCapas client:visible />
+
+### ¿Por qué cuesta más una conversación muy larga? (La atención cuadrática)
+
+Seguro que has notado que los proveedores cobran más o los modelos tardan más cuando la conversación acumula miles de palabras. ¿A qué se debe?
+
+En la atención tradicional, si tienes $N$ palabras, cada una debe compararse con las $N$ palabras restantes. El número de operaciones crece de forma cuadrática: **$N \times N = N^2$**.
+- Con $1.000$ tokens: $1.000.000$ de comparaciones.
+- Con $100.000$ tokens: ¡$10.000.000.000$ de operaciones matriciales!
+
+Aunque hoy en día se utilizan optimizaciones de ingeniería avanzadas (como *FlashAttention* y mecanismos de memoria temporal llamados *KV Cache*), el contexto largo sigue requiriendo una enorme cantidad de memoria RAM en la tarjeta gráfica.
+
+---
+
+## 4. Matemáticas mínimas: cómo se decide la siguiente palabra
+
+Al salir de la última capa, el modelo no produce una palabra directamente. Produce una lista de puntuaciones en bruto llamadas **logits**, una para cada palabra de su vocabulario (unas 128.000 palabras posibles).
+
+Para convertir esas puntuaciones en probabilidades que sumen exactamente el 100%, se aplica una fórmula matemática clásica llamada **Softmax**:
+
+```text
+P_i = e^(z_i / T) / ∑ e^(z_j / T)
+```
+
+Donde:
+- $z_i$ es la puntuación (logit) de la palabra candidata.
+- $T$ es la **Temperatura**, el mando que modula la variabilidad de la respuesta.
+- $e$ es la base del logaritmo natural, que amplifica las diferencias.
+
+### El efecto de la Temperatura ($T$) y el muestreo de núcleo (Top-P)
+
+- **Temperatura baja ($T \to 0$ o $0.1$):** Las puntuaciones más altas se disparan y las demás caen a cero. El modelo se vuelve casi determinista («codicioso» o *greedy*). Siempre elige la opción más obvia y lógica. Ideal para programar, extraer datos o clasificaciones botánicas rigurosas.
+- **Temperatura media ($T \approx 0.7$):** El equilibrio estándar de los chats comerciales. Respuestas fluidas y naturales sin divagar.
+- **Temperatura alta ($T > 1.2$):** La distribución se aplana. Palabras improbables ganan opciones de salir. Ideal para poesía o lluvia de ideas, pero con riesgo de incoherencias y alucinaciones.
+- **Top-P (Muestreo de Núcleo):** En vez de mirar todo el diccionario, corta la lista cuando las mejores opciones suman, por ejemplo, el 90% ($P = 0.9$) y descarta radicalmente la «cola» de palabras absurdas.
+
+Pruébalo tú mismo en el simulador interactivo:
+
+<SimuladorTemperatura client:visible />
+
+<Callout tipo="advertencia" titulo="Nota sobre modelos de razonamiento (o1, o3, Claude 3.7 Thinking)">
+En los modelos de última generación con razonamiento profundo, la temperatura suele estar **fijada a 1.0 por el proveedor** y no se permite moverla. Modificar la temperatura en esos modelos degradaría la precisión de su cadena interna de pensamiento. En su lugar, el comportamiento se gradúa mediante el **esfuerzo de razonamiento** (*reasoning effort*), que estudiaremos en la <a href="/curso-ia/lecciones/20-mapa-de-modelos-y-niveles-de-razonamiento/">Lección 20</a>.
+</Callout>
+
+---
+
+## Práctica en tu Mac: comprobar la estocasticidad
+
+Aunque en la <a href="/curso-ia/lecciones/06-cuantizacion-y-modelos-locales/">Lección 06</a> instalaremos un modelo local en tu terminal donde ajustaremos el parámetro `--temperature` con precisión numérica, ya puedes comprobar este fenómeno hoy mismo en la web de ChatGPT o Claude:
+
+<Pasos>
+  <Paso numero={1} titulo="Abre tu chat habitual">
+    Entra en tu navegador en ChatGPT o Claude con una sesión limpia.
+  </Paso>
+  <Paso numero={2} titulo="Pide una continuación ambigua tres veces">
+    Escribe exactamente el siguiente mensaje:
+    *«Escribe una única frase poética que empiece por: En el envés de la hoja de haya...»*
+  </Paso>
+  <Paso numero={3} titulo="Abre un nuevo chat y repite la misma petición">
+    Copia y pega exactamente la misma frase en dos chats nuevos independientes.
+  </Paso>
+  <Paso numero={4} titulo="Comprueba las divergencias">
+    Observa cómo el inicio es idéntico, pero a partir de la cuarta o quinta palabra el muestreo probabilístico toma bifurcaciones distintas. Si la temperatura estuviera a 0, obtendrías exactamente la misma frase letra por letra cada vez.
+  </Paso>
+</Pasos>
+
+---
+
+## Reto final
+
+<Reto
+  titulo="Configuración del botánico: rigor vs divulgación"
+  dificultad="media"
+  tiempo="15 min"
+>
+Imagina que estás configurando un asistente de IA para tu cuaderno de campo botánico y tienes dos tareas muy distintas:
+
+1. **Tarea A (Identificación taxonómica):** Quieres que el modelo reciba una lista de caracteres morfológicos (hojas alternas, borde aserrado, nervadura penninervia) y determine sin vacilar la familia o género botánico exacto.
+2. **Tarea B (Divulgación y metáforas):** Quieres redactar una introducción evocadora para una excursión naturalista con niños sobre el ciclo estacional del hayedo.
+
+**Tu misión:**
+- Utiliza el simulador de temperatura anterior para elegir qué valor de **Temperatura ($T$)** y qué valor de **Top-P** asignarías a cada tarea.
+- Justifica tu elección: ¿por qué una temperatura de $1.4$ sería desastrosa en la Tarea A, y por qué una temperatura de $0.05$ haría aburrida la Tarea B?
+</Reto>
+
+---
+
+## Resumen y glosario botánico-digital
+
+<Herbario
+  items={[
+    {
+      termino: "Autoatención (Self-Attention)",
+      definicion: "Mecanismo por el cual cada token de una secuencia calcula su afinidad matemática con todos los demás tokens para enriquecer su representación antes de predecir la siguiente palabra."
+    },
+    {
+      termino: "Transformer",
+      definicion: "Arquitectura de red neuronal presentada en 2017 basada exclusivamente en capas de atención y redes densas, sin procesamiento secuencial recurrente."
+    },
+    {
+      termino: "Logit",
+      definicion: "Puntuación numérica en bruto que el modelo asigna a cada palabra candidata antes de aplicar la función de normalización probabilística."
+    },
+    {
+      termino: "Softmax",
+      definicion: "Función matemática que transforma un vector de números reales cualesquiera en una distribución de porcentajes que suman exactamente 1 (o 100%)."
+    },
+    {
+      termino: "Temperatura (T)",
+      definicion: "Hiperparámetro que divide los logits antes del Softmax. A menor valor, más predecible y estricto; a mayor valor, más variado y sorprendente."
+    },
+    {
+      termino: "Top-P (Nucleus Sampling)",
+      definicion: "Técnica de recorte que conserva únicamente el conjunto más probable de palabras cuya suma acumulada alcanza el umbral P (por ejemplo, el 90%), eliminando opciones extravagantes."
+    }
+  ]}
+/>
