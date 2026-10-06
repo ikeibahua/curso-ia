@@ -1,15 +1,174 @@
 ---
-title: "Lección 20 — Panorama y tendencias"
-description: "Hacia dónde avanza la investigación y cómo mantenerse al día con criterio."
+title: "Lección 20 — Panorama, tendencias y brújula de futuro"
+description: "Multimodalidad, razonamiento, regulación europea (AI Act), dieta informativa y cómo seguir aprendiendo sin saturarse."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Terminal from '../../../components/ui/Terminal.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import Herbario from '../../../components/ui/Herbario.astro';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L18**, orden en el itinerario: **20**).
+import LineaTemporalIa from '../../../components/widgets/linea-temporal-ia/LineaTemporalIa.tsx';
+import DietaInformativa from '../../../components/widgets/dieta-informativa/DietaInformativa.tsx';
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+<Verificado
+  fecha="2026-03"
+  fuente="https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:32024R1689"
+  nota="Reglamento (UE) 2024/1689 del Parlamento Europeo y del Consejo (Ley de Inteligencia Artificial - EU AI Act), entrada en vigor progresiva y obligaciones de transparencia para modelos de propósito general."
+/>
 
 ## Objetivo de la lección
-Hacia dónde avanza la investigación y cómo mantenerse al día con criterio.
+Situar los conocimientos adquiridos a lo largo del curso dentro del panorama tecnológico global, comprendiendo las grandes tendencias de futuro (multimodalidad, razonamiento y modelos locales), los marcos legales de protección ciudadana (AI Act) y aprendiendo a cultivar una dieta informativa saludable que evite la saturación mental.
+
+---
+
+## 1. La radiación adaptativa: Cómo hemos llegado hasta aquí
+
+A lo largo de las lecciones anteriores has recorrido un camino extraordinario:
+- En el **Bloque 1** desmitificamos la magia: comprendiste los tokens (L01), los espacios semánticos de embeddings (L02), la atención de los transformers (L03) y cómo los pesos neuronales se comprimen para caber en la memoria de tu Mac (L05 y L06).
+- En el **Bloque 2** perdiste el miedo a la Terminal, dominando rutas, Homebrew y la custodia de claves de API (L07 y L08).
+- En el **Bloque 3** entraste en la era agéntica: observaste el bucle de decisión, el protocolo MCP, la ingeniería de contexto con archivos Markdown, el uso seguro con Git, el examen a libro abierto con RAG, la ciberseguridad y el salto al mundo físico diseñando piezas 3D para tu taller (L09 a L18).
+
+Para no sentirte abrumado por las noticias diarias, conviene mirar con perspectiva histórica. Observa en esta línea temporal interactiva cómo cada hito se apoya sobre el anterior:
+
+<LineaTemporalIa client:visible />
+
+---
+
+## 2. Las cuatro grandes corrientes del presente
+
+Si miras bajo el capó de las noticias de investigación actuales, todo el desarrollo de la inteligencia artificial converge en cuatro corrientes maestras:
+
+### 1. Multimodalidad nativa
+Los modelos ya no son meros "lectores de texto". Fueron entrenados desde la base escuchando sonido, viendo fotografías y procesando texto de forma unificada. Para un naturalista, esto significa que puedes mostrarle la foto de una agalla en un roble o el espectrograma del canto de un petirrojo y dialogar directamente sobre los detalles visuales y acústicos.
+
+### 2. Razonamiento deliberado (*Test-time compute*)
+Como estudiamos en la Lección 05 (L20), la frontera ya no consiste solo en hacer modelos más gigantescos, sino en **darles tiempo para pensar antes de contestar**. Al permitir que el modelo genere una cadena interna de razonamiento (*thinking tokens*), contrasta hipótesis, detecta inconsistencias y reduce drásticamente las alucinaciones matemáticas y taxonómicas.
+
+### 3. Modelos pequeños y soberanía local (SLMs)
+Frente a los mastodontes en la nube que consumen megavatios, la investigación ha logrado que modelos de 3.000 a 8.000 millones de parámetros (Llama 3.2, Qwen 2.5 Coder) alcancen un rendimiento asombroso en tareas concretas. Con la arquitectura de memoria unificada de Apple Silicon en tu Mac, puedes ejecutar asistentes rápidos, privados y con coste cero sin enviar un solo byte a servidores ajenos.
+
+### 4. Agentes persistentes y estándares abiertos (MCP)
+La era de las interfaces de chat aisladas da paso a agentes capaces de consultar tus herramientas favoritas mediante estándares abiertos como **MCP**. El modelo ya no inventa respuestas en el vacío: consulta bases de datos, comprueba el tiempo en estaciones meteorológicas o modela geometrías en FreeCAD.
+
+---
+
+## 3. La Ley Europea de IA (*EU AI Act*): Tus derechos y límites éticos
+
+La Unión Europea ha sido la primera región del mundo en aprobar un marco normativo integral: el **Reglamento (UE) 2024/1689 (Ley de IA)**. Lejos de ser un texto burocrático árido, establece salvaguardas esenciales que todo ciudadano debe conocer:
+
+- **Riesgo Inaceptable (Totalmente Prohibido en la UE):** Se prohíben de forma taxativa los sistemas de puntuación social ciudadana (*social scoring*), la manipulación cognitiva subliminal para alterar el comportamiento y el reconocimiento de emociones en puestos de trabajo o centros educativos.
+- **Alto Riesgo (Sujeto a auditorías estrictas):** Sistemas de IA empleados en medicina crítica, selección de personal, concesión de créditos o infraestructuras esenciales. Exigen supervisión humana obligatoria, datos de entrenamiento libres de sesgos y trazabilidad algorítmica.
+- **Modelos de Propósito General (GPAI):** Las empresas que comercializan modelos como Claude, ChatGPT o Gemini deben publicar resúmenes de los contenidos utilizados para entrenar, respetar los derechos de autor europeos y documentar sus medidas de ciberseguridad.
+
+Para ti como usuario particular, la ley garantiza un principio básico: **tienes derecho a saber cuándo estás interactuando con una máquina y las imágenes sintéticas hiperrealistas (*deepfakes*) deben llevar marcas de agua identificativas obligatorias**.
+
+---
+
+## 4. El arte de la Dieta Informativa: Cómo no perder la paz mental
+
+En la era de las redes sociales, el negocio de muchos medios digitales consiste en mantenerte en un estado constante de asombro o pánico existencial.
+
+Para disfrutar de esta tecnología como un pasatiempo fértil y útil sin que colonice tu tiempo, aplica esta guía de recursos y el ritual mensual de 30 minutos:
+
+<DietaInformativa client:visible />
+
+<Analogia titulo="La explosión cámbrica y la radiación adaptativa">
+Lo que ocurre hoy con los modelos y herramientas de IA es idéntico a una **radiación adaptativa biológica tras una gran innovación evolutiva**, como la explosión del Cámbrico:
+- Aparece un rasgo clave (el Transformer, el razonamiento, el protocolo MCP) y de repente surgen miles de especies experimentales de software con formas extravagantes compitiendo en el mismo ecosistema.
+- En pocos años, la inmensa mayoría de esas herramientas efímeras se extinguirán por falta de alimento (financiación o utilidad real). Solo sobrevivirán unas pocas familias troncales sólidas y adaptadas al entorno.
+
+**Dónde se rompe la analogía:** La selección natural tarda millones de años y opera por mutación ciega. En el software, la selección opera a velocidad vertiginosa impulsada por decisiones humanas conscientes, consumo de vatios de energía eléctrica y legislaciones como el AI Act. No necesitas perseguir cada "especie fósil" que nace y muere en una semana en Twitter: basta con observar con serenidad las familias principales que arraigan en la práctica real.
+</Analogia>
+
+---
+
+## 5. Práctica en tu Mac: Configura tu rincón sereno de aprendizaje
+
+Vamos a dejar preparado en tu propio Mac un espacio limpio para tus consultas mensuales sin ruido publicitario:
+
+<Pasos>
+  <Paso numero={1} titulo="Crea una carpeta de marcadores en Safari">
+    Abre **Safari** en tu Mac y abre la barra lateral de marcadores (`Cmd + Control + 1`).
+    - Haz clic derecho y selecciona **Nueva carpeta**.
+    - Nómbrala: `IA-Seria`.
+    - Guarda en ella dos o tres enlaces rigurosos: por ejemplo, el blog de ingeniería de Anthropic (`anthropic.com/research`), el portal de documentación de Ollama (`ollama.com`) o las notas técnicas de Simon Willison (`simonwillison.net`).
+  </Paso>
+
+  <Paso numero={2} titulo="Programa tu ritual mensual en el Calendario de macOS">
+    Abre la aplicación **Calendario** en tu Mac:
+    - Crea un evento para el **primer domingo del mes próximo a las 11:00 AM**.
+    - Título: *"Ritual de IA: 30 minutos de lectura tranquila y paseo"*.
+    - Ajusta la opción de **Repetición**: *Cada mes*.
+    - Este recordatorio te protegerá de la urgencia artificial del día a día: sabrás que tienes tu momento reservado y podrás ignorar el bombardeo de titulares el resto del mes.
+  </Paso>
+
+  <Paso numero={3} titulo="Comprueba la salud de tus herramientas en la Terminal">
+    Abre la **Terminal** y acostúmbrate a este breve chequeo mensual que mantiene todo a punto:
+
+    ```bash
+    brew update
+    ollama list
+    ```
+
+    Verás qué versiones de herramientas tienes al día sin necesidad de complicarte con instalaciones experimentales.
+  </Paso>
+</Pasos>
+
+---
+
+## 6. Reto final: Tu plan de campo para los próximos tres meses
+
+<Reto titulo="Traza tu horizonte personal de curiosidad">
+Este curso no termina aquí: te ha entregado un cuaderno de campo y las mejores lentes de observación. Ahora tú eres el naturalista a cargo de tu propia expedición.
+
+Escribe en tus notas personales tres propósitos modestos y gratificantes para los próximos 90 días:
+
+1. **Mes 1 (La consolidación):** ¿Qué pequeña tarea de tu Mac vas a delegar por completo en tu agente supervisado? (Por ejemplo: *"Tener mis 500 fotos botánicas de los últimos tres años perfectamente ordenadas en carpetas"*).
+2. **Mes 2 (El experimento físico):** ¿Qué pieza práctica vas a diseñar en FreeCAD con ayuda de un modelo y enviar a tu impresora 3D? (Por ejemplo: *"Una gradilla para viales de semillas con sus tolerancias calibradas"*).
+3. **Mes 3 (La biblioteca propia):** ¿Qué colección de apuntes o artículos históricos vas a indexar en un consultorio RAG local para poder hacerle preguntas en tus tardes de estudio?
+</Reto>
+
+---
+
+## 7. Resumen y herbario de conceptos
+
+- El ecosistema avanza hacia la **multimodalidad integrada**, el **razonamiento deliberado** en inferencia y la ejecución de **modelos pequeños en local** con chip Apple Silicon.
+- La **Ley Europea de IA (AI Act)** protege al ciudadano prohibiendo sistemas de manipulación y vigilancia abusiva, e imponiendo transparencia obligatoria en modelos comerciales.
+- Una buena **dieta informativa** filtra el sensacionalismo: busca fuentes con código reproducible y reserva un **ritual mensual de 30 minutos** para aprender con sosiego.
+- La inteligencia artificial no sustituye tu mirada ni tu pasión botánica: es una lupa extraordinaria que limpia el trabajo mecánico para que tú puedas dedicar tu tiempo a lo que de verdad importa.
+
+<Herbario
+  terminos={[
+    {
+      termino: "Multimodalidad nativa",
+      definicion: "Capacidad de una red neuronal para procesar, relacionar y generar conjuntamente diversos tipos de información (texto, imagen, audio y código) dentro del mismo modelo.",
+      analogia: "La percepción sensorial integrada de un animal: el olor del polen, el color de los pétalos y la textura de la hoja forman una única experiencia indivisible."
+    },
+    {
+      termino: "AI Act (Ley Europea de Inteligencia Artificial)",
+      definicion: "Primer marco regulatorio integral del mundo aprobado por la Unión Europea que clasifica las aplicaciones de IA según su nivel de riesgo y establece prohibiciones y garantías de transparencia.",
+      analogia: "El convenio CITES de protección de especies amenazadas o las leyes de parques nacionales: fijan qué actividades humanas son inadmisibles para salvaguardar el bien común."
+    },
+    {
+      termino: "SLM (Small Language Model - Modelo Pequeño)",
+      definicion: "Modelo de lenguaje optimizado y compacto (típicamente entre 1.000 y 8.000 millones de parámetros) capaz de ejecutarse con gran rapidez y bajo consumo de memoria en dispositivos personales.",
+      analogia: "Un colibrí o un vencejo: ágil, ligero y con un consumo de recursos mínimo, adaptado a maniobras rápidas en comparación con un gran albatros oceánico."
+    },
+    {
+      termino: "Inferencia deliberada (Test-time compute)",
+      definicion: "Técnica donde el modelo emplea recursos de cómputo adicionales durante el momento de responder para generar cadenas internas de verificación lógica y corrección de hipótesis.",
+      analogia: "Un jugador de ajedrez o un botánico clasificando una muestra dudosa que consulta varias claves dicotómicas antes de emitir su determinación final."
+    },
+    {
+      termino: "Dieta informativa",
+      definicion: "Selección consciente y limitada de fuentes técnicas rigurosas para mantenerse informado, evitando el ruido sensacionalista y la sobrecarga cognitiva.",
+      analogia: "Una dieta mediterránea equilibrada frente al consumo compulsivo de comida ultraprocesada: te nutre sin saturar tu organismo."
+    }
+  ]}
+/>
