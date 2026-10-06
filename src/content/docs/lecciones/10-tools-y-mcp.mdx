@@ -1,15 +1,198 @@
 ---
-title: "Lección 11 — Tools y MCP"
-description: "El estándar de herramientas para conectar la IA con el mundo real."
+title: "Lección 11 — Tools y MCP: el estándar de herramientas"
+description: "Cómo el protocolo abierto Model Context Protocol (MCP) conecta tus modelos con archivos, bases de datos y el mundo real."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Terminal from '../../../components/ui/Terminal.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import Herbario from '../../../components/ui/Herbario.astro';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L10**, orden en el itinerario: **11**).
+import DiagramaMcp from '../../../components/widgets/diagrama-mcp/DiagramaMcp.tsx';
+import DisenadorTools from '../../../components/widgets/disenador-tools/DisenadorTools.tsx';
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+<Verificado
+  fecha="2026-03"
+  fuente="https://modelcontextprotocol.io/"
+  nota="Especificación oficial del protocolo abierto Model Context Protocol (MCP) impulsado por Anthropic y adoptado por la industria."
+/>
 
 ## Objetivo de la lección
-El estándar de herramientas para conectar la IA con el mundo real.
+Entender qué es una herramienta para un modelo de lenguaje, cómo el protocolo abierto MCP estandariza su conexión como si fuera un cable USB universal, y cómo configurar servidores de herramientas con permisos estrictamente acotados.
+
+---
+
+## 1. La anatomía de una herramienta (Tool)
+
+En la <a href="/curso-ia/lecciones/09-anatomia-de-un-agente/">Lección 10</a> vimos que un agente «actúa» emitiendo un bloque de texto técnico en formato JSON. Pero, ¿cómo sabe el modelo qué herramientas existen y para qué sirve cada una?
+
+Toda herramienta se presenta ante el modelo con tres elementos indispensables:
+1. **Nombre técnico:** Por ejemplo, `identificar_especie_arbol`.
+2. **Parámetros:** La lista de datos que necesita recibir (por ejemplo, el tipo de hoja o la altitud geográfica).
+3. **Descripción en lenguaje natural:** **La pieza más importante de todas.**
+
+El modelo no tiene ojos para ver el código Python o C++ que hay detrás de la herramienta. **Lo único que lee es la descripción.** Si la descripción es ambigua, vaga o está mal redactada, el modelo vacilará, cometerá errores o se negará a usarla.
+
+Compruébalo tú mismo en este laboratorio de diseño:
+
+<DisenadorTools client:visible />
+
+<Callout tipo="info" titulo="En una herramienta, la documentación ES el código">
+Para un programador clásico, los comentarios de ayuda son secundarios. Para un agente de IA, la descripción en lenguaje natural es el código ejecutable de su propia mente: es la única brújula que tiene para juzgar si esa herramienta resolverá el problema del usuario.
+</Callout>
+
+---
+
+## 2. El caos previo y la llegada de MCP (El USB de la IA)
+
+Hasta finales de 2024, conectar herramientas a un modelo era un auténtico dolor de cabeza:
+- Si querías conectar una base de datos a OpenAI, tenías que programar un conector específico.
+- Si querías conectar esa misma base de datos a Claude, tenías que reprogramar el conector desde cero con el formato de Anthropic.
+- Si querías usarla en local con Ollama o en un editor, necesitabas otro adaptador más.
+
+Era exactamente igual que la época en la que cada marca de teléfono móvil tenía su propio cargador incompatible.
+
+Todo cambió con la presentación de **MCP (Model Context Protocol)**, un estándar abierto que funciona como el **USB-C de la inteligencia artificial**:
+- Quien crea una herramienta programa un **Servidor MCP** una sola vez.
+- Cualquier aplicación compatible (**Cliente MCP**, como Claude Desktop, editores de código o agentes en la terminal) puede enchufarse a ese servidor de inmediato.
+
+<Analogia
+  concepto="El protocolo MCP y los servidores de herramientas"
+  metafora="La simbiosis mutualista de los líquenes en la corteza de los árboles"
+  limite="En la naturaleza, la simbiosis entre el micobionte (hongo) y el fotobionte (alga o cianobacteria) coevolucionó durante millones de años mediante adaptaciones químicas celulares microscópicas. En la informática, MCP es un protocolo digital que negocia conexiones en milisegundos mediante mensajes JSON-RPC estandarizados."
+>
+Un liquen no es un organismo individual: es una asociación íntima y perfecta entre un hongo y un alga. El hongo aporta la estructura física protectora, retiene la humedad y absorbe sales minerales del sustrato. El alga realiza la fotosíntesis y sintetiza azúcares para alimentar a ambos.
+
+MCP es esa misma interfaz de simbiosis: el modelo de lenguaje aporta el cerebro y el razonamiento simbólico, mientras que el servidor MCP aporta las manos físicas (leer archivos de tu Mac, consultar bases de datos o crear modelos 3D).
+</Analogia>
+
+---
+
+## 3. Diagrama interactivo: El flujo Cliente ↔ Servidor
+
+Explora en el siguiente visualizador cómo dialoga el cliente de IA con los distintos servidores a través del cable MCP:
+
+<DiagramaMcp client:visible />
+
+---
+
+## 4. Aclarando el vocabulario: Tools, Skills y MCP
+
+Es muy fácil confundir estos tres términos en las conversaciones sobre agentes:
+
+| Concepto | ¿Qué es? | Analogía cotidiana |
+|---|---|---|
+| **Tool (Herramienta)** | Una **función ejecutable concreta** con código que hace algo físico (ej. `leer_fichero`, `enviar_correo`). | Una tijera de podar en tu mano. |
+| **Skill (Habilidad)** | Un **conjunto de instrucciones escritas en texto** que enseñan al modelo un método de trabajo o procedimiento (lo veremos a fondo en la <a href="/curso-ia/lecciones/11-los-md-instrucciones-skills-memoria/">Lección 12</a>). | El manual de poda que explica en qué época y con qué ángulo cortar cada rama. |
+| **MCP** | El **cable o protocolo de comunicación** que conecta las herramientas externas con el modelo. | El cinturón de herramientas donde llevas colgadas las tijeras y el metro. |
+
+<Callout tipo="tip" titulo="Anticipo: Herramientas con efectos en el mundo físico">
+Un servidor MCP no solo lee texto en una pantalla. En la <a href="/curso-ia/lecciones/21-ia-para-diseno-3d-freecad/">Lección 17 (IA para diseño 3D)</a>, conectaremos un servidor MCP a **FreeCAD** para que el modelo diseñe piezas mecánicas y macetas paramétricas en 3D que luego podrás enviar a imprimir en filamento plástico real.
+</Callout>
+
+---
+
+## 5. La regla de oro de la seguridad: Mínimo Privilegio
+
+Conectar un servidor MCP a tu ordenador le otorga capacidades reales sobre tus datos. Por eso, existe un principio de seguridad inquebrantable: **el principio de mínimo privilegio (*Least Privilege*)**.
+
+- **El gran error:** Darle a un servidor de archivos acceso a toda tu carpeta de usuario (`/Users/tu_nombre`) o al disco raíz (`/`). Si el modelo sufriera una alucinación o un ataque malicioso, podría modificar tus fotos familiares, documentos bancarios o configuraciones del sistema.
+- **La buena práctica:** Acotar los permisos a carpetas de trabajo aisladas (por ejemplo, autorizar únicamente el acceso a `~/curso-ia-practicas`). Si el servidor intenta asomarse fuera de esa carpeta, el sistema bloqueará la operación al instante.
+
+---
+
+## Práctica en tu Mac: Inspeccionar la configuración de un servidor MCP
+
+Vamos a ver cómo se declara un servidor MCP en un archivo de configuración real de macOS:
+
+<Pasos>
+  <Paso numero={1} titulo="Abre tu Terminal de prácticas">
+    Entra en tu terminal habitual:
+    <Terminal comando="cd ~/curso-ia-practicas" explicacion="Nos situamos en la carpeta de laboratorio." />
+  </Paso>
+  <Paso numero={2} titulo="Crea un archivo de configuración MCP de muestra">
+    Crea un archivo llamado `mcp_config_ejemplo.json` con nano:
+    <Terminal comando="nano mcp_config_ejemplo.json" explicacion="Abre el editor para escribir una configuración MCP." />
+  </Paso>
+  <Paso numero={3} titulo="Pega la configuración con permisos seguros acotados">
+    Copia y pega este bloque JSON estándar:
+
+```json
+{
+  "mcpServers": {
+    "archivos-curso": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/alumno/curso-ia-practicas"
+      ]
+    }
+  }
+}
+```
+  </Paso>
+  <Paso numero={4} titulo="Analiza la jaula de seguridad">
+    Fíjate en la última línea: en lugar de poner `/` o `~`, la ruta está estrictamente delimitada a `/Users/alumno/curso-ia-practicas`.
+    Guarda con **Control + O** y sal con **Control + X**.
+  </Paso>
+</Pasos>
+
+---
+
+## Reto final: El análisis del administrador de sistemas
+
+<Reto
+  titulo="La auditoría de permisos del herbario"
+  dificultad="media"
+  tiempo="15 min"
+>
+Imagina que un colega instala un asistente de IA en su Mac y configura su servidor MCP de archivos con esta ruta:
+
+```json
+"args": ["-y", "@modelcontextprotocol/server-filesystem", "/Users/juan/"]
+```
+
+**Tu misión:**
+1. Explica en dos o tres frases qué peligros reales corre la privacidad y seguridad de Juan con esa configuración tan amplia.
+2. Si Juan solo quiere que el agente le ayude a organizar sus archivos de botánica que están en la carpeta `Documentos/Botanica`, ¿cómo reescribirías exactamente esa línea del archivo de configuración?
+3. ¿Por qué es preferible crear tres servidores MCP pequeños y especializados (uno para archivos, uno para clima y uno para 3D) en lugar de un único servidor gigante con permisos para todo el ordenador?
+</Reto>
+
+---
+
+## Resumen y glosario botánico-digital
+
+<Herbario
+  items={[
+    {
+      termino: "Tool (Herramienta)",
+      definicion: "Función informática con nombre, parámetros y descripción que un modelo de lenguaje puede solicitar ejecutar para interactuar con el mundo exterior."
+    },
+    {
+      termino: "MCP (Model Context Protocol)",
+      definicion: "Estándar abierto de conectividad que unifica la comunicación entre aplicaciones de inteligencia artificial (clientes) y fuentes de datos o herramientas externas (servidores)."
+    },
+    {
+      termino: "Cliente MCP",
+      definicion: "Aplicación o interfaz donde se aloja el modelo de IA que consume las herramientas expuestas por los servidores (ej. Claude Desktop, terminal, agentes)."
+    },
+    {
+      termino: "Servidor MCP",
+      definicion: "Programa ligero independiente que expone capacidades concretas (archivos locales, bases de datos SQLite, software 3D) siguiendo el protocolo estándar."
+    },
+    {
+      termino: "JSON-RPC",
+      definicion: "Protocolo de llamada a procedimientos remotos en texto ligero que utiliza mensajes JSON para enviar peticiones y recibir respuestas entre cliente y servidor."
+    },
+    {
+      termino: "Principio de mínimo privilegio",
+      definicion: "Regla de seguridad informática que establece que un programa debe tener acceso únicamente a los recursos estrictamente necesarios para su tarea, nunca a todo el sistema."
+    }
+  ]}
+/>
