@@ -1,15 +1,185 @@
 ---
 title: "Lección 18 — Agentes generalistas que viven en tu ordenador"
-description: "Agentes que automatizan tareas cotidianas en el sistema operativo."
+description: "Asistentes personales siempre activos: arquitectura, canales de mensajería, memoria permanente, tareas programadas y límites éticos."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Terminal from '../../../components/ui/Terminal.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import Herbario from '../../../components/ui/Herbario.astro';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L16**, orden en el itinerario: **18**).
+import ArquitecturaAgenteGeneralista from '../../../components/widgets/arquitectura-agente-generalista/ArquitecturaAgenteGeneralista.tsx';
+import MatrizAutonomia from '../../../components/widgets/matriz-autonomia/MatrizAutonomia.tsx';
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+<Verificado
+  fecha="2026-03"
+  fuente="https://github.com/NousResearch/hermes-agent"
+  nota="Agentes generalistas autoalojados de código abierto (Hermes Agent de Nous Research y ecosistema OpenClaw): arquitectura de pasarela multicanal (Telegram, Discord, Signal), bucle de aprendizaje continuo y programación de tareas mediante Cron."
+/>
 
 ## Objetivo de la lección
-Agentes que automatizan tareas cotidianas en el sistema operativo.
+Comprender la arquitectura y el propósito de los agentes autónomos de fondo (*always-on personal agents*), distinguiéndolos con claridad de los agentes de programación de terminal, identificando casos de uso sensatos y reconociendo sus riesgos de coste y seguridad antes de decidir si instalar uno.
+
+---
+
+## 1. La diferencia crucial: Herramienta de banco de trabajo frente a Guardián nocturno
+
+A lo largo de este bloque hemos aprendido a utilizar agentes como **OpenCode** o **Claude Code**. Esos son **agentes de sesión puntual**:
+- Te sientas ante la terminal de tu Mac, abres una carpeta de trabajo acotada, le encomiendas una tarea (ordenar fotos o depurar una tabla CSV), supervisas cada acción y cierras la sesión. Al terminar, el agente deja de existir en la memoria de tu ordenador.
+
+Un **agente generalista (o asistente personal autónomo)** opera bajo una filosofía totalmente distinta:
+- Vive como un proceso silencioso en segundo plano (un *demonio* o servicio permanente) en tu ordenador o en un servidor doméstico.
+- **No espera a que abras la terminal:** está conectado a tus canales habituales (como un bot privado en tu Telegram o Signal).
+- Cuenta con un **reloj interno (*cron*)** para ejecutar tareas programadas (por ejemplo, a las siete de la mañana o cada domingo).
+- Posee **memoria persistente a largo plazo**: recuerda las conversaciones de la semana pasada, tus preferencias botánicas y las notas que le dictaste hace un mes.
+
+Explora cómo viaja la información a través de los cuatro bloques de su arquitectura:
+
+<ArquitecturaAgenteGeneralista client:visible />
+
+---
+
+## 2. Los protagonistas del ecosistema: Hermes Agent y OpenClaw
+
+En el mundo del software libre han florecido dos proyectos de referencia para quienes desean tener su propio asistente autónomo sin entregar sus datos a grandes corporaciones:
+
+1. **Hermes Agent (de Nous Research):**
+   - Marco de código abierto diseñado para ejecutarse en tu propio servidor o Mac.
+   - Destaca por su **bucle de aprendizaje continuo**: tras completar una tarea, analiza su propia ruta, extrae la habilidad aprendida (*skill*) y la guarda en su memoria para ser más eficaz la próxima vez.
+   - Es compatible con más de 300 modelos de lenguaje (incluidos modelos locales con Ollama) y permite programar tareas con Cron.
+
+2. **OpenClaw:**
+   - Uno de los proyectos pioneros en asistentes autónomos de escritorio.
+   - Cuenta con una amplia biblioteca de conectores comunitarios para integrar mensajería, calendarios y servicios web.
+
+Ambos comparten un principio innegociable: **tú eres el dueño del servidor**. Ninguna empresa decide qué funciones tienes ni lee tus registros diarios.
+
+---
+
+## 3. ¿Dónde vive un agente siempre activo?
+
+Para que un asistente pueda enviarte un mensaje a las 07:00 AM con la previsión meteorológica de la sierra, el programa tiene que estar encendido en ese momento:
+
+- **En tu Mac personal:** Si usas un portátil MacBook, cuando cierras la tapa el ordenador entra en reposo y el agente se duerme con él. Por tanto, no puede realizar tareas mientras duermes salvo que esté enchufado y configurado para no suspenderse.
+- **En un Mac mini o equipo de bajo consumo:** Muchos entusiastas utilizan un Mac mini antiguo o una pequeña máquina doméstica conectada al router que consume muy pocos vatios y permanece activa 24 horas al día.
+- **En un servidor privado virtual (VPS):** Un pequeño servidor en la nube alquilado por unos pocos euros al mes donde se aloja el agente de forma ininterrumpida.
+
+---
+
+## 4. El peligro invisible: El "Goteo de Tokens" (*Token Bleed*)
+
+Existe una trampa económica muy real al desplegar agentes autónomos que todo usuario debe conocer:
+
+<Callout tipo="peligro" titulo="Cuidado con los bucles desatendidos">
+Imagina que configuras una tarea que revisa una página web cada 15 minutos utilizando un modelo comercial grande en la nube (como Claude 3.7 Sonnet o GPT-4o). 
+
+Cada ciclo de lectura y razonamiento puede consumir 2.500 tokens. En un solo día habrás consumido 240.000 tokens; en un mes, **más de 7 millones de tokens**. 
+
+Si no vigilas las llamadas, una tarea inocua puede generar una factura imprevista de decenas de euros.
+</Callout>
+
+**La solución de ingeniería:**
+Para las tareas de fondo que se repiten periódicamente, utiliza siempre **modelos locales gratuitos en tu Mac con Ollama** (vistos en la Lección 06) o modelos ultraligeros de coste residual (como Claude 3.5 Haiku o Gemini Flash). Reserva los modelos de máximo razonamiento exclusivamente para cuando tú le pidas expresamente un análisis complejo.
+
+---
+
+## 5. La brújula ética: ¿Qué delegar y qué jamás confiar a un agente?
+
+El bombo publicitario en internet suele asegurar que pronto los agentes lo harán "todo por ti". Quien tiene criterio científico sabe que delegar a ciegas en un sistema probabilístico es una temeridad.
+
+Utiliza esta matriz de decisión para calibrar tus proyectos:
+
+<MatrizAutonomia client:visible />
+
+<Analogia titulo="El sistema nervioso autónomo y el reloj circadiano">
+Un agente generalista bien diseñado funciona exactamente como el **sistema nervioso autónomo** de un organismo vivo:
+- No tienes que ordenar conscientemente a tu corazón que lata ni a tu estómago que secrete enzimas digestivas: hay procesos de fondo que se encargan de la regulación homeostática mientras tu mente consciente piensa en otra cosa.
+
+**Dónde se rompe la analogía:** La regulación biológica tiene cientos de millones de años de evolución y un mecanismo de seguridad implacable: **la fatiga y el agotamiento de glucosa**. Si un músculo trabaja de más, se agota y se detiene. Un proceso de software defectuoso no siente fatiga: si entra en un bucle infinito de reintentos, consumirá el 100% de la energía de tu procesador o tu saldo bancario hasta que alguien desenchufe la máquina.
+</Analogia>
+
+---
+
+## 6. Práctica en tu Mac: Auditoría de necesidades antes de instalar
+
+Antes de pasar al Bloque 4 y considerar si deseas montar un agente generalista completo (lo cual exploraremos como proyecto opcional en la Lección 19), realiza este autoexamen técnico en tu Mac:
+
+<Pasos>
+  <Paso numero={1} titulo="Evalúa tus hábitos de uso del Mac">
+    Pregúntate con honestidad:
+    - ¿Tu Mac permanece encendido por las noches o sueles cerrar la tapa cuando terminas de trabajar?
+    - Si duerme contigo, una tarea programada a las 06:00 AM no se ejecutará a menos que uses un equipo siempre activo.
+  </Paso>
+
+  <Paso numero={2} titulo="Comprueba la carga de fondo de tu máquina">
+    Abre la aplicación **Monitor de Actividad** en macOS (en `Aplicaciones` → `Utilidades`).
+    - Observa la pestaña **CPU** y **Memoria**.
+    - Comprueba cuánta memoria libre tienes habitualmente. Un agente ligero en Python consume menos de 200 MB de RAM; pero si además ejecutas Ollama en segundo plano con un modelo de 7B, necesitarás unos 5 a 6 GB de memoria RAM unificada libres.
+  </Paso>
+
+  <Paso numero={3} titulo="Define tu canal preferido">
+    ¿Por dónde te gustaría comunicarte con tu asistente si estuviera activo?
+    - ¿Un bot de Telegram en tu teléfono móvil?
+    - ¿Una ventana de terminal abierta en un rincón de la pantalla?
+    - Anota en tus notas de laboratorio qué canal te resultaría verdaderamente cómodo en el día a día.
+  </Paso>
+</Pasos>
+
+---
+
+## 7. Reto final: Tus tres aliados y tus tres líneas rojas
+
+<Reto titulo="Define tu carta de delegación personal">
+Redacta en un documento de texto (o en tu cuaderno de campo) tu lista de prioridades para un asistente autónomo:
+
+1. **Tus 3 tareas ideales para delegar:**
+   - Tres procesos cotidianos que te ahorrarían tiempo o despistes (por ejemplo: *"avisarme si la previsión anuncia viento fuerte para regar el jardín"*, *"recopilar y guardar los enlaces de artículos de botánica que leo en el móvil"*, *"recordarme una vez al mes hacer copia de seguridad de las fotos"*).
+
+2. **Tus 3 líneas rojas infranqueables:**
+   - Tres acciones que jamás permitirás que un agente ejecute sin tu dedo sobre el teclado (por ejemplo: *"pagos con tarjeta bancaria"*, *"responder correos en mi nombre a amistades o familiares"*, *"borrar archivos originales de mi disco duro"*).
+</Reto>
+
+---
+
+## 8. Resumen y herbario de conceptos
+
+- Los **agentes generalistas** viven como procesos continuos en segundo plano (*daemons*), conectados a canales de mensajería (Telegram) y con un reloj interno (*cron*).
+- Se diferencian de los agentes de programación en que no requieren abrir la terminal para cada consulta y conservan **memoria persistente a largo plazo**.
+- Proyectos como **Hermes Agent** y **OpenClaw** permiten autoalojar estos agentes en tu propia máquina con soberanía de datos absoluta.
+- El **goteo de tokens** es el riesgo de incurrir en costes elevados por llamadas repetitivas; se mitiga utilizando modelos locales con Ollama o APIs de coste residual.
+- Las acciones financieras y la correspondencia personal deben quedar siempre fuera del alcance de la automatización desatendida.
+
+<Herbario
+  terminos={[
+    {
+      termino: "Demonio (Daemon / Servicio en segundo plano)",
+      definicion: "Programa informático que se ejecuta silenciosamente en segundo plano en el sistema operativo sin necesidad de mantener una ventana abierta ni requerir interacción constante.",
+      analogia: "La función respiratoria o los latidos cardíacos en un animal: continúan operando de forma constante mientras el individuo duerme o realiza otras tareas."
+    },
+    {
+      termino: "Pasarela (Gateway)",
+      definicion: "Capa de entrada y seguridad que recibe los mensajes procedentes de canales externos (Telegram, Signal) y verifica que el remitente está autorizado antes de trasladar la petición al modelo.",
+      analogia: "El conserje o vigilante en la entrada de una reserva biológica que comprueba los permisos de los visitantes en la valla antes de dejarlos entrar al recinto."
+    },
+    {
+      termino: "Memoria persistente (Long-term memory)",
+      definicion: "Estructura de almacenamiento (en archivos Markdown o bases de datos) que permite al agente recordar hechos y preferencias entre diferentes sesiones y días distintos.",
+      analogia: "El diario de navegación o el cuaderno de campo de un naturalista donde quedan registradas las observaciones históricas para contrastarlas años después."
+    },
+    {
+      termino: "Cron Job (Tarea programada)",
+      definicion: "Utilidad del sistema operativo que ejecuta comandos o programas automáticamente a intervalos de tiempo o fechas fijas predeterminadas por el usuario.",
+      analogia: "El fotoperiodo y el ritmo circadiano de las plantas que desencadena la floración o la caída de la hoja al llegar una hora o estación concreta."
+    },
+    {
+      termino: "Token Bleed (Goteo de tokens)",
+      definicion: "Consumo continuado e inadvertido de tokens de API debido a tareas automáticas en segundo plano que consultan modelos de pago repetidamente a lo largo del tiempo.",
+      analogia: "Un grifo que gotea gota a gota en el jardín: parece una insignificancia en un minuto, pero vacía el depósito de agua al cabo de un mes."
+    }
+  ]}
+/>
