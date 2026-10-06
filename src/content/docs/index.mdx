@@ -5,10 +5,18 @@ template: splash
 hero:
   tagline: Una guía práctica, paso a paso y sin rodeos para entender la IA, experimentar con modelos en tu propio Mac y automatizar tu día a día.
   actions:
-    - text: Abrir la Lección 1
+    - text: Empezar con la Lección 01
       link: /curso-ia/lecciones/01-que-es-un-llm/
       icon: right-arrow
       variant: primary
+    - text: Consultar el Glosario (Herbario)
+      link: /curso-ia/glosario/
+      icon: open-book
+      variant: secondary
+    - text: Recursos y Enlaces
+      link: /curso-ia/recursos/
+      icon: external
+      variant: minimal
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
@@ -16,17 +24,24 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 ## Los 4 bloques del cuaderno
 
 <CardGrid stagger>
-  <Card title="Bloque 1: Fundamentos y modelos" icon="open-book">
-    Qué es un token, cómo predice un modelo de lenguaje, la brújula de modelos y niveles de razonamiento, y cómo ejecutar modelos locales en tu Mac.
+  <Card title="Bloque 1: Fundamentos y modelos (Lecciones 01 a 07)" icon="open-book">
+    Qué es un token, cómo predice un modelo, los espacios de embeddings, la atención del Transformer, pesos y parámetros (70B), y cómo ejecutar modelos cuantizados en local en tu Mac con Ollama.
   </Card>
-  <Card title="Bloque 2: La terminal sin miedo" icon="laptop">
-    Perder el miedo a la línea de comandos en macOS: moverte por carpetas, instalar utilidades y gestionar entornos de forma segura.
+  <Card title="Bloque 2: La terminal sin miedo (Lecciones 08 a 09)" icon="laptop">
+    Perder el miedo a la línea de comandos en macOS: moverte por carpetas, instalar herramientas seguras con Homebrew y proteger tus claves secretas de API en variables de entorno.
   </Card>
-  <Card title="Bloque 3: Agentes, herramientas y contexto" icon="puzzle">
-    La anatomía de un agente, el protocolo MCP, el poder de los archivos de instrucciones (`.md`), conexión a tus propios documentos (RAG) y diseño 3D.
+  <Card title="Bloque 3: Agentes, herramientas y contexto (Lecciones 10 a 18)" icon="puzzle">
+    La anatomía del bucle perceptivo, el protocolo estándar MCP, directrices en archivos `.md`, agentes de código y escritorio (OpenCode y Claude Code), RAG sobre documentos propios, ciberseguridad y fabricación 3D en FreeCAD.
   </Card>
-  <Card title="Bloque 4: Proyectos y futuro" icon="rocket">
-    De la teoría a la práctica: automatizaciones reales en tu día a día, seguridad y panorama de hacia dónde evoluciona la tecnología.
+  <Card title="Bloque 4: Proyectos y futuro (Lecciones 19 a 21)" icon="rocket">
+    De la teoría a la práctica: diseña tu proyecto personal descargable, descubre las tendencias del futuro (EU AI Act, razonamiento deliberado) y un tutorial guiado para montar un agente autónomo siempre activo.
   </Card>
 </CardGrid>
 
+---
+
+## Filosofía del curso
+
+- **Diseñado para ti:** Con explicaciones claras en español, sin jerga innecesaria y con analogías honestas de biología de campo.
+- **Tu Mac como laboratorio:** Prácticas reales pensadas para macOS y Apple Silicon, priorizando herramientas gratuitas de código abierto y modelos locales de coste cero.
+- **El humano siempre al mando:** Aprende a supervisar con criterio, proteger tu privacidad y disponer siempre de una red de seguridad infalible para deshacer cualquier cambio.

@@ -73,6 +73,13 @@ export default defineConfig({
             { label: '21. Tutorial opcional: montar un agente generalista', slug: 'lecciones/19-tutorial-agente-generalista' },
           ],
         },
+        {
+          label: 'Consulta y recursos',
+          items: [
+            { label: 'Glosario maestro (Herbario)', slug: 'glosario' },
+            { label: 'Recursos y enlaces de referencia', slug: 'recursos' },
+          ],
+        },
       ],
     }),
     react(),

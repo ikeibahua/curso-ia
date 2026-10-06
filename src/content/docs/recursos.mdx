@@ -1,0 +1,84 @@
+---
+title: "Recursos y enlaces de referencia"
+description: "Enlaces oficiales, herramientas recomendadas para macOS, descargables y documentación verificada."
+---
+
+import Callout from '../../components/ui/Callout.astro';
+import Verificado from '../../components/ui/Verificado.astro';
+import Terminal from '../../components/ui/Terminal.astro';
+
+<Verificado
+  fecha="2026-03"
+  fuente="https://ikeibahua.github.io/curso-ia/"
+  nota="Recopilación curada de herramientas oficiales compatibles con macOS Apple Silicon, gratuitas o de código abierto siempre que sea posible."
+/>
+
+Esta página reúne los enlaces a las herramientas oficiales, repositorios y recursos recomendados a lo largo de las 21 lecciones del curso. Guárdala en tus marcadores de Safari para consultarla siempre que necesites reinstalar una herramienta o comprobar una actualización.
+
+---
+
+## 1. El taller de tu Mac (Herramientas base)
+
+- **[Homebrew (El gestor de paquetes para macOS)](https://brew.sh):** La vía más limpia y segura para instalar utilidades de terminal en tu Mac sin ensuciar el sistema operativo.
+  - Comando de instalación: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
+- **[Ollama (Modelos locales en tu Mac)](https://ollama.com):** El motor que permite descargar y ejecutar modelos de lenguaje en tu procesador Apple Silicon sin internet y con coste cero.
+  - Modelos recomendados para empezar: `llama3.2` (3B, 2.0 GB de RAM) y `qwen2.5-coder` (7B, 4.5 GB de RAM).
+- **[LM Studio](https://lmstudio.ai):** Interfaz gráfica de escritorio alternativa para explorar y chatear con modelos locales cuantizados (formato GGUF).
+
+---
+
+## 2. Agentes de terminal y código
+
+- **[OpenCode](https://opencode.ai):** Agente de terminal y TUI de código abierto, agnóstico de modelo (conectable a Ollama local o a cualquier API).
+  - Instalación con Homebrew: `brew install anomalyco/tap/opencode`
+- **[Claude Code (Anthropic)](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview):** Agente CLI comercial de Anthropic con integración de subagentes y modo plan. Requiere cuenta Pro/Max o saldo de API.
+  - Instalación oficial: `curl -fsSL https://claude.ai/install.sh | bash`
+- **[Aider](https://aider.chat):** Agente de programación veterano en terminal con soporte automático para commits descriptivos en Git y modelos locales.
+  - Instalación: `brew install aider`
+- **[Hermes Agent (Nous Research)](https://github.com/NousResearch/hermes-agent):** Framework de agente autónomo autoalojado con bucle de memoria persistente y conexión a bots de Telegram.
+
+---
+
+## 3. Diseño 3D paramétrico y fabricación
+
+- **[FreeCAD 1.0 Oficial](https://www.freecad.org):** Software libre de modelado paramétrico 3D para macOS Apple Silicon con consola integrada de Python 3.
+- **[neka-nat/freecad-mcp](https://github.com/neka-nat/freecad-mcp):** Servidor del protocolo MCP para conectar FreeCAD con clientes de IA y permitir el ciclo de diseño asistido con capturas 3D.
+- **[Bambu Studio](https://bambulab.com/es/download/studio) y [PrusaSlicer](https://www.prusa3d.com/es/pagina/prusaslicer_424/):** Laminadores de código abierto de referencia para cortar modelos STL o 3MF en capas y enviarlos a la impresora 3D.
+
+---
+
+## 4. Protocolos y documentación técnica
+
+- **[Especificación de Model Context Protocol (MCP)](https://modelcontextprotocol.io):** El estándar de la industria creado por Anthropic para conectar modelos con herramientas locales y fuentes de datos.
+- **[OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/):** Guía de referencia de ciberseguridad sobre riesgos de inyección de instrucciones (*Prompt Injection*), filtración de datos sensibles y exceso de privilegios.
+- **[Reglamento Europeo de IA (EU AI Act)](https://digital-strategy.ec.europa.eu/es/policies/regulatory-framework-ai):** Portal oficial de la Comisión Europea con el texto del Reglamento (UE) 2024/1689 sobre derechos y garantías de los ciudadanos.
+
+---
+
+## 5. Plantillas de cabecera para tus proyectos
+
+Copia estas plantillas para pegarlas en la raíz de tus carpetas de trabajo:
+
+### Plantilla de directrices `AGENTS.md`
+```markdown
+# AGENTS.md — Reglas del Proyecto
+
+## Objetivo
+[Describe en una frase qué debe resolver el proyecto]
+
+## Normas de Seguridad
+1. Trabajar exclusivamente dentro de esta carpeta acotada.
+2. No borrar archivos originales: generar copias o archivos con sufijo _nuevo.
+3. Explicar cada comando propuesto en la terminal antes de solicitar aprobación.
+4. Si encuentras datos ambiguos o fechas con formato dudoso, no adivines: consúltame.
+```
+
+### Plantilla de lista de privacidad `~/NUNCA_COMPARTIR.txt`
+```text
+LISTA ROJA DE PRIVACIDAD PERSONAL:
+1. Contraseñas de acceso, códigos de banca electrónica y PIN.
+2. Documento Nacional de Identidad (DNI) y datos fiscales.
+3. Archivos de claves secretas (.env, API keys de OpenAI/Anthropic).
+4. Informes médicos o correspondencia confidencial de familiares.
+5. Nunca aprobar un comando "rm -rf" o de borrado en un agente sin leer la lista de archivos.
+```
