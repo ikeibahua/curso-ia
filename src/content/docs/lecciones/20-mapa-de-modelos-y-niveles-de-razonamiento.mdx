@@ -1,15 +1,187 @@
 ---
-title: "Lección 05 — El mapa de modelos: familias y niveles de razonamiento"
-description: "Brújula para no perderse entre marcas, versiones y esfuerzos de razonamiento."
+title: "Lección 05 — El mapa de modelos: herramientas, familias y niveles de razonamiento"
+description: "Brújula para no perderse entre marcas, interfaces, tamaños de modelos y esfuerzos de pensamiento."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Terminal from '../../../components/ui/Terminal.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import Herbario from '../../../components/ui/Herbario.astro';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L20**, orden en el itinerario: **5**).
+import PiramideModelos from '../../../components/widgets/piramide-modelos/PiramideModelos.tsx';
+import DialEsfuerzo from '../../../components/widgets/dial-esfuerzo/DialEsfuerzo.tsx';
+import ClasificadorHerramientaModelo from '../../../components/widgets/clasificador-herramienta-modelo/ClasificadorHerramientaModelo.tsx';
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+<Verificado
+  fecha="2026-03"
+  fuente="https://platform.openai.com/docs/models"
+  nota="Jerarquías de modelos y parámetros de esfuerzo de razonamiento verificados según documentación oficial de OpenAI (familias GPT-6/5.6 y o-series) y Anthropic (escala Haiku, Sonnet, Opus y niveles de 'thinking budget')."
+/>
 
 ## Objetivo de la lección
-Brújula para no perderse entre marcas, versiones y esfuerzos de razonamiento.
+Aprender a distinguir con total claridad la empresa que fabrica la tecnología, la aplicación en la que escribes, el modelo neuronal concreto que te responde y el nivel de esfuerzo de pensamiento que le asignas a cada problema.
+
+---
+
+## 1. El gran equívoco: «Yo uso ChatGPT»
+
+Es una de las frases más habituales en cualquier conversación sobre tecnología: *«Le pregunté a ChatGPT y me dijo tal cosa»*. 
+
+Sin embargo, para un biólogo o un científico de campo, esa afirmación es tan imprecisa como decir: *«Fui al campo en un Toyota»*. ¿Ibas en un utilitario urbano híbrido por una autovía lisa o en un todoterreno 4x4 reductor subiendo un pedregal de montaña? El fabricante es el mismo, pero el vehículo y su motor son completamente distintos.
+
+En inteligencia artificial ocurre exactamente igual:
+1. **ChatGPT y Claude.ai son solo aplicaciones (herramientas)**: la carrocería exterior, la ventana donde tecleas.
+2. **Dentro de esa ventana conviven motores muy distintos (modelos)**: desde modelos ultraligeros que responden en un parpadeo hasta gigantescos cerebros matemáticos diseñados para pensar durante dos minutos antes de emitir una sola palabra.
+
+Para no perderte jamás en este bosque de siglas y nombres comerciales, utilizaremos una **pirámide conceptual de cuatro niveles**:
+
+---
+
+## 2. La Pirámide de los cuatro niveles
+
+Explora cada nivel de la pirámide interactiva para fijar los límites de cada concepto:
+
+<PiramideModelos client:visible />
+
+<Analogia
+  concepto="La jerarquía Empresa → Aplicación → Modelo → Esfuerzo"
+  metafora="La clasificación taxonómica botánica: Familia → Género → Especie → Variedad fenotípica"
+  limite="En botánica, las relaciones filogenéticas provienen de antepasados comunes y descendencia genética inmutable. En el software comercial, las empresas pueden cambiar de la noche a la mañana el modelo interno que alimenta un botón de su web sin previo aviso y sin que cambie el nombre exterior de la aplicación."
+>
+- **Empresa** (Familia botánica, ej. *Fagaceae*): El grupo amplio con su propia filosofía de diseño.
+- **Herramienta** (El cuaderno de campo o la lupa): El instrumento que sostienes en la mano para interactuar.
+- **Modelo** (Especie concreta, ej. *Quercus robur* vs *Quercus ilex*): El organismo específico con sus características biológicas propias (tamaño, resistencia, velocidad).
+- **Esfuerzo** (La intensidad de observación del botánico): Un vistazo rápido de 3 segundos para confirmar que es un roble frente a una disección minuciosa con microscopio de sus glándulas estigmáticas.
+</Analogia>
+
+---
+
+## 3. Las familias actuales de OpenAI y Anthropic
+
+En el mercado conviven hoy dos grandes familias de referencia que encontrarás en tu día a día:
+
+### La escalera de OpenAI
+OpenAI organiza sus modelos en función de su potencia y latencia. En sus generaciones recientes:
+- **Luna**: El más pequeño, rápido y económico. Ideal para clasificaciones rápidas, resúmenes y extracción de datos.
+- **Sol / Terra**: El equilibrio estándar de propósito general para la inmensa mayoría de conversaciones.
+- **Astra**: El modelo de mayor capacidad y ventana de contexto, reservado para análisis masivos y tareas científicas complejas.
+
+### La escalera poética de Anthropic (Claude)
+Anthropic utiliza una elegante metáfora métrica para nombrar el tamaño de sus redes:
+- **Haiku** *(el poema japonés breve de tres versos)*: Su modelo más veloz y ligero. Responde en milisegundos.
+- **Sonnet** *(el soneto clásico de 14 versos)*: El equilibrio dorado. Es el modelo más utilizado del mundo para programar, analizar texto y razonar con precisión sin demoras.
+- **Opus** *(la gran obra magna)*: El modelo más masivo, diseñado para investigaciones profundas y redacciones de gran calado literario o argumentativo.
+- **Fable**: Variante avanzada dotada de verificaciones de seguridad formal reforzadas.
+
+<Callout tipo="advertencia" titulo="Los modelos envejecen a gran velocidad">
+A diferencia de un libro de texto que mantiene su vigencia durante décadas, un modelo de IA suele ser sustituido o retirado cada 12 a 18 meses. Si lees una guía en internet de hace solo dos años recomendando *«GPT-3.5»* o *«Claude 2»*, ten en cuenta que son fósiles tecnológicos que ya no representan las capacidades actuales.
+</Callout>
+
+---
+
+## 4. El nuevo mando: El Dial de Esfuerzo de Razonamiento
+
+Hasta hace poco, la única forma de interactuar con un modelo era el «reflejo inmediato»: escribías una pregunta y el modelo empezaba a escupir palabras al instante (como vimos en la <a href="/curso-ia/lecciones/01-que-es-un-llm/">Lección 01</a>).
+
+Sin embargo, las familias de razonamiento profundo (como la serie *o* de OpenAI o el modo *Thinking* de Claude) incorporan un mecanismo revolucionario: **tokens de pensamiento interno**. Antes de decirte nada, el modelo redacta para sí mismo una cadena de razonamiento invisible, prueba hipótesis, detecta posibles trampas lógicas y se autocorrige.
+
+El parámetro que gradúa este comportamiento es el **Esfuerzo de Razonamiento** (*Reasoning Effort* o *Thinking Budget*). Pruébalo en el simulador:
+
+<DialEsfuerzo client:visible />
+
+<Callout tipo="info" titulo="¿Por qué ya no se usa la Temperatura en estos modelos?">
+Como anticipamos en la <a href="/curso-ia/lecciones/03-transformers-atencion/">Lección 03</a>, en los modelos de razonamiento las empresas **fijan internamente la temperatura a 1.0**. Variar la temperatura alteraría la lógica interna de los pasos de deducción. En su lugar, el único mando que necesitas es el dial de esfuerzo.
+</Callout>
+
+---
+
+## 5. Mini-juego: Pon a prueba tu instinto
+
+¿Sabrías clasificar de memoria qué es una empresa, qué es una aplicación y qué es un modelo neuronal? Realiza esta prueba rápida:
+
+<ClasificadorHerramientaModelo client:visible />
+
+---
+
+## Práctica en tu Mac: Inspeccionar tus selectores reales
+
+Vamos a comprobar qué modelos y opciones tienes disponibles ahora mismo en tus cuentas cotidianas:
+
+<Pasos>
+  <Paso numero={1} titulo="Abre tu navegador en ChatGPT">
+    Entra en tu sesión habitual de <a href="https://chatgpt.com" target="_blank" rel="noreferrer">chatgpt.com</a> en Safari o Chrome.
+  </Paso>
+  <Paso numero={2} titulo="Localiza el selector de modelo en la esquina superior">
+    Fíjate en la parte superior izquierda de la pantalla, justo al lado del logotipo de ChatGPT. Suele haber un desplegable o un indicador. 
+    Anota qué modelo está activo por defecto (en cuentas gratuitas suele ser una versión automática equilibrada que conmuta según la demanda).
+    {/* TODO(personalizar): Confirmar qué modelo exacto ve el alumno en su pantalla de ChatGPT web gratuita */}
+  </Paso>
+  <Paso numero={3} titulo="Abre Claude.ai y busca el botón de pensamiento">
+    Entra en tu sesión de <a href="https://claude.ai" target="_blank" rel="noreferrer">claude.ai</a>.
+    En la caja de texto inferior, fíjate si aparece un pequeño icono con forma de interruptor o bombilla etiquetado como **«Thinking»** o **«Razonar»**.
+    {/* TODO(personalizar): Indicar si su cuenta de Claude muestra el conmutador de pensamiento extendido gratuito */}
+  </Paso>
+  <Paso numero={4} titulo="Haz una prueba de velocidad comparativa">
+    Haz a ambos la misma pregunta sencilla: *«¿Qué diferencia hay entre una gimnosperma y una angiosperma?»*.
+    Comprueba que la respuesta aparece casi de inmediato porque no requiere una cadena de deducción matemática profunda.
+  </Paso>
+</Pasos>
+
+---
+
+## Reto final: El despacho del consultor
+
+<Reto
+  titulo="Selecciona la herramienta, el modelo y el esfuerzo idóneo"
+  dificultad="media"
+  tiempo="15 min"
+>
+Imagina que estás asesorando a un colega sobre cómo resolver seis tareas cotidianas sin perder tiempo ni desperdiciar cuota de computación:
+
+1. **Tarea 1:** Corregir las faltas ortográficas y la puntuación de un correo electrónico breve.
+2. **Tarea 2:** Planificar una ruta botánica de tres días por el Pirineo aragonés cruzando horarios de refugios y cotas de floración.
+3. **Tarea 3:** Depurar un script informático de 400 líneas que arroja un error numérico intermitente incomprensible.
+4. **Tarea 4:** Resumir en tres párrafos un artículo científico de 15 páginas en formato PDF.
+5. **Tarea 5:** Resolver un enigma matemático de lógica espacial con múltiples restricciones simultáneas.
+6. **Tarea 6:** Renombrar y clasificar 200 fotografías de flores según su nombre vulgar y científico.
+
+**Tu misión:**
+Para cada una de las 6 tareas, elige:
+- **Tamaño de modelo:** ¿Ligero/Rápido (Haiku / Luna), Equilibrado (Sonnet / Sol) o Pesado (Opus / Astra)?
+- **Nivel de esfuerzo de razonamiento:** ¿Desactivado/Bajo o Medio/Alto?
+- Justifica en una frase por qué no conviene usar esfuerzo máximo en la Tarea 1 ni un modelo ligero en la Tarea 3.
+</Reto>
+
+---
+
+## Resumen y glosario botánico-digital
+
+<Herbario
+  items={[
+    {
+      termino: "Herramienta (Producto)",
+      definicion: "La aplicación, interfaz web o programa cliente a través del cual el usuario envía y recibe mensajes (ej. ChatGPT, Claude.ai, Claude Code, Ollama)."
+    },
+    {
+      termino: "Modelo de Lenguaje",
+      definicion: "La red neuronal matemática concreta (con sus pesos y arquitectura Transformer) que procesa los tokens y genera la respuesta (ej. Sonnet 5.5, Sol, Opus)."
+    },
+    {
+      termino: "Tokens de razonamiento (Thinking Tokens)",
+      definicion: "Fichas de texto generadas internamente por el modelo durante su fase de deducción previa que no se muestran en el mensaje final pero permiten estructurar la solución paso a paso."
+    },
+    {
+      termino: "Esfuerzo de razonamiento (Reasoning Effort)",
+      definicion: "Parámetro que gradúa la cantidad máxima de cómputo y tiempo que el modelo puede dedicar a pensar antes de emitir la respuesta (none, low, medium, high, max)."
+    },
+    {
+      termino: "Haiku / Sonnet / Opus",
+      definicion: "Escalera tradicional de tamaños de Anthropic: Haiku para velocidad extrema, Sonnet para equilibrio general y programación, Opus para máxima profundidad analítica."
+    }
+  ]}
+/>
