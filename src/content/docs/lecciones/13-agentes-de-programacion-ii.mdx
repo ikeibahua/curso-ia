@@ -1,15 +1,205 @@
 ---
 title: "Lección 14 — Agentes de programación y de escritorio II: ecosistema"
-description: "Comparativa de herramientas y cómo elegir la adecuada para cada tarea."
+description: "Comparativa rigurosa de herramientas: Claude Code, OpenCode, Aider, modelos locales y cómo elegir según coste, privacidad y capacidad."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Terminal from '../../../components/ui/Terminal.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import Herbario from '../../../components/ui/Herbario.astro';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L13**, orden en el itinerario: **14**).
+import ComparativaFiltrable from '../../../components/widgets/comparativa-filtrable/ComparativaFiltrable.tsx';
+import CuestionarioAgente from '../../../components/widgets/cuestionario-agente/CuestionarioAgente.tsx';
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+<Verificado
+  fecha="2026-03"
+  fuente="https://opencode.ai"
+  nota="Ecosistema de agentes de terminal (OpenCode, Claude Code, Aider, Goose): compatibilidad de modelos locales vía Ollama, planes de suscripción y políticas de privacidad verificadas."
+/>
 
 ## Objetivo de la lección
-Comparativa de herramientas y cómo elegir la adecuada para cada tarea.
+Aprender a orientarse con criterio en el ecosistema actual de agentes de terminal, diferenciando herramientas propietarias de soluciones abiertas y eligiendo con precisión el motor de inteligencia (en la nube o 100% local en tu Mac) según tu presupuesto y el nivel de privacidad que requieran tus documentos.
+
+---
+
+## 1. La gran bifurcación: Agentes propietarios frente a Agentes abiertos
+
+En la lección anterior vimos cómo trabajar de forma segura con un agente en la terminal. Ahora surge la pregunta práctica: **¿qué herramienta elijo para instalar en mi Mac?**
+
+Hoy el ecosistema se divide en dos grandes familias de herramientas:
+
+1. **Agentes propietarios (como Claude Code o GitHub Copilot):**
+   - Son desarrollados por una empresa concreta (Anthropic, Microsoft).
+   - Están extraordinariamente integrados con sus propios modelos de cabecera.
+   - Requieren habitualmente una suscripción de pago (unos 20 $/mes) o saldo de API comercial.
+   - Tus datos y peticiones viajan a sus servidores en la nube.
+
+2. **Agentes abiertos y agnósticos (como OpenCode o Aider):**
+   - Son programas de código abierto y descarga gratuita.
+   - **No están atados a ninguna empresa:** tú decides qué cerebro les conectas en cada momento.
+   - Pueden impulsarse tanto con modelos de pago como con **modelos gratuitos o 100% locales** ejecutándose en tu propio Mac mediante Ollama (como vimos en las lecciones 05 y 06).
+   - Si trabajas con notas de campo confidenciales o datos que no quieres subir a internet, un agente abierto con un modelo local garantiza que ningún byte abandone tu máquina.
+
+Explora en esta comparativa interactiva las características, costes y requisitos de las principales alternativas:
+
+<ComparativaFiltrable client:visible />
+
+---
+
+## 2. Tres conceptos avanzados que conviene entender
+
+Aunque no vayas a programar, cuando leas tutoriales o uses un agente moderno te toparás con tres términos que es muy útil desmitificar:
+
+### A. Subagentes (*Subagents*)
+En lugar de que un único modelo intente resolver una tarea gigante de golpe, los agentes modernos pueden **engendrar asistentes secundarios especializados**:
+- Un subagente lector se encarga solo de inspeccionar 50 PDFs y extraer datos.
+- Otro subagente sintetizador recopila los hallazgos y redacta el informe final.
+- El agente principal supervisa a ambos y te presenta a ti el resultado unificado.
+
+### B. El Modo Plan (*Plan Mode*)
+Es un estado de funcionamiento donde el agente tiene **bloqueadas todas las herramientas de escritura o borrado**. En modo plan, el agente puede leer archivos, buscar en internet o analizar el problema, pero tiene prohibido modificar tu disco. Solo cuando apruebas su propuesta por escrito pasa al modo de ejecución.
+
+### C. Ganchos de ciclo de vida (*Hooks*)
+Son pequeñas instrucciones automáticas que se disparan en momentos clave: por ejemplo, *"cada vez que crees un archivo nuevo, añade automáticamente una cabecera con la fecha"* o *"antes de ejecutar cualquier comando de terminal, verifica que no use la palabra rm"*.
+
+---
+
+## 3. ¿Qué combinación se adapta a tu forma de trabajar?
+
+No existe la herramienta universal perfecta; existe la herramienta adecuada para tu caso particular. Responde a estas tres preguntas para encontrar tu combinación idónea:
+
+<CuestionarioAgente client:visible />
+
+---
+
+## 4. Aplicando el criterio de L20: Cuándo usar local y cuándo acudir a la nube
+
+Recuerda la pirámide de modelos y el dial de esfuerzo de razonamiento que estudiamos en la Lección 05 (L20):
+
+- **Modelos locales en tu Mac (Llama 3.2 3B, Qwen 2.5 Coder 7B con Ollama):**
+  - **Ventajas:** Coste 0€, privacidad absoluta, funcionan en el tren o en el campo sin cobertura Wi-Fi.
+  - **Cuándo usarlos:** Tareas mecánicas, ordenar archivos por fecha o tipo, transformar formatos de tablas tabuladas simples.
+  - **Límites:** Tienen una "mochila de contexto" más reducida y pueden perderse si les pides correlacionar 40 documentos largos simultáneamente.
+
+- **Modelos en la nube con razonamiento alto (Claude 3.7 Sonnet, DeepSeek R1, GPT-4o):**
+  - **Ventajas:** Capacidad de deducción de nivel científico, manejan contextos masivos sin perder información.
+  - **Cuándo usarlos:** Reconciliación de datos biológicos con discrepancias taxonómicas, análisis de publicaciones científicas extensas o redacción de síntesis complejas.
+
+<Analogia titulo="El telescopio de campo y el observatorio astronómico">
+Tener un modelo local en tu Mac con Ollama es como llevar en tu mochila de biólogo unos **prismáticos de 10x42**:
+- Los tienes siempre a mano, no gastan batería de red, no dependen de que haya repetidor en la montaña y te sirven perfectamente para identificar el 90% de las aves del bosque en tu día a día.
+
+Conectarte a un gran modelo en la nube (como Claude 3.7 Sonnet) es como pedir turno en un **gran observatorio astronómico**:
+- Obtienes una resolución y un alcance analítico inigualables, pero dependes de una conexión constante y de una infraestructura externa.
+
+**Dónde se rompe la analogía:** Los prismáticos no se quedan pequeños si la especie es rara; simplemente requieren más paciencia. Un modelo local pequeño de 3.000 millones de parámetros tiene límites matemáticos estrictos de capacidad: ante un problema de lógica relacional intrincada, no es que tarde más, es que puede inventar o equivocarse con seguridad aplastante (*alucinación*).
+</Analogia>
+
+---
+
+## 5. Práctica en tu Mac: Configurar OpenCode con tu motor local
+
+Dado que en las lecciones 06 y 08 dejamos instalados Homebrew y Ollama en tu Mac, vamos a conectar el agente gratuito **OpenCode** a tu propio ordenador sin gastar un solo céntimo ni registrar tarjetas de crédito:
+
+<Pasos>
+  <Paso numero={1} titulo="Instala OpenCode mediante Homebrew">
+    Abre la aplicación **Terminal** y ejecuta el instalador oficial mediante el gestor Homebrew:
+
+    ```bash
+    brew install anomalyco/tap/opencode
+    ```
+
+    Espera unos segundos hasta que el sistema descargue la herramienta y confirme la instalación.
+  </Paso>
+
+  <Paso numero={2} titulo="Asegúrate de que Ollama está activo en segundo plano">
+    Comprueba que el motor local de Ollama está en marcha en tu Mac abriendo otra pestaña de terminal o comprobando su icono en la barra de menús superior de macOS. Si quieres verificar qué modelos tienes descargados en tu disco, escribe:
+
+    ```bash
+    ollama list
+    ```
+
+    Deberías ver los modelos que descargamos en la lección 06 (por ejemplo `llama3.2` o `qwen2.5-coder`).
+  </Paso>
+
+  <Paso numero={3} titulo="Inicia una sesión de OpenCode conectada a tu modelo local">
+    Entra en tu carpeta de prácticas seguras y lanza OpenCode indicándole que use tu servidor local de Ollama:
+
+    ```bash
+    cd ~/laboratorio-agente
+    opencode --model ollama/llama3.2
+    ```
+
+    Verás cómo se abre la interfaz de terminal interactiva (TUI) de OpenCode.
+  </Paso>
+
+  <Paso numero={4} titulo="Prueba una tarea de inspección inocua">
+    Escribe en el prompt del agente:
+
+    ```text
+    ¿Qué archivos hay en esta carpeta y qué contiene arboles.csv?
+    ```
+
+    Observa cómo el agente lee el archivo utilizando herramientas locales, sin que un solo dato haya salido de tu Mac a internet.
+  </Paso>
+
+  <Paso numero={5} titulo="Cierra la sesión">
+    Para salir de la interfaz del agente y volver a tu terminal habitual de macOS, pulsa `Ctrl + C` o escribe `/exit`.
+  </Paso>
+</Pasos>
+
+---
+
+## 6. Reto final: El duelo de modelos
+
+<Reto titulo="Compara dos motores ante la misma tarea botánica">
+Si tienes ocasión de probar un modelo ligero local (como `llama3.2:3b`) y un modelo más potente (como `claude-3-5-haiku` o `deepseek-r1` vía API o prueba web):
+
+1. **La prueba del algodón taxonómico:**
+   Pídeles a ambos este encargo exacto:
+   *"Tengo esta lista de nombres: 'Pino carrasco', 'Pinus halepensis', 'Pino piñonero', 'Pinus pinea', 'Pino albar'. Genera una tabla con tres columnas: Nombre vulgar, Nombre científico binomial y Familia botánica. Si falta el nombre vulgar o el científico correspondiente a alguno, búscalo e incorpóralo."*
+
+2. **Reflexión sobre los resultados:**
+   - ¿Qué modelo completó la tabla al instante y cuál se tomó unos segundos para 'razonar'?
+   - ¿Cometió el modelo pequeño algún error al asignar el nombre vulgar que faltaba?
+   - ¿Por qué para una lista de 5 especies el modelo local es más que suficiente, mientras que para una lista de 500 especies con nombres obsoletos de sinónimos taxonómicos necesitarías un modelo con mayor esfuerzo de razonamiento?
+</Reto>
+
+---
+
+## 7. Resumen y herbario de conceptos
+
+- Las herramientas de terminal se dividen entre **propietarias cerradas** (como Claude Code, muy potentes pero de pago y ligadas a su nube) y **abiertas agnósticas** (como OpenCode o Aider, gratuitas y compatibles con múltiples modelos).
+- Los **modelos locales (Ollama)** permiten ejecutar agentes con coste 0€ y privacidad total en el Mac, ideales para ordenar y convertir archivos cotidianos sin conexión.
+- Los **grandes modelos en la nube** destacan cuando la tarea exige reconciliar datos ambiguos o aplicar deducción científica compleja.
+- Conceptos como el **modo plan** garantizan que el agente sólo inspeccione y diseñe sin alterar ningún fichero hasta que tú lo autorices.
+
+<Herbario
+  terminos={[
+    {
+      termino: "Agente agnóstico",
+      definicion: "Herramienta de software que no está atada a ningún proveedor concreto de inteligencia artificial y permite alternar libremente entre modelos de OpenAI, Anthropic, Google o modelos locales.",
+      analogia: "Un microscopio de laboratorio con montura universal: puedes acoplarle lentes de distintas marcas según aumentos y presupuesto."
+    },
+    {
+      termino: "Subagente",
+      definicion: "Instancia secundaria de un modelo invocada por el agente principal para resolver de manera autónoma una subtarea especializada y devolver una síntesis concisa.",
+      analogia: "El ornitólogo jefe que envía a un ayudante a revisar los nidos del acantilado norte mientras él sigue examinando los del bosque."
+    },
+    {
+      termino: "Modo Plan (Plan Mode)",
+      definicion: "Modo operativo en el que se deshabilitan las herramientas de modificación y borrado de disco, limitando la actividad del agente a la lectura y elaboración de una estrategia.",
+      analogia: "La fase de anteproyecto de una reserva natural: se trazan mapas y planes sobre el papel antes de mover la primera piedra de las obras."
+    },
+    {
+      termino: "TUI (Terminal User Interface)",
+      definicion: "Interfaz de usuario que se dibuja con texto y recuadros dentro de la propia ventana de la terminal, ofreciendo menús y colores sin ser una ventana gráfica independiente.",
+      analogia: "Una libreta de campo con casillas y cuadrículas preimpresas que te ayuda a rellenar los datos de forma ordenada."
+    }
+  ]}
+/>
