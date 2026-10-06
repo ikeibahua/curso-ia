@@ -1,0 +1,171 @@
+---
+interface Props {
+  titulo?: string;
+  numero?: number | string;
+  resultadoEsperado?: string;
+  pista?: string;
+}
+
+const {
+  titulo = 'Reto final de la lección',
+  numero,
+  resultadoEsperado,
+  pista,
+} = Astro.props;
+---
+
+<div class="reto-card" role="region" aria-label={`Reto: ${titulo}`}>
+  <div class="reto-header">
+    <div class="reto-badge">
+      <span class="reto-icon" aria-hidden="true">🎯</span>
+      <span class="reto-badge-text">
+        {numero ? `Reto #${numero}` : 'Reto final'}
+      </span>
+    </div>
+    <h3 class="reto-title">{titulo}</h3>
+  </div>
+
+  <div class="reto-body">
+    <slot />
+  </div>
+
+  {(resultadoEsperado || Astro.slots.has('resultado')) && (
+    <div class="reto-esperado">
+      <div class="esperado-tag">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
+          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+        </svg>
+        <strong>Resultado esperado:</strong>
+      </div>
+      <div class="esperado-text">
+        {resultadoEsperado ? <p>{resultadoEsperado}</p> : <slot name="resultado" />}
+      </div>
+    </div>
+  )}
+
+  {(pista || Astro.slots.has('pista')) && (
+    <details class="reto-pista">
+      <summary class="pista-summary">
+        <span aria-hidden="true">💡</span>
+        <span>¿Te has atascado? Ver pista</span>
+      </summary>
+      <div class="pista-content">
+        {pista ? <p>{pista}</p> : <slot name="pista" />}
+      </div>
+    </details>
+  )}
+</div>
+
+<style>
+  .reto-card {
+    margin: 2.5rem 0;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    background-color: var(--superficie);
+    border: 2px solid var(--ocre-borde);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    position: relative;
+  }
+
+  .reto-header {
+    border-bottom: 1px dashed var(--linea);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .reto-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background-color: var(--ocre-suave);
+    color: var(--ocre);
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-family: var(--sl-font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+    border: 1px solid var(--ocre-borde);
+  }
+
+  .reto-title {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    color: var(--tinta);
+  }
+
+  .reto-body {
+    color: var(--tinta);
+    line-height: 1.65;
+    margin-bottom: 1.25rem;
+  }
+
+  .reto-body :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .reto-esperado {
+    background-color: var(--superficie-elevada);
+    border: 1px solid var(--musgo-borde);
+    border-left: 3px solid var(--musgo);
+    border-radius: 0.45rem;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .esperado-tag {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--musgo);
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .esperado-text {
+    font-size: 0.925rem;
+    color: var(--tinta);
+    line-height: 1.5;
+  }
+
+  .esperado-text :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .reto-pista {
+    background-color: var(--ocre-suave);
+    border: 1px dashed var(--ocre-borde);
+    border-radius: 0.45rem;
+    font-size: 0.9rem;
+  }
+
+  .pista-summary {
+    padding: 0.65rem 0.9rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--ocre);
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    user-select: none;
+    transition: background 0.15s ease;
+  }
+
+  .pista-summary:hover {
+    background-color: rgba(217, 164, 65, 0.15);
+  }
+
+  .pista-content {
+    padding: 0.75rem 1rem 0.9rem 1rem;
+    border-top: 1px dashed var(--ocre-borde);
+    color: var(--tinta);
+    line-height: 1.55;
+  }
+
+  .pista-content :global(p:last-child) {
+    margin-bottom: 0;
+  }
+</style>

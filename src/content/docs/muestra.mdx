@@ -1,0 +1,178 @@
+---
+title: Catálogo de componentes y diseño (Muestra)
+description: Demostración visual e interactiva de todos los componentes de contenido del sistema de diseño Cuaderno de campo.
+---
+
+import Callout from '../../components/ui/Callout.astro';
+import Analogia from '../../components/ui/Analogia.astro';
+import Terminal from '../../components/ui/Terminal.astro';
+import Pasos from '../../components/ui/Pasos.astro';
+import Paso from '../../components/ui/Paso.astro';
+import Reto from '../../components/ui/Reto.astro';
+import Verificado from '../../components/ui/Verificado.astro';
+import Termino from '../../components/ui/Termino.astro';
+import GlosarioIndice from '../../components/ui/GlosarioIndice.astro';
+import ProgresoCurso from '../../components/ui/ProgresoCurso.astro';
+
+Esta página sirve como **banco de pruebas y muestra viva** de todos los componentes y tokens visuales creados para el curso. Todos los elementos han sido diseñados bajo la metáfora del *Cuaderno de campo de naturalista*, cuidando la accesibilidad (contraste WCAG AA, foco visible y navegación por teclado) y respetando las preferencias de reducción de movimiento (`prefers-reduced-motion`).
+
+---
+
+## 1. Indicador de progreso local (`ProgresoCurso`)
+
+Un componente discreto que lee el avance del alumno directamente desde su navegador (mediante `localStorage`), sin requerir cuentas de usuario ni rastreo externo:
+
+<ProgresoCurso totalPasos={3} />
+
+---
+
+## 2. Sellos de verificación (`Verificado`)
+
+Para garantizar que ningún dato caduco confunda al alumno, todo dato volátil (versiones de software, precios, modelos vigentes) cuenta con su comprobación fechada y enlazada a la fuente oficial:
+
+Astro se encuentra actualmente en su versión 7.3 <Verificado fecha="2026-10" fuente="https://astro.build" nota="Versión estable oficial de Astro" /> y el protocolo abierto MCP sigue expandiéndose <Verificado fecha="2026-10" fuente="https://modelcontextprotocol.io" nota="Especificación oficial del protocolo" />.
+
+---
+
+## 3. Términos con explicación emergente (`Termino`)
+
+La jerga técnica nunca se da por sabida. La primera vez que aparece un concepto en una lección, se envuelve con una definición emergente accesible tanto con ratón como con teclado o toque táctil:
+
+> Cuando envías una pregunta a ChatGPT, el texto no se procesa como letras sueltas, sino fragmentado en <Termino def="Trozo mínimo de texto que el modelo procesa y predice numéricamente.">tokens</Termino>. Estos números se proyectan en un espacio vectorial llamado <Termino def="Representación numérica multidimensional donde palabras con significado similar se sitúan cerca.">embedding</Termino> para calcular probabilidades.
+
+---
+
+## 4. Notas y llamadas de atención (`Callout`)
+
+Disponemos de cuatro variantes con identidad visual clara y alto contraste:
+
+<Callout tipo="nota" titulo="Nota de campo">
+Los modelos locales se ejecutan 100% en el procesador de tu Mac. No necesitan conexión a internet ni envían una sola palabra a servidores ajenos.
+</Callout>
+
+<Callout tipo="ojo" titulo="Ojo al dato">
+Un modelo de 70 mil millones de parámetros (70B) requiere al menos 40 GB de memoria unificada para cargar en memoria con fluidez. En un MacBook de 16 GB, optaremos por modelos de 7B u 8B.
+</Callout>
+
+<Callout tipo="truco" titulo="Truco de laboratorio">
+En macOS puedes pulsar `Cmd + Espacio` para abrir Spotlight y teclear directamente "Terminal" para abrir la consola en medio segundo.
+</Callout>
+
+<Callout tipo="peligro" titulo="Atención a los permisos">
+Nunca ejecutes un comando copiado de internet que incluya `sudo` sin entender con exactitud qué carpetas va a modificar en tu sistema.
+</Callout>
+
+---
+
+## 5. Analogías con biología (`Analogia`)
+
+Siguiendo las reglas de redacción, las analogías biológicas son honestas y siempre declaran de forma explícita dónde deja de ser válida la metáfora:
+
+<Analogia
+  conceptoBiologico="El código genético y los codones"
+  titulo="¿Por qué la IA no lee letras individuales?"
+>
+  En el ARN mensajero, los ribosomas no leen bases nitrogenadas sueltas (A, U, C, G) de una en una, sino en tripletes llamados **codones**. Cada triplete codifica un aminoácido concreto o una señal de parada.
+
+  De forma similar, los modelos de lenguaje no leen letras individuales: leen **tokens**. Un token suele ser una palabra corta o una raíz común (como `bio-`, `logía`, `árbol`). Agrupar las letras en paquetes con significado ahorra espacio y permite entender el contexto con mucha mayor rapidez.
+
+  <div slot="limite">
+    A diferencia del código genético, donde el código es universal, fijo y exacto (tres letras = un aminoácido estricto), los tokens de un modelo son estadísticos y varían según cada empresa o arquitectura: el tokenizador de Claude trocea las frases de manera ligeramente distinta al de ChatGPT o Llama.
+  </div>
+</Analogia>
+
+---
+
+## 6. Comandos de consola (`Terminal`)
+
+La terminal es el único elemento deliberadamente técnico del curso y cuenta con botones de copia al portapapeles y desgloses explicativos:
+
+### Comando estándar con desglose
+
+<Terminal
+  comando="brew install ollama"
+  titulo="macOS Terminal — Instalando herramientas locales"
+  partes={[
+    { token: 'brew', explicacion: 'Homebrew: el gestor de paquetes de macOS (nuestra "tienda de herramientas" para la terminal).' },
+    { token: 'install', explicacion: 'La instrucción que le pide a Homebrew que descargue y prepare un nuevo programa.' },
+    { token: 'ollama', explicacion: 'El software que nos permitirá ejecutar modelos de lenguaje libres en nuestro propio Mac.' }
+  ]}
+/>
+
+### Comando delicado o destructivo con advertencia
+
+<Terminal
+  comando="rm -rf ~/.ollama/models"
+  destructivo={true}
+  avisoDestructivo="Este comando borra irreversiblemente todos los modelos de IA descargados en tu disco sin pedir confirmación."
+  alternativaSegura="ollama rm llama3.2"
+  titulo="macOS Terminal — Comando delicado"
+  partes={[
+    { token: 'rm', explicacion: 'Instrucción para eliminar (remove).' },
+    { token: '-rf', explicacion: 'Banderas r (recursivo) y f (forzado sin preguntar). ¡Peligroso si no se usa con cuidado!' },
+    { token: '~/.ollama/models', explicacion: 'Ruta a la carpeta interna donde se guardan los pesos descargados.' }
+  ]}
+/>
+
+---
+
+## 7. Prácticas numeradas en tu Mac (`Pasos` y `Paso`)
+
+Las prácticas guían al alumno paso a paso, guardan las casillas marcadas en su equipo e indican con claridad qué debe ver en pantalla y qué hacer si algo falla:
+
+<Pasos titulo="Práctica de campo: Comprobar la memoria de tu Mac">
+  <Paso
+    numero={1}
+    id="muestra-paso-1"
+    titulo="Abre la ventana de información del sistema"
+    esperado="Aparecerá una ventana con el logo de Apple indicando el chip (M1, M2, M3 o M4) y los gigabytes (GB) de memoria unificada."
+    siFalla="Si tienes macOS antiguo, haz clic en el icono de la manzana (arriba a la izquierda) y elige 'Acerca de este Mac'."
+  >
+    Haz clic en la manzana de la esquina superior izquierda de tu pantalla y pulsa en **Ajustes del Sistema > General > Información**.
+  </Paso>
+
+  <Paso
+    numero={2}
+    id="muestra-paso-2"
+    titulo="Localiza tu cifra de memoria RAM unificada"
+    esperado="Verás una línea que dice 'Memoria: 16 GB' (u 8 GB, 24 GB, 36 GB...)."
+    siFalla="Si solo ves el número de serie, desplázate un poco hacia abajo en el panel."
+  >
+    Anota esa cifra en tu cuaderno de notas. Será la brújula que determine qué modelos caben holgadamente en tu equipo en el Bloque 1.
+  </Paso>
+
+  <Paso
+    numero={3}
+    id="muestra-paso-3"
+    titulo="Abre tu primera sesión de terminal"
+    esperado="Se abrirá una ventana con fondo oscuro o blanco y una línea terminada en el símbolo % esperando tus teclas."
+    siFalla="Si no aparece, pulsa 'Cmd + Barra espaciadora', teclea 'Terminal' y pulsa Enter."
+  >
+    Abre la aplicación **Terminal** desde la carpeta de Aplicaciones > Utilidades.
+  </Paso>
+</Pasos>
+
+---
+
+## 8. Reto de laboratorio (`Reto`)
+
+Al final de cada sesión de trabajo, el alumno encuentra una pequeña misión para consolidar lo aprendido:
+
+<Reto
+  numero="01"
+  titulo="La prueba del conteo de letras"
+  resultadoEsperado="ChatGPT afirmará erróneamente que la palabra contiene una cantidad diferente de letras o dudará al descomponerla."
+  pista="Pídele al modelo: '¿Cuántas letras r tiene la palabra ferrocarril?'. Observa cómo los tokens ocultan las letras individuales al modelo."
+>
+  Abre tu navegador habitual y entra en tu cuenta de ChatGPT o Claude. Pídele al modelo que cuente cuántas veces aparece una letra concreta en una palabra larga en español.
+
+  Comprueba si acierta a la primera o si tropieza, y piensa en cómo trocea los tokens para explicar su comportamiento.
+</Reto>
+
+---
+
+## 9. Índice temático (`GlosarioIndice`)
+
+Muestra de tarjetas de conceptos para la página de glosario y repaso de cada bloque:
+
+<GlosarioIndice />

@@ -1,0 +1,146 @@
+---
+interface EntradaGlosario {
+  termino: string;
+  definicion: string;
+  categoria?: string;
+  analogia?: string;
+}
+
+interface Props {
+  entradas?: EntradaGlosario[];
+}
+
+const defaultEntradas: EntradaGlosario[] = [
+  {
+    termino: 'Token',
+    categoria: 'Fundamentos',
+    definicion: 'Fracción mínima de texto (palabra, trozo de palabra o puntuación) que el modelo de lenguaje procesa y predice.',
+    analogia: 'Como los codones de tres nucleótidos en el ARN mensajero: no lees letra a letra, sino en bloques con significado funcional.',
+  },
+  {
+    termino: 'Embedding',
+    categoria: 'Representación',
+    definicion: 'Vector de números que sitúa un concepto en un espacio multidimensional donde palabras con significados similares quedan situadas cerca unas de otras.',
+    analogia: 'Las coordenadas de latitud, altitud y pH del suelo que sitúan a una especie vegetal dentro de su nicho ecológico.',
+  },
+  {
+    termino: 'Ventana de contexto',
+    categoria: 'Modelos',
+    definicion: 'Cantidad máxima de tokens que el modelo puede "recordar" o tener presente a la vez en una conversación.',
+    analogia: 'La memoria de trabajo del naturalista en el campo o el espacio disponible en la mesa de observación.',
+  },
+  {
+    termino: 'MCP (Model Context Protocol)',
+    categoria: 'Agentes',
+    definicion: 'Estándar abierto para conectar modelos de IA con herramientas externas (archivos locales, bases de datos o programas).',
+    analogia: 'Un puerto universal tipo USB que permite conectar cualquier instrumento de laboratorio a un microscopio.',
+  },
+  {
+    termino: 'Cuantización',
+    categoria: 'Local',
+    definicion: 'Técnica de compresión que reduce la precisión matemática de los pesos (por ejemplo de 16 bits a 4 bits) para que el modelo ocupe mucha menos memoria RAM.',
+    analogia: 'Reducir la resolución de una fotografía de microscopio conservando la morfología visible del tejido.',
+  },
+];
+
+const { entradas = defaultEntradas } = Astro.props;
+
+// Ordenar alfabéticamente
+const entradasOrdenadas = [...entradas].sort((a, b) => a.termino.localeCompare(b.termino, 'es'));
+---
+
+<div class="glosario-indice" role="region" aria-label="Índice del glosario">
+  <div class="glosario-grid">
+    {entradasOrdenadas.map((e) => (
+      <article class="glosario-card" id={`glosario-${e.termino.toLowerCase().replace(/\s+/g, '-')}`}>
+        <div class="glosario-card-header">
+          <h4 class="glosario-termino">{e.termino}</h4>
+          {e.categoria && <span class="glosario-cat">{e.categoria}</span>}
+        </div>
+        <p class="glosario-def">{e.definicion}</p>
+        {e.analogia && (
+          <div class="glosario-analogia">
+            <span class="analogia-lead" aria-hidden="true">🌱</span>
+            <span><em>Analogía de campo:</em> {e.analogia}</span>
+          </div>
+        )}
+      </article>
+    ))}
+  </div>
+</div>
+
+<style>
+  .glosario-indice {
+    margin: 2rem 0;
+  }
+
+  .glosario-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .glosario-card {
+    background-color: var(--superficie);
+    border: 1px solid var(--linea);
+    border-radius: 0.65rem;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: border-color 0.15s ease;
+  }
+
+  .glosario-card:hover {
+    border-color: var(--musgo-borde);
+  }
+
+  .glosario-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px dashed var(--linea);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .glosario-termino {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    color: var(--tinta);
+  }
+
+  .glosario-cat {
+    font-size: 0.75rem;
+    font-family: var(--sl-font-mono);
+    color: var(--musgo);
+    background-color: var(--musgo-suave);
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+  }
+
+  .glosario-def {
+    font-size: 0.925rem;
+    color: var(--tinta);
+    line-height: 1.55;
+    margin: 0 0 0.85rem 0;
+    flex-grow: 1;
+  }
+
+  .glosario-analogia {
+    background-color: var(--musgo-suave);
+    border-radius: 0.45rem;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+    color: var(--tinta);
+    line-height: 1.45;
+    display: flex;
+    gap: 0.4rem;
+    align-items: baseline;
+  }
+
+  .analogia-lead {
+    flex-shrink: 0;
+  }
+</style>

@@ -1,0 +1,118 @@
+---
+interface Props {
+  titulo?: string;
+  descripcion?: string;
+}
+
+const { titulo = 'Práctica paso a paso', descripcion } = Astro.props;
+---
+
+<div class="pasos-container" role="region" aria-label={titulo}>
+  <div class="pasos-header">
+    <div class="pasos-header-left">
+      <span class="pasos-icon" aria-hidden="true">🌱</span>
+      <h3 class="pasos-title">{titulo}</h3>
+    </div>
+    <span class="pasos-meta">Guarda tu avance localmente</span>
+  </div>
+
+  {descripcion && <p class="pasos-desc">{descripcion}</p>}
+
+  <ol class="pasos-list">
+    <slot />
+  </ol>
+</div>
+
+<script>
+  function initPasosStorage() {
+    const STORAGE_PREFIX = 'curso_ia_paso_';
+
+    document.querySelectorAll('.paso-item').forEach((item) => {
+      const checkbox = item.querySelector('.paso-checkbox') as HTMLInputElement | null;
+      if (!checkbox || checkbox.hasAttribute('data-bound')) return;
+      checkbox.setAttribute('data-bound', 'true');
+
+      const storageId = checkbox.getAttribute('data-storage-id');
+      if (!storageId) return;
+
+      const key = `${STORAGE_PREFIX}${storageId}`;
+
+      // Restaurar estado guardado
+      const isSaved = localStorage.getItem(key) === 'true';
+      if (isSaved) {
+        checkbox.checked = true;
+        item.classList.add('is-completed');
+      }
+
+      // Escuchar cambios
+      checkbox.addEventListener('change', () => {
+        if (checkbox.checked) {
+          localStorage.setItem(key, 'true');
+          item.classList.add('is-completed');
+        } else {
+          localStorage.removeItem(key);
+          item.classList.remove('is-completed');
+        }
+
+        // Notificar al indicador de progreso general
+        window.dispatchEvent(new CustomEvent('curso-ia:progreso-cambiado'));
+      });
+    });
+  }
+
+  initPasosStorage();
+  document.addEventListener('astro:page-load', initPasosStorage);
+</script>
+
+<style>
+  .pasos-container {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    background-color: var(--superficie);
+    border: 1px solid var(--linea);
+  }
+
+  .pasos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--musgo-borde);
+    padding-bottom: 0.65rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .pasos-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .pasos-icon {
+    font-size: 1.2rem;
+  }
+
+  .pasos-title {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    color: var(--tinta);
+  }
+
+  .pasos-meta {
+    font-size: 0.8rem;
+    color: var(--tinta-secundaria);
+    font-family: var(--sl-font-mono);
+  }
+
+  .pasos-desc {
+    font-size: 0.95rem;
+    color: var(--tinta-secundaria);
+    margin-bottom: 1.5rem;
+  }
+
+  .pasos-list {
+    padding: 0;
+    margin: 0;
+  }
+</style>

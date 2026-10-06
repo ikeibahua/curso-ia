@@ -2,9 +2,9 @@
    Cuaderno de Campo — Sistema de diseño para Curso de IA
    ========================================================================== */
 
-/* Variables de tema y tokens */
+/* Variables de tema y tokens (Modo Oscuro por defecto) */
 :root {
-  /* Tipografías */
+  /* Tipografías autoalojadas */
   --sl-font: 'Source Sans 3', system-ui, -apple-system, sans-serif;
   --sl-font-mono: 'JetBrains Mono', ui-monospace, monospace;
   --font-serif: 'Fraunces', Georgia, serif;
@@ -14,51 +14,76 @@
   --sl-line-height: 1.7;
   --sl-content-width: 68ch;
 
-  /* Tokens por defecto (modo oscuro) */
+  /* Paleta Cuaderno de Campo (Dark) */
   --papel: #151B17;
+  --superficie: #1C241F;
+  --superficie-elevada: #232D27;
   --tinta: #E9E4D6;
+  --tinta-secundaria: #B8B09F;
   --musgo: #7FB08F;
+  --musgo-suave: rgba(127, 176, 143, 0.12);
+  --musgo-borde: rgba(127, 176, 143, 0.35);
   --terracota: #E08A62;
+  --terracota-suave: rgba(224, 138, 98, 0.12);
+  --terracota-borde: rgba(224, 138, 98, 0.35);
   --ocre: #E3B965;
+  --ocre-suave: rgba(227, 185, 101, 0.12);
+  --ocre-borde: rgba(227, 185, 101, 0.35);
   --agua: #7DB0CF;
+  --agua-suave: rgba(125, 176, 207, 0.12);
+  --agua-borde: rgba(125, 176, 207, 0.35);
   --linea: #2C362F;
+  --linea-fuerte: #3D4A41;
 
-  /* Mapeo a Starlight (Dark) */
+  /* Mapeo Starlight (Dark) */
   --sl-color-bg: var(--papel);
-  --sl-color-bg-nav: #18201b;
+  --sl-color-bg-nav: #18201B;
   --sl-color-bg-sidebar: #131915;
-  --sl-color-bg-inline-code: #1c2420;
+  --sl-color-bg-inline-code: #1E2721;
   --sl-color-hairline: var(--linea);
-  --sl-color-hairline-light: #232c25;
+  --sl-color-hairline-light: #222B25;
   --sl-color-text: var(--tinta);
   --sl-color-text-accent: var(--musgo);
-  --sl-color-accent-low: #1d3326;
+  --sl-color-accent-low: #1D3326;
   --sl-color-accent: var(--musgo);
-  --sl-color-accent-high: #b8dec4;
+  --sl-color-accent-high: #C2E2CC;
 }
 
-/* Modo claro */
+/* Modo Claro */
 [data-theme='light'] {
+  /* Paleta Cuaderno de Campo (Light) */
   --papel: #F6F1E7;
+  --superficie: #FAF6EE;
+  --superficie-elevada: #FFFFFF;
   --tinta: #1F2A24;
+  --tinta-secundaria: #525F56;
   --musgo: #3F6B4F;
+  --musgo-suave: rgba(63, 107, 79, 0.08);
+  --musgo-borde: rgba(63, 107, 79, 0.3);
   --terracota: #C4623A;
-  --ocre: #D9A441;
-  --agua: #3C6E8F;
+  --terracota-suave: rgba(196, 98, 58, 0.08);
+  --terracota-borde: rgba(196, 98, 58, 0.3);
+  --ocre: #996B1E; /* Ajustado para garantizar contraste AA (>=4.5:1 sobre fondo claro) */
+  --ocre-suave: rgba(217, 164, 65, 0.1);
+  --ocre-borde: rgba(217, 164, 65, 0.35);
+  --agua: #2C5B7A; /* Ajustado para garantizar contraste AA sobre fondo claro */
+  --agua-suave: rgba(60, 110, 143, 0.08);
+  --agua-borde: rgba(60, 110, 143, 0.3);
   --linea: #D8CFBC;
+  --linea-fuerte: #B8AC94;
 
-  /* Mapeo a Starlight (Light) */
+  /* Mapeo Starlight (Light) */
   --sl-color-bg: var(--papel);
-  --sl-color-bg-nav: #eee8dc;
-  --sl-color-bg-sidebar: #f2ecdF;
-  --sl-color-bg-inline-code: #eae3d4;
+  --sl-color-bg-nav: #EFE8DC;
+  --sl-color-bg-sidebar: #F2ECDF;
+  --sl-color-bg-inline-code: #ECE4D4;
   --sl-color-hairline: var(--linea);
-  --sl-color-hairline-light: #e5dece;
+  --sl-color-hairline-light: #E4DDCD;
   --sl-color-text: var(--tinta);
   --sl-color-text-accent: var(--musgo);
-  --sl-color-accent-low: #d6e8dc;
+  --sl-color-accent-low: #D6E8DC;
   --sl-color-accent: var(--musgo);
-  --sl-color-accent-high: #24412f;
+  --sl-color-accent-high: #24412F;
 }
 
 /* Tipografía de títulos con carácter editorial */
@@ -69,27 +94,51 @@ h1, h2, h3, h4, h5, h6,
   font-feature-settings: 'cv01' on, 'cv02' on;
   letter-spacing: -0.015em;
   font-weight: 600;
+  color: var(--tinta);
 }
 
 h1 {
   font-weight: 700;
+  line-height: 1.25;
+}
+
+h2 {
+  margin-top: 1.8em;
+  line-height: 1.3;
+}
+
+h3 {
+  margin-top: 1.4em;
+  line-height: 1.35;
 }
 
 /* Contenedor de lectura generoso y centrado */
 .sl-markdown-content {
   font-size: var(--sl-text-base);
   line-height: var(--sl-line-height);
-  color: var(--sl-color-text);
+  color: var(--tinta);
 }
 
 .sl-markdown-content p {
-  margin-bottom: 1.4em;
+  margin-bottom: 1.3em;
 }
 
 /* Enlaces con estilo cálido y accesible */
 .sl-markdown-content a {
+  color: var(--musgo);
   text-decoration-thickness: 1.5px;
   text-underline-offset: 3px;
+  transition: color 0.15s ease;
+}
+
+.sl-markdown-content a:hover {
+  color: var(--terracota);
+}
+
+/* Foco de accesibilidad bien visible para navegación por teclado */
+:focus-visible {
+  outline: 2px solid var(--musgo) !important;
+  outline-offset: 3px !important;
 }
 
 /* Accesibilidad: Reducción de movimiento */
@@ -103,4 +152,3 @@ h1 {
     scroll-behavior: auto !important;
   }
 }
-

@@ -26,6 +26,12 @@ export default defineConfig({
       ],
       sidebar: [
         {
+          label: 'Sistema de diseño',
+          items: [
+            { label: 'Muestra de componentes', slug: 'muestra' },
+          ],
+        },
+        {
           label: 'Bloque 1: Fundamentos y modelos',
           items: [
             { label: '01. ¿Qué es un LLM y qué son los tokens?', slug: 'lecciones/01-que-es-un-llm' },

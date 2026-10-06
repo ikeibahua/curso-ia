@@ -1,0 +1,187 @@
+---
+interface Props {
+  numero: number | string;
+  titulo: string;
+  id: string;
+  esperado?: string;
+  siFalla?: string;
+}
+
+const { numero, titulo, id, esperado, siFalla } = Astro.props;
+const checkboxId = `paso-check-${id}`;
+---
+
+<li class="paso-item" data-paso-id={id}>
+  <div class="paso-header">
+    <div class="paso-checkbox-wrap">
+      <input
+        type="checkbox"
+        id={checkboxId}
+        class="paso-checkbox"
+        data-storage-id={id}
+      />
+      <label for={checkboxId} class="sr-only">Marcar paso {numero} como completado</label>
+    </div>
+    <div class="paso-title-wrap">
+      <span class="paso-num" aria-hidden="true">{numero}</span>
+      <h4 class="paso-title">{titulo}</h4>
+    </div>
+  </div>
+
+  <div class="paso-body">
+    <slot />
+
+    {(esperado || Astro.slots.has('esperado')) && (
+      <div class="resultado-esperado">
+        <div class="esperado-header">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          <strong>Deberías ver esto:</strong>
+        </div>
+        <div class="esperado-content">
+          {esperado ? <p>{esperado}</p> : <slot name="esperado" />}
+        </div>
+
+        {siFalla && (
+          <div class="si-falla-note">
+            <span class="si-falla-tag">¿No coincide?</span>
+            <span>{siFalla}</span>
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+</li>
+
+<style>
+  .paso-item {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px dashed var(--linea);
+    list-style: none;
+    position: relative;
+  }
+
+  .paso-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .paso-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .paso-checkbox-wrap {
+    display: flex;
+    align-items: center;
+  }
+
+  .paso-checkbox {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--musgo);
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  .paso-title-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+  }
+
+  .paso-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: var(--musgo-suave);
+    color: var(--musgo);
+    font-weight: 700;
+    font-family: var(--sl-font-mono);
+    font-size: 0.85rem;
+    border: 1px solid var(--musgo-borde);
+    flex-shrink: 0;
+  }
+
+  .paso-title {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    color: var(--tinta);
+    transition: opacity 0.2s ease, text-decoration 0.2s ease;
+  }
+
+  .paso-item.is-completed .paso-title {
+    opacity: 0.7;
+    text-decoration: line-through;
+    color: var(--tinta-secundaria);
+  }
+
+  .paso-body {
+    padding-left: 2.25rem;
+    color: var(--tinta);
+    line-height: 1.6;
+  }
+
+  .resultado-esperado {
+    margin-top: 1rem;
+    background-color: var(--superficie);
+    border: 1px solid var(--musgo-borde);
+    border-radius: 0.5rem;
+    padding: 0.85rem 1rem;
+  }
+
+  .esperado-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--musgo);
+    font-size: 0.9rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .esperado-content {
+    font-size: 0.925rem;
+    color: var(--tinta);
+  }
+
+  .esperado-content :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .si-falla-note {
+    margin-top: 0.65rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--linea);
+    font-size: 0.85rem;
+    color: var(--tinta-secundaria);
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
+  }
+
+  .si-falla-tag {
+    font-weight: 600;
+    color: var(--terracota);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>

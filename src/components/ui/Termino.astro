@@ -1,0 +1,126 @@
+---
+interface Props {
+  def: string;
+  palabra?: string;
+}
+
+const { def, palabra } = Astro.props;
+const terminoId = `term-${Math.random().toString(36).substring(2, 9)}`;
+---
+
+<span class="termino-wrapper">
+  <button
+    type="button"
+    class="termino-trigger"
+    aria-describedby={terminoId}
+    data-def={def}
+  >
+    <slot>{palabra}</slot>
+    <span class="termino-mark" aria-hidden="true">?</span>
+  </button>
+  <span id={terminoId} role="tooltip" class="termino-tooltip">
+    <span class="tooltip-header">
+      <span class="tooltip-tag">Glosario</span>
+    </span>
+    <span class="tooltip-text">{def}</span>
+  </span>
+</span>
+
+<style>
+  .termino-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .termino-trigger {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    cursor: help;
+    border-bottom: 1.5px dashed var(--musgo);
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.15rem;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .termino-trigger:hover,
+  .termino-trigger:focus-visible {
+    color: var(--musgo);
+    border-bottom-style: solid;
+  }
+
+  .termino-mark {
+    font-size: 0.7em;
+    color: var(--musgo);
+    vertical-align: super;
+    font-family: var(--sl-font-mono);
+    font-weight: 700;
+  }
+
+  /* Tooltip flotante accesible */
+  .termino-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    width: max-content;
+    max-width: 280px;
+    background-color: var(--superficie);
+    border: 1px solid var(--musgo-borde);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-radius: 0.5rem;
+    padding: 0.65rem 0.85rem;
+    z-index: 100;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+  }
+
+  .termino-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: var(--superficie) transparent transparent transparent;
+  }
+
+  /* Mostrar con hover o foco */
+  .termino-wrapper:hover .termino-tooltip,
+  .termino-trigger:focus .termino-tooltip {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+  }
+
+  .tooltip-header {
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .tooltip-tag {
+    font-size: 0.7rem;
+    font-family: var(--sl-font-mono);
+    text-transform: uppercase;
+    color: var(--musgo);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .tooltip-text {
+    display: block;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: var(--tinta);
+    font-family: var(--sl-font);
+    text-align: left;
+  }
+</style>

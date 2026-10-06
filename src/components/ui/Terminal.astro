@@ -1,0 +1,330 @@
+---
+interface ParteExplicada {
+  token: string;
+  explicacion: string;
+}
+
+interface Props {
+  comando: string;
+  partes?: ParteExplicada[];
+  destructivo?: boolean;
+  avisoDestructivo?: string;
+  alternativaSegura?: string;
+  titulo?: string;
+}
+
+const {
+  comando,
+  partes = [],
+  destructivo = false,
+  avisoDestructivo = 'Este comando modifica o borra datos permanentemente en tu Mac.',
+  alternativaSegura,
+  titulo = 'Terminal de macOS (zsh)',
+} = Astro.props;
+
+// ID único para accesibilidad en el botón de copiado
+const terminalId = `term-${Math.random().toString(36).substring(2, 9)}`;
+---
+
+<div class={`terminal-wrapper ${destructivo ? 'is-destructive' : ''}`} id={terminalId}>
+  {destructivo && (
+    <div class="destructive-warning" role="alert">
+      <div class="warning-header">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18" aria-hidden="true">
+          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+        <strong>¡Atención: Comando delicado o destructivo!</strong>
+      </div>
+      <p class="warning-text">{avisoDestructivo}</p>
+      {alternativaSegura && (
+        <div class="safe-alternative">
+          <span>Alternativa segura recomendada:</span>
+          <code>{alternativaSegura}</code>
+        </div>
+      )}
+    </div>
+  )}
+
+  <div class="terminal-window">
+    <div class="terminal-header">
+      <div class="mac-buttons" aria-hidden="true">
+        <span class="btn btn-close"></span>
+        <span class="btn btn-min"></span>
+        <span class="btn btn-max"></span>
+      </div>
+      <span class="terminal-title">{titulo}</span>
+      <button
+        type="button"
+        class="copy-btn"
+        aria-label="Copiar comando al portapapeles"
+        data-command={comando}
+      >
+        <svg class="copy-icon" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
+          <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+          <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 2H9a3 3 0 01-3-2z" />
+        </svg>
+        <span class="copy-label">Copiar</span>
+      </button>
+    </div>
+
+    <div class="terminal-body">
+      <div class="terminal-code">
+        <span class="prompt" aria-hidden="true">% </span>
+        <code class="command-text">{comando}</code>
+      </div>
+    </div>
+  </div>
+
+  {partes.length > 0 && (
+    <details class="terminal-explainer">
+      <summary class="explainer-summary">
+        <span class="summary-icon" aria-hidden="true">🔍</span>
+        <span>¿Qué hace cada parte de este comando? (haz clic para desplegar)</span>
+      </summary>
+      <div class="explainer-content">
+        <ul class="parts-list">
+          {partes.map((p) => (
+            <li class="part-item">
+              <code class="part-token">{p.token}</code>
+              <span class="part-desc">{p.explicacion}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </details>
+  )}
+</div>
+
+<script>
+  // Inicialización accesible del botón de copiado
+  function initTerminalCopy() {
+    document.querySelectorAll('.terminal-wrapper').forEach((wrapper) => {
+      const btn = wrapper.querySelector('.copy-btn');
+      if (!btn || btn.hasAttribute('data-bound')) return;
+      btn.setAttribute('data-bound', 'true');
+
+      btn.addEventListener('click', async () => {
+        const cmd = btn.getAttribute('data-command') || '';
+        const label = btn.querySelector('.copy-label');
+        try {
+          await navigator.clipboard.writeText(cmd);
+          if (label) {
+            const originalText = label.textContent;
+            label.textContent = '¡Copiado!';
+            btn.classList.add('is-copied');
+            setTimeout(() => {
+              label.textContent = originalText;
+              btn.classList.remove('is-copied');
+            }, 2000);
+          }
+        } catch {
+          if (label) label.textContent = 'Error al copiar';
+        }
+      });
+    });
+  }
+
+  initTerminalCopy();
+  document.addEventListener('astro:page-load', initTerminalCopy);
+</script>
+
+<style>
+  .terminal-wrapper {
+    margin: 1.75rem 0;
+    border-radius: 0.65rem;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    background-color: #0E1310;
+    border: 1px solid var(--linea);
+  }
+
+  .terminal-wrapper.is-destructive {
+    border-color: var(--terracota);
+  }
+
+  .destructive-warning {
+    background-color: var(--terracota-suave);
+    border-bottom: 2px solid var(--terracota);
+    padding: 0.85rem 1.25rem;
+    color: var(--tinta);
+  }
+
+  .warning-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--terracota);
+    font-size: 0.95rem;
+  }
+
+  .warning-text {
+    margin: 0.35rem 0 0.5rem 0;
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .safe-alternative {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 0.4rem 0.6rem;
+    border-radius: 0.35rem;
+  }
+
+  .safe-alternative code {
+    color: var(--musgo);
+    font-family: var(--sl-font-mono);
+  }
+
+  .terminal-window {
+    background-color: #0E1310;
+  }
+
+  .terminal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #171E19;
+    padding: 0.5rem 0.85rem;
+    border-bottom: 1px solid #232C25;
+  }
+
+  .mac-buttons {
+    display: flex;
+    gap: 0.35rem;
+    align-items: center;
+  }
+
+  .btn {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .btn-close { background-color: #FF5F56; }
+  .btn-min { background-color: #FFBD2E; }
+  .btn-max { background-color: #27C93F; }
+
+  .terminal-title {
+    font-size: 0.8rem;
+    font-family: var(--sl-font-mono);
+    color: #8C9990;
+    text-align: center;
+  }
+
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-family: var(--sl-font-mono);
+    color: #C2CEC6;
+    background-color: #222C24;
+    border: 1px solid #334036;
+    padding: 0.25rem 0.6rem;
+    border-radius: 0.35rem;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .copy-btn:hover {
+    background-color: #2D3A30;
+    color: #FFFFFF;
+  }
+
+  .copy-btn.is-copied {
+    background-color: var(--musgo);
+    color: #0E1310;
+    font-weight: 600;
+  }
+
+  .terminal-body {
+    padding: 1.15rem 1.25rem;
+    overflow-x: auto;
+  }
+
+  .terminal-code {
+    display: flex;
+    align-items: baseline;
+    font-family: var(--sl-font-mono);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .prompt {
+    color: #7FB08F;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    user-select: none;
+  }
+
+  .command-text {
+    color: #E6EAE7;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  /* Desglose de partes del comando */
+  .terminal-explainer {
+    background-color: #141B16;
+    border-top: 1px solid #232C25;
+    font-size: 0.875rem;
+  }
+
+  .explainer-summary {
+    padding: 0.65rem 1rem;
+    cursor: pointer;
+    color: #B4C0B8;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    user-select: none;
+    transition: background 0.15s ease;
+  }
+
+  .explainer-summary:hover {
+    background-color: #1A221D;
+    color: #FFFFFF;
+  }
+
+  .explainer-content {
+    padding: 0.75rem 1.25rem 1rem 1.25rem;
+    border-top: 1px dashed #232C25;
+  }
+
+  .parts-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .part-item {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+
+  .part-token {
+    font-family: var(--sl-font-mono);
+    background-color: #202A22;
+    color: #A0D4B0;
+    padding: 0.15rem 0.45rem;
+    border-radius: 0.25rem;
+    font-size: 0.825rem;
+    white-space: nowrap;
+    border: 1px solid #2B392F;
+  }
+
+  .part-desc {
+    color: #C0CDC4;
+    line-height: 1.45;
+  }
+</style>

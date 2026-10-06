@@ -1,0 +1,195 @@
+---
+interface Props {
+  totalPasos?: number;
+}
+
+const { totalPasos = 5 } = Astro.props;
+---
+
+<div class="progreso-curso-card" role="region" aria-label="Progreso de prácticas" data-total-pasos={totalPasos}>
+  <div class="progreso-top">
+    <div class="progreso-label-wrap">
+      <span class="progreso-icon" aria-hidden="true">🧭</span>
+      <span class="progreso-label">Tu cuaderno de campo</span>
+    </div>
+    <span class="progreso-counter" id="progreso-contador">Calculando...</span>
+  </div>
+
+  <div
+    class="progreso-track"
+    role="progressbar"
+    id="progreso-barra-wrap"
+    aria-valuenow="0"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    aria-label="Porcentaje de prácticas completadas"
+  >
+    <div class="progreso-fill" id="progreso-barra" style="width: 0%;"></div>
+  </div>
+
+  <div class="progreso-footer">
+    <span class="progreso-hint">Los datos se guardan exclusivamente en tu navegador</span>
+    <button type="button" class="progreso-reset-btn" id="progreso-reset">
+      Reiniciar marcas
+    </button>
+  </div>
+</div>
+
+<script>
+  function updateProgress() {
+    const STORAGE_PREFIX = 'curso_ia_paso_';
+    let completedCount = 0;
+
+    // Contar claves en localStorage
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith(STORAGE_PREFIX) && localStorage.getItem(key) === 'true') {
+        completedCount++;
+      }
+    }
+
+    // Contar los pasos presentes en el DOM si los hay, o usar la propiedad totalPasos
+    const card = document.querySelector('.progreso-curso-card');
+    const defaultTotal = card ? parseInt(card.getAttribute('data-total-pasos') || '5', 10) : 5;
+    const pageSteps = document.querySelectorAll('.paso-item').length;
+    const total = pageSteps > 0 ? pageSteps : defaultTotal;
+    const percent = Math.min(100, Math.round((completedCount / total) * 100));
+
+    const contador = document.getElementById('progreso-contador');
+    const barra = document.getElementById('progreso-barra');
+    const barraWrap = document.getElementById('progreso-barra-wrap');
+
+    if (contador) {
+      contador.textContent = `${completedCount} de ${total} pasos (${percent}%)`;
+    }
+
+    if (barra) {
+      barra.style.width = `${percent}%`;
+    }
+
+    if (barraWrap) {
+      barraWrap.setAttribute('aria-valuenow', percent.toString());
+    }
+  }
+
+  function initProgressComponent() {
+    updateProgress();
+
+    window.addEventListener('curso-ia:progreso-cambiado', updateProgress);
+
+    const resetBtn = document.getElementById('progreso-reset');
+    if (resetBtn && !resetBtn.hasAttribute('data-bound')) {
+      resetBtn.setAttribute('data-bound', 'true');
+      resetBtn.addEventListener('click', () => {
+        if (confirm('¿Deseas reiniciar las casillas de las prácticas guardadas en este equipo?')) {
+          const STORAGE_PREFIX = 'curso_ia_paso_';
+          const toRemove: string[] = [];
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith(STORAGE_PREFIX)) {
+              toRemove.push(key);
+            }
+          }
+          toRemove.forEach((k) => localStorage.removeItem(k));
+
+          // Desmarcar checkboxes en el DOM
+          document.querySelectorAll('.paso-item').forEach((item) => {
+            const cb = item.querySelector('.paso-checkbox') as HTMLInputElement | null;
+            if (cb) cb.checked = false;
+            item.classList.remove('is-completed');
+          });
+
+          updateProgress();
+        }
+      });
+    }
+  }
+
+  initProgressComponent();
+  document.addEventListener('astro:page-load', initProgressComponent);
+</script>
+
+<style>
+  .progreso-curso-card {
+    margin: 1.5rem 0;
+    padding: 1.15rem 1.35rem;
+    background-color: var(--superficie);
+    border: 1px solid var(--musgo-borde);
+    border-radius: 0.65rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  }
+
+  .progreso-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.65rem;
+  }
+
+  .progreso-label-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-weight: 600;
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    color: var(--tinta);
+  }
+
+  .progreso-icon {
+    font-size: 1.1rem;
+  }
+
+  .progreso-counter {
+    font-size: 0.85rem;
+    font-family: var(--sl-font-mono);
+    color: var(--musgo);
+    font-weight: 600;
+  }
+
+  .progreso-track {
+    width: 100%;
+    height: 10px;
+    background-color: var(--linea);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+
+  .progreso-fill {
+    height: 100%;
+    background-color: var(--musgo);
+    border-radius: 999px;
+    transition: width 0.3s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .progreso-fill {
+      transition: none;
+    }
+  }
+
+  .progreso-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--tinta-secundaria);
+  }
+
+  .progreso-reset-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--tinta-secundaria);
+    font-size: 0.775rem;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.15s ease;
+  }
+
+  .progreso-reset-btn:hover {
+    color: var(--terracota);
+  }
+</style>

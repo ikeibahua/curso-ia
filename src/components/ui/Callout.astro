@@ -1,0 +1,120 @@
+---
+interface Props {
+  tipo?: 'nota' | 'ojo' | 'truco' | 'peligro';
+  titulo?: string;
+}
+
+const { tipo = 'nota', titulo } = Astro.props;
+
+const config = {
+  nota: {
+    defaultTitle: 'Nota de campo',
+    colorVar: 'var(--agua)',
+    bgVar: 'var(--agua-suave)',
+    borderVar: 'var(--agua-borde)',
+    badgeLabel: 'Nota',
+  },
+  ojo: {
+    defaultTitle: 'Ojo al dato',
+    colorVar: 'var(--ocre)',
+    bgVar: 'var(--ocre-suave)',
+    borderVar: 'var(--ocre-borde)',
+    badgeLabel: 'Atención',
+  },
+  truco: {
+    defaultTitle: 'Truco práctico',
+    colorVar: 'var(--musgo)',
+    bgVar: 'var(--musgo-suave)',
+    borderVar: 'var(--musgo-borde)',
+    badgeLabel: 'Consejo',
+  },
+  peligro: {
+    defaultTitle: 'Precaución',
+    colorVar: 'var(--terracota)',
+    bgVar: 'var(--terracota-suave)',
+    borderVar: 'var(--terracota-borde)',
+    badgeLabel: 'Peligro',
+  },
+};
+
+const current = config[tipo] || config.nota;
+const titleText = titulo || current.defaultTitle;
+---
+
+<aside class={`callout callout-${tipo}`} role="region" aria-label={titleText}>
+  <div class="callout-header">
+    <span class="callout-icon" aria-hidden="true">
+      {tipo === 'nota' && (
+        <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+        </svg>
+      )}
+      {tipo === 'ojo' && (
+        <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+          <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+        </svg>
+      )}
+      {tipo === 'truco' && (
+        <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+          <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14H8a4 4 0 01-.813-7.917A4 4 0 0112.813 6.083 4 4 0 0112 14z" />
+        </svg>
+      )}
+      {tipo === 'peligro' && (
+        <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+      )}
+    </span>
+    <span class="callout-title">{titleText}</span>
+  </div>
+  <div class="callout-body">
+    <slot />
+  </div>
+</aside>
+
+<style define:vars={{ color: current.colorVar, bg: current.bgVar, border: current.borderVar }}>
+  .callout {
+    margin: 1.5rem 0;
+    padding: 1rem 1.25rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid var(--color);
+    background-color: var(--bg);
+    border-top: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .callout-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 600;
+    color: var(--color);
+    margin-bottom: 0.5rem;
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+  }
+
+  .callout-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .callout-body {
+    color: var(--tinta);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  /* Asegurar que párrafos internos no agreguen margen extra al final */
+  .callout-body :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .callout-body :global(p:first-child) {
+    margin-top: 0;
+  }
+</style>
