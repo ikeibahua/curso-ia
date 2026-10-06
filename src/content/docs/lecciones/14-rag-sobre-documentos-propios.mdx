@@ -1,15 +1,222 @@
 ---
 title: "Lección 15 — RAG sobre documentos propios"
-description: "Consultar y dialogar con tus propios apuntes, PDFs y cuadernos de campo."
+description: "Cómo dialogar con tus propios apuntes, PDFs y guías de campo mediante Generación Aumentada por Recuperación (RAG)."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Callout from '../../../components/ui/Callout.astro';
+import Analogia from '../../../components/ui/Analogia.astro';
+import Terminal from '../../../components/ui/Terminal.astro';
+import Pasos from '../../../components/ui/Pasos.astro';
+import Paso from '../../../components/ui/Paso.astro';
+import Reto from '../../../components/ui/Reto.astro';
+import Verificado from '../../../components/ui/Verificado.astro';
+import Termino from '../../../components/ui/Termino.astro';
+import Herbario from '../../../components/ui/Herbario.astro';
 
-<Aside type="note" title="Lección en preparación (Fase 1: Andamiaje)">
-Esta página forma parte de la estructura base del curso (identificador interno: **L14**, orden en el itinerario: **15**).
+import PipelineRag from '../../../components/widgets/pipeline-rag/PipelineRag.tsx';
+import ChunkingAjustable from '../../../components/widgets/chunking-ajustable/ChunkingAjustable.tsx';
 
-El contenido completo, los interactivos y las prácticas de laboratorio se incorporarán en las siguientes fases del plan de trabajo.
-</Aside>
+<Verificado
+  fecha="2026-03"
+  fuente="https://docs.trychroma.com"
+  nota="Arquitectura estándar de Retrieval-Augmented Generation (RAG): bases vectoriales locales (Chroma, SQLite-vec), modelos de embeddings locales y ventanas de contexto de gran capacidad."
+/>
 
 ## Objetivo de la lección
-Consultar y dialogar con tus propios apuntes, PDFs y cuadernos de campo.
+Comprender los fundamentos técnicos de la Generación Aumentada por Recuperación (RAG), aprendiendo a construir un sistema que consulte tus propios documentos y cuadernos de campo para responder preguntas con citas exactas y sin riesgo de alucinaciones.
+
+---
+
+## 1. El examen a libro abierto: ¿Por qué el modelo no conoce tus documentos?
+
+Un modelo de lenguaje comercial (como Claude, GPT o Gemini) fue entrenado en una fecha determinada con cientos de miles de millones de textos públicos de internet. Por muy inteligente que sea:
+- **No tiene acceso a tus archivos personales:** no ha leído tus cuadernos de campo de los años 80, tus informes florísticos locales ni los PDFs privados que guardas en tu disco duro.
+- **Reentrenar el modelo con tus documentos no es viable:** costaría miles de euros en centros de cálculo y alteraría los pesos que vimos en las lecciones 04 y 05.
+
+¿Cómo resolvemos este dilema? Mediante **RAG (*Retrieval-Augmented Generation* o Generación Aumentada por Recuperación)**.
+
+La idea es tan sencilla como brillante: en lugar de exigir al modelo que responda "de memoria", le permites hacer un **examen a libro abierto**. Cuando le haces una pregunta, el sistema busca en tu biblioteca los dos o tres párrafos relevantes, los coloca discretamente en su ventana de contexto y le dice: *"Responde a la pregunta del usuario utilizando exclusivamente la información de estos fragmentos y cita de qué página proviene cada dato"*.
+
+Observa los cinco eslabones de esta cadena en el interactivo:
+
+<PipelineRag client:visible />
+
+---
+
+## 2. El arte de trocear: *Chunking* y solapamiento (*Overlap*)
+
+No podemos meter una enciclopedia de 800 páginas entera en cada búsqueda. Por eso, el primer paso técnico consiste en **trocear el documento (*chunking*)**.
+
+Sin embargo, cortar un texto no es tan simple como usar unas tijeras cada 500 palabras:
+
+- **Si el fragmento es demasiado pequeño:** se destruye la relación sintáctica. Una frase como *"Esta especie es venenosa"* separada del nombre de la planta conduce a conclusiones catastróficas.
+- **Si el fragmento es excesivamente largo:** se mezclan cinco temas distintos en el mismo trozo, diluyendo el vector de significado (como vimos en la Lección 02 con los embeddings).
+- **El puente del solapamiento (*Overlap*):** para que el hilo de una idea no quede amputado al cambiar de página, repetimos las últimas 10 o 20 palabras de un fragmento al principio del siguiente.
+
+Comprueba el efecto del tamaño y el solapamiento en este texto botánico:
+
+<ChunkingAjustable client:visible />
+
+---
+
+## 3. ¿Dónde se guardan los trozos? La base de datos vectorial
+
+Una vez divididos los documentos, cada fragmento se procesa con un modelo de embeddings (como vimos en la Lección 02). Ese modelo convierte el texto en una lista de coordenadas matemáticas (un vector) que captura su significado conceptual.
+
+Estos vectores se almacenan en una **base de datos vectorial local**:
+- Herramientas ligeras y gratuitas como **Chroma** o extensiones como **SQLite-vec** se ejecutan en tu propio Mac sin coste alguno.
+- Cuando haces una pregunta, la base de datos no busca coincidencias literales de letras (como el buscador de Finder o Word), sino **proximidad de significado**: si preguntas por *"árboles resistentes a la sequía"*, encontrará párrafos sobre *"adaptaciones xéricas del quejigo"* aunque no compartan una sola palabra exacta.
+
+### La recuperación híbrida
+Los sistemas modernos más eficaces combinan dos miradas:
+1. **Búsqueda semántica (vectores):** entiende sinónimos y conceptos globales.
+2. **Búsqueda léxica (palabras clave exactas, algoritmo BM25):** garantiza que códigos específicos, fechas o nombres científicos latinos muy concretos (como *Quercus pyrenaica Willd.*) no se diluyan en la abstracción geométrica.
+
+---
+
+## 4. RAG frente a meter el documento entero en el contexto
+
+Con las ventanas de contexto actuales de los modelos grandes (que admiten entre 128.000 y 1.000.000 de tokens, el equivalente a libros enteros), surge una pregunta obligada:
+
+*¿Tiene sentido montar un sistema RAG si puedo arrastrar mi PDF directamente a Claude o ChatGPT?*
+
+<Callout tipo="info" titulo="La regla de oro del volumen">
+- **Para 1 a 5 documentos (hasta 100 páginas):** **No uses RAG**. Es mucho más fiable arrastrar el documento entero a la ventana de contexto. El modelo podrá relacionar el inicio con el final sin riesgo de que ningún trozo se quede fuera de la búsqueda.
+- **Para decenas o centenares de documentos (un archivo con 5.000 folios):** **Usa RAG**. No cabe todo en el contexto a la vez, y procesar millones de tokens en cada pregunta saldría carísimo o saturaría la memoria del ordenador.
+</Callout>
+
+<Analogia titulo="El herbario de consulta rápida y la memoria enciclopédica">
+Imagina tu estación botánica:
+- Intentar que el modelo "sepa" tus cuadernos sin RAG es como exigir a un botánico que memorice de memoria cada pliego recolectado durante 40 años de expediciones. Tarde o temprano confundirá una fecha o inventará un paraje.
+- Con RAG, el botánico se sienta en su despacho con un fichero de tarjetas índice (la base vectorial). Cuando alguien le pregunta sobre un helecho de Cazorla, consulta el tarjetero, saca los dos sobres exactos del archivo, los abre sobre la mesa y lee el dato contrastado.
+
+**Dónde se rompe la analogía:** Un botánico humano hojea y relaciona ideas periféricas espontáneamente (*"esto me recuerda a una muestra de Sierra Nevada"*). El sistema RAG es estrictamente ciego a todo lo que quede fuera de los trozos recuperados: si la respuesta a tu pregunta requiere enlazar un párrafo de la página 3 con una tabla de la página 280 y el buscador sólo rescató la página 3, el modelo te dirá con total convicción que el documento no contiene esa información.
+</Analogia>
+
+---
+
+## 5. Práctica en tu Mac: Montar un RAG mínimo en local con Python
+
+Vamos a crear un consultorio documental en tu Mac empleando un script mínimo de Python y una base vectorial local, asegurando que tus archivos nunca viajen a internet:
+
+<Pasos>
+  <Paso numero={1} titulo="Crea un entorno virtual aislado en tu Mac">
+    Abre la **Terminal** de tu Mac y crea una carpeta de laboratorio con su propio entorno virtual de Python (para no interferir con las herramientas del sistema):
+
+    ```bash
+    mkdir -p ~/laboratorio-rag && cd ~/laboratorio-rag
+    python3 -m venv .venv
+    source .venv/bin/activate
+    ```
+
+    Verás que el prompt de tu terminal muestra ahora `(.venv)`, indicando que estás dentro de tu burbuja segura.
+  </Paso>
+
+  <Paso numero={2} titulo="Instala una base vectorial ligera">
+    Instala la biblioteca libre Chroma para almacenar y buscar vectores en local:
+
+    ```bash
+    pip install chromadb
+    ```
+  </Paso>
+
+  <Paso numero={3} titulo="Crea tres notas botánicas de prueba">
+    Genera tres archivos de texto simples que simulen tus cuadernos de campo:
+
+    ```bash
+    echo "Pino albar (Pinus sylvestris): habita en cotas de 1.200 a 2.000 metros en el Sistema Central. Prefiere suelos graníticos." > nota_01.txt
+    echo "Alcornoque (Quercus suber): árbol silicícola mediterráneo. La primera saca de corcho (bornizo) se realiza a los 30 años." > nota_02.txt
+    echo "Hayedo de Montejo: bosque relicto de Fagus sylvatica en la Sierra del Rincón, límite meridional de la especie." > nota_03.txt
+    ```
+  </Paso>
+
+  <Paso numero={4} titulo="Indexa y consulta tus notas con un script de 10 líneas">
+    Crea un pequeño script de consulta llamado `consultar.py` pegando este comando en la terminal:
+
+    ```bash
+    cat << 'EOF' > consultar.py
+    import chromadb
+
+    client = chromadb.Client()
+    coleccion = client.create_collection("cuaderno_campo")
+
+    # Añadir los 3 fragmentos
+    coleccion.add(
+        documents=[
+            open("nota_01.txt").read(),
+            open("nota_02.txt").read(),
+            open("nota_03.txt").read(),
+        ],
+        ids=["nota_01", "nota_02", "nota_03"]
+    )
+
+    pregunta = "¿En qué tipo de suelo vive el alcornoque y a qué edad se extrae el bornizo?"
+    resultado = coleccion.query(query_texts=[pregunta], n_results=1)
+
+    print("\n🔍 Pregunta:", pregunta)
+    print("📄 Fragmento recuperado:", resultado['documents'][0][0])
+    print("📌 Fuente exacta:", resultado['ids'][0][0])
+    EOF
+    ```
+  </Paso>
+
+  <Paso numero={5} titulo="Ejecuta la consulta">
+    Lanza el script en tu Mac:
+
+    ```bash
+    python3 consultar.py
+    ```
+
+    Comprobarás que, sin enviar nada a internet y en fracciones de segundo, el sistema localiza con exactitud la ficha del alcornoque basándose en la afinidad semántica de tu pregunta.
+  </Paso>
+</Pasos>
+
+---
+
+## 6. Reto final: El detective de fallos en RAG
+
+<Reto titulo="Diagnostica dos fallos típicos de recuperación">
+Un colega biólogo ha montado un sistema RAG sobre 50 artículos de micología. Sin embargo, su sistema falla ante dos preguntas. Identifica cuál es la causa técnica de cada tropiezo:
+
+1. **Fallo A:** Pregunta: *"¿Cuántas especies del género Boletus se han registrado en total a lo largo de los 50 artículos?"*
+   - *Resultado del RAG:* Responde mencionando sólo 3 especies y dice que son las únicas.
+   - *Diagnóstico:* **Límite de fragmentos (Retrieval Window)**. El sistema RAG sólo recupera los 3 o 4 fragmentos con mayor puntuación de similitud. Una pregunta agregada cuantitativa (*"cuántas en total en toda la obra"*) requiere leer todas las páginas; no se puede responder mediante recuperación por similitud aislada.
+
+2. **Fallo B:** Pregunta: *"¿Qué toxicidad presenta Amanita phalloides var. alba?"*
+   - *Resultado del RAG:* El sistema responde que no encuentra información sobre esa variedad. Al abrir el PDF original, la frase estaba partida así: *"Encontrada en pinares de repoblación Amanita phalloides [FIN DE PÁGINA 12] var. alba, causante de síndrome faloidiano grave [INICIO PÁGINA 13]"*.
+   - *Diagnóstico:* **Chunking sin solapamiento**. El corte de página separó la especie de su variedad botánica y de su cuadro de toxicidad. Al no haber configurado solapamiento (*overlap*), el vector de la página 12 no contenía la variedad y el de la página 13 no mencionaba el género.
+</Reto>
+
+---
+
+## 7. Resumen y herbario de conceptos
+
+- **RAG** soluciona el problema de consultar documentos propios sin reentrenar modelos: recupera fragmentos y los inyecta en la ventana de contexto como un examen a libro abierto.
+- El **troceado (*chunking*)** divide los textos en unidades coherentes; el **solapamiento (*overlap*)** garantiza que las ideas en las fronteras entre páginas no queden mutiladas.
+- Las **bases vectoriales locales** (como Chroma o SQLite-vec) operan en tu propio Mac con privacidad total y coste cero.
+- Si trabajas con pocos documentos (menos de 50–100 páginas), es más seguro adjuntar el documento entero al modelo antes que construir un pipeline RAG.
+
+<Herbario
+  terminos={[
+    {
+      termino: "RAG (Retrieval-Augmented Generation)",
+      definicion: "Arquitectura que combina un motor de búsqueda sobre documentos propios con un modelo de lenguaje, aportando fragmentos relevantes como contexto para responder con citas verificables.",
+      analogia: "Un estudiante que acude a un examen con sus cuadernos de laboratorio y busca en el índice las páginas pertinentes antes de redactar cada respuesta."
+    },
+    {
+      termino: "Chunking (Troceado)",
+      definicion: "Proceso de segmentar un documento extenso en fragmentos más pequeños de longitud predeterminada aptos para la búsqueda semántica.",
+      analogia: "Cortar una tira de celuloide o papel de herbario en pliegos individuales ordenados para poder archivarlos en carpetas manejables."
+    },
+    {
+      termino: "Overlap (Solapamiento)",
+      definicion: "Zona de repetición de palabras entre el final de un fragmento y el inicio del contiguo para mantener la continuidad contextual.",
+      analogia: "Las tejas de un tejado o las escamas de una piña: se montan unas sobre otras para que el agua no se filtre por la rendija."
+    },
+    {
+      termino: "Base de datos vectorial",
+      definicion: "Sistema de almacenamiento optimizado para guardar vectores de alta dimensión y realizar búsquedas ultra-rápidas basadas en similitud geométrica (distancia del coseno).",
+      analogia: "El mapa tridimensional de un bosque donde cada árbol está situado por sus coordenadas geográficas y altitud: buscar los árboles vecinos es una cuestión de distancia métrica."
+    }
+  ]}
+/>
