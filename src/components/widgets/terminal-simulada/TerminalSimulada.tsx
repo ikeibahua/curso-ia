@@ -186,12 +186,36 @@ export default function TerminalSimulada() {
         break;
 
       case 'ls': {
-        const currNode = getNodeAtPath(cwd, fs);
-        if (!currNode || !currNode.children) {
-          // empty
+        const isLong = args.includes('-l');
+        const targetArg = args.find((a) => !a.startsWith('-'));
+        let targetNode = getNodeAtPath(cwd, fs);
+
+        if (targetArg) {
+          const cleanArg = targetArg.replace(/\/+$/, '').replace(/^\.\//, '');
+          if (cleanArg === '..' || cleanArg.startsWith('../')) {
+            if (cwd.length > 0) targetNode = getNodeAtPath(cwd.slice(0, -1), fs);
+          } else if (cleanArg === '~' || cleanArg === '') {
+            targetNode = getNodeAtPath([], fs);
+          } else if (targetNode?.children) {
+            const foundKey = Object.keys(targetNode.children).find(
+              (k) => k.toLowerCase() === cleanArg.toLowerCase()
+            );
+            if (foundKey && targetNode.children[foundKey].type === 'dir') {
+              targetNode = targetNode.children[foundKey];
+            } else if (foundKey) {
+              newHistory.push(foundKey);
+              break;
+            } else {
+              newHistory.push(`ls: ${targetArg}: No existe el archivo o el directorio`);
+              break;
+            }
+          }
+        }
+
+        if (!targetNode || !targetNode.children) {
+          newHistory.push('(directorio vacío)');
         } else {
-          const isLong = args.includes('-l');
-          const entries = Object.values(currNode.children);
+          const entries = Object.values(targetNode.children);
           if (entries.length === 0) {
             newHistory.push('(directorio vacío)');
           } else if (isLong) {
@@ -212,7 +236,8 @@ export default function TerminalSimulada() {
       }
 
       case 'cd': {
-        const target = args[0];
+        const rawTarget = args[0] || '';
+        let target = rawTarget.replace(/\/+$/, '').replace(/^\.\//, '');
         if (!target || target === '~' || target === '') {
           setCwd([]);
         } else if (target === '..') {
@@ -223,21 +248,36 @@ export default function TerminalSimulada() {
           // Stay
         } else {
           const currNode = getNodeAtPath(cwd, fs);
-          if (currNode && currNode.children && currNode.children[target]) {
-            if (currNode.children[target].type === 'dir') {
-              setCwd((prev) => [...prev, target]);
+          if (currNode && currNode.children) {
+            let foundKey = Object.keys(currNode.children).find(
+              (k) => k.toLowerCase() === target.toLowerCase()
+            );
+            // Soporte flexible para nombres en inglés/español comunes en macOS
+            if (!foundKey) {
+              if (target.toLowerCase() === 'documents') foundKey = 'Documentos';
+              if (target.toLowerCase() === 'downloads') foundKey = 'Descargas';
+              if (target.toLowerCase() === 'pictures' || target.toLowerCase() === 'photos') foundKey = 'Fotos';
+            }
+
+            if (foundKey && currNode.children[foundKey]) {
+              if (currNode.children[foundKey].type === 'dir') {
+                setCwd((prev) => [...prev, foundKey]);
+              } else {
+                newHistory.push(`cd: no es un directorio: ${rawTarget}`);
+              }
             } else {
-              newHistory.push(`cd: no es un directorio: ${target}`);
+              newHistory.push(`cd: no existe el archivo o el directorio: ${rawTarget}`);
             }
           } else {
-            newHistory.push(`cd: no existe el archivo o el directorio: ${target}`);
+            newHistory.push(`cd: no existe el archivo o el directorio: ${rawTarget}`);
           }
         }
         break;
       }
 
       case 'mkdir': {
-        const dirName = args[0];
+        const rawDirName = args[0] || '';
+        const dirName = rawDirName.replace(/\/+$/, '').replace(/^\.\//, '');
         if (!dirName) {
           newHistory.push('mkdir: falta el nombre del directorio que deseas crear');
         } else {
@@ -259,42 +299,58 @@ export default function TerminalSimulada() {
       }
 
       case 'cat': {
-        const fileName = args[0];
+        const rawFileName = args[0] || '';
+        const fileName = rawFileName.replace(/\/+$/, '').replace(/^\.\//, '');
         if (!fileName) {
           newHistory.push('cat: debes especificar el nombre del archivo a leer');
         } else {
           const currNode = getNodeAtPath(cwd, fs);
-          if (currNode && currNode.children && currNode.children[fileName]) {
-            const file = currNode.children[fileName];
-            if (file.type === 'dir') {
-              newHistory.push(`cat: ${fileName}: Es un directorio`);
+          if (currNode && currNode.children) {
+            const foundKey = Object.keys(currNode.children).find(
+              (k) => k.toLowerCase() === fileName.toLowerCase()
+            );
+            if (foundKey && currNode.children[foundKey]) {
+              const file = currNode.children[foundKey];
+              if (file.type === 'dir') {
+                newHistory.push(`cat: ${rawFileName}: Es un directorio`);
+              } else {
+                newHistory.push(file.content || '(archivo vacío)');
+              }
             } else {
-              newHistory.push(file.content || '(archivo vacío)');
+              newHistory.push(`cat: ${rawFileName}: No existe el archivo o el directorio`);
             }
           } else {
-            newHistory.push(`cat: ${fileName}: No existe el archivo o el directorio`);
+            newHistory.push(`cat: ${rawFileName}: No existe el archivo o el directorio`);
           }
         }
         break;
       }
 
       case 'rm': {
-        const target = args[0];
+        const rawTarget = args[0] || '';
+        const target = rawTarget.replace(/\/+$/, '').replace(/^\.\//, '');
         if (!target) {
           newHistory.push('rm: falta el nombre del archivo a eliminar');
         } else {
           setFs((prevFs) => {
             const copy: FileNode = JSON.parse(JSON.stringify(prevFs));
             const node = getNodeAtPath(cwd, copy);
-            if (node && node.children && node.children[target]) {
-              if (node.children[target].type === 'dir' && !args.includes('-r')) {
-                newHistory.push(`rm: ${target}: es un directorio (para borrar directorios se requiere rm -r)`);
+            if (node && node.children) {
+              const foundKey = Object.keys(node.children).find(
+                (k) => k.toLowerCase() === target.toLowerCase()
+              );
+              if (foundKey && node.children[foundKey]) {
+                if (node.children[foundKey].type === 'dir' && !args.includes('-r')) {
+                  newHistory.push(`rm: ${rawTarget}: es un directorio (para borrar directorios se requiere rm -r)`);
+                } else {
+                  delete node.children[foundKey];
+                  newHistory.push(`(archivo "${foundKey}" eliminado)`);
+                }
               } else {
-                delete node.children[target];
-                newHistory.push(`(archivo "${target}" eliminado)`);
+                newHistory.push(`rm: ${rawTarget}: No existe el archivo o el directorio`);
               }
             } else {
-              newHistory.push(`rm: ${target}: No existe el archivo o el directorio`);
+              newHistory.push(`rm: ${rawTarget}: No existe el archivo o el directorio`);
             }
             return copy;
           });
