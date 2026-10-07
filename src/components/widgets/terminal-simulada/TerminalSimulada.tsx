@@ -105,7 +105,7 @@ export default function TerminalSimulada() {
   const [cwd, setCwd] = useState<string[]>([]); // [] represents home (~ = /Users/alumno)
   const [history, setHistory] = useState<string[]>([
     'Bienvenido a la terminal interactiva zsh simulada de macOS.',
-    'Escribe "help" para ver los comandos disponibles o sigue las misiones.',
+    'Escribe "help" para ver comandos y pulsa Tab (⇥) para autocompletar.',
   ]);
   const [inputVal, setInputVal] = useState<string>('');
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
@@ -310,10 +310,95 @@ export default function TerminalSimulada() {
     setInputVal('');
   };
 
+  const findCommonPrefix = (strings: string[]): string => {
+    if (strings.length === 0) return '';
+    let prefix = strings[0];
+    for (let i = 1; i < strings.length; i++) {
+      while (!strings[i].toLowerCase().startsWith(prefix.toLowerCase())) {
+        prefix = prefix.slice(0, -1);
+        if (!prefix) return '';
+      }
+    }
+    return prefix;
+  };
+
+  const handleAutocomplete = () => {
+    const currentInput = inputVal;
+    if (!currentInput.trim()) return;
+
+    const hasSpace = currentInput.includes(' ');
+
+    if (!hasSpace) {
+      // Autocompletar comando principal
+      const availableCommands = ['pwd', 'ls', 'cd', 'mkdir', 'cat', 'rm', 'clear', 'help'];
+      const matches = availableCommands.filter((c) => c.startsWith(currentInput.toLowerCase()));
+
+      if (matches.length === 1) {
+        setInputVal(matches[0] + ' ');
+      } else if (matches.length > 1) {
+        const prefix = findCommonPrefix(matches);
+        if (prefix.length > currentInput.length) {
+          setInputVal(prefix);
+        } else {
+          // Mostrar opciones coincidentes en el historial
+          setHistory((prev) => [
+            ...prev,
+            `alumno@Mac-de-Iker ${currentPathString} % ${currentInput}`,
+            matches.join('   '),
+          ]);
+        }
+      }
+      return;
+    }
+
+    // Autocompletar argumento (archivo o carpeta según el directorio actual)
+    const lastSpaceIdx = currentInput.lastIndexOf(' ');
+    const commandPart = currentInput.slice(0, lastSpaceIdx + 1);
+    const argPart = currentInput.slice(lastSpaceIdx + 1);
+    const mainCommand = currentInput.trim().split(/\s+/)[0]?.toLowerCase();
+
+    const currNode = getNodeAtPath(cwd, fs);
+    if (!currNode || !currNode.children) return;
+
+    const allEntries = Object.values(currNode.children);
+    // Para 'cd', solo sugerir carpetas
+    const candidateEntries = mainCommand === 'cd'
+      ? allEntries.filter((e) => e.type === 'dir')
+      : allEntries;
+
+    const matches = candidateEntries.filter((e) =>
+      e.name.toLowerCase().startsWith(argPart.toLowerCase())
+    );
+
+    if (matches.length === 1) {
+      const match = matches[0];
+      const suffix = match.type === 'dir' ? '/' : ' ';
+      setInputVal(commandPart + match.name + suffix);
+    } else if (matches.length > 1) {
+      const names = matches.map((m) => m.name);
+      const prefix = findCommonPrefix(names);
+      if (prefix.length > argPart.length) {
+        setInputVal(commandPart + prefix);
+      } else {
+        const displayList = matches
+          .map((m) => (m.type === 'dir' ? `${m.name}/` : m.name))
+          .join('   ');
+        setHistory((prev) => [
+          ...prev,
+          `alumno@Mac-de-Iker ${currentPathString} % ${currentInput}`,
+          displayList,
+        ]);
+      }
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       executeCommand(inputVal);
+    } else if (e.key === 'Tab') {
+      e.preventDefault();
+      handleAutocomplete();
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (commandHistory.length > 0) {

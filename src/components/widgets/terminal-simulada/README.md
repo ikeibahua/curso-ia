@@ -12,6 +12,7 @@ Permite al estudiante perder el miedo a la línea de comandos en un entorno 100%
 
 ## Funcionalidades
 - Historial de comandos con flechas arriba/abajo.
+- Autocompletado inteligente con la tecla Tabulador (⇥) para comandos y nombres de archivos/carpetas.
 - Prompt realista de zsh de macOS (`alumno@Mac-de-Iker ~ %`).
 - Botón de reinicio completo del sistema de archivos virtual a su estado de fábrica.
 - Cumple criterios de accesibilidad y contraste cromático.
