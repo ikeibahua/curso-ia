@@ -8,24 +8,24 @@ interface PathDirectory {
 
 const PATH_DIRECTORIES: PathDirectory[] = [
   {
-    path: '/opt/homebrew/bin',
-    description: '1. Programas instalados con Homebrew (Apple Silicon)',
-    installedBinaries: ['brew', 'tree', 'ollama', 'node', 'htop'],
-  },
-  {
     path: '/usr/local/bin',
-    description: '2. Herramientas tradicionales compartidas de usuario',
-    installedBinaries: ['code', 'docker'],
+    description: '1. Programas instalados por el usuario y Homebrew',
+    installedBinaries: ['brew', 'tree', 'ollama', 'node', 'htop', 'code'],
   },
   {
     path: '/usr/bin',
-    description: '3. Utilidades estándar de macOS incluidas por Apple',
+    description: '2. Utilidades estándar de macOS incluidas por Apple',
     installedBinaries: ['git', 'python3', 'curl', 'ssh', 'tar', 'man', 'nano'],
   },
   {
     path: '/bin',
-    description: '4. Comandos esenciales del sistema Unix (Darwin)',
+    description: '3. Comandos esenciales del sistema Unix (Darwin)',
     installedBinaries: ['ls', 'cd', 'pwd', 'mkdir', 'cp', 'mv', 'rm', 'cat', 'echo', 'zsh', 'bash'],
+  },
+  {
+    path: '/usr/sbin',
+    description: '4. Utilidades administrativas del sistema',
+    installedBinaries: ['netstat', 'diskutil'],
   },
 ];
 
@@ -35,10 +35,10 @@ interface CommandQuery {
 }
 
 const PRESET_QUERIES: CommandQuery[] = [
-  { name: 'ls', expectedDirIndex: 3 }, // /bin/ls
-  { name: 'brew', expectedDirIndex: 0 }, // /opt/homebrew/bin/brew
-  { name: 'git', expectedDirIndex: 2 }, // /usr/bin/git
-  { name: 'tree', expectedDirIndex: 0 }, // /opt/homebrew/bin/tree
+  { name: 'ls', expectedDirIndex: 2 }, // /bin/ls
+  { name: 'brew', expectedDirIndex: 0 }, // /usr/local/bin/brew
+  { name: 'git', expectedDirIndex: 1 }, // /usr/bin/git
+  { name: 'tree', expectedDirIndex: 0 }, // /usr/local/bin/tree
   { name: 'botanica', expectedDirIndex: -1 }, // not found
 ];
 

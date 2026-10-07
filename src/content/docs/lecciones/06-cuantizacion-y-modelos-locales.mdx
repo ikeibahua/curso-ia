@@ -19,7 +19,7 @@ import CalculadoraMemoriaMac from '../../../components/widgets/calculadora-memor
 <Verificado
   fecha="2026-03"
   fuente="https://github.com/ggerganov/llama.cpp"
-  nota="Especificación del formato GGUF y métodos de cuantización k-quants (Q4_K_M) de llama.cpp, y requisitos de memoria unificada en chips Apple Silicon (M1 a M4)."
+  nota="Especificación del formato GGUF y métodos de cuantización k-quants (Q4_K_M) de llama.cpp, y requisitos de memoria RAM para ejecución local en Mac."
 />
 
 ## Objetivo de la lección
@@ -63,22 +63,21 @@ Dentro de este formato, verás nombres como **Q4_K_M** o **Q5_K_M**:
 
 ---
 
-## 3. La ventaja secreta de tu Mac: La Memoria Unificada
+## 3. El presupuesto de memoria en tu Mac: ¿Cómo saber qué cabe?
 
-Si tienes un Mac moderno con procesador Apple Silicon (chip M1, M2, M3 o M4), posees una de las mejores máquinas del mundo para ejecutar inteligencia artificial personal.
+Para ejecutar inteligencia artificial en local en tu propio Mac, el factor determinante no es una suscripción mensual ni la velocidad de tu conexión a internet, sino **cuánta memoria RAM física tiene tu equipo**.
 
-En un ordenador tradicional con Windows o Linux:
-- La tarjeta gráfica (GPU) tiene su propia memoria dedicada (por ejemplo, 8 GB de VRAM).
-- El procesador (CPU) tiene la memoria RAM normal (por ejemplo, 32 GB).
-- Si quieres que la tarjeta gráfica procese el modelo, estás limitado a esos 8 GB de VRAM; no puede usar fácilmente la memoria general porque el cable que las une es demasiado lento.
+Cuando abres un modelo en local (a través de herramientas como LM Studio u Ollama), el archivo comprimido en GGUF se carga en la memoria RAM principal de tu Mac. Durante la conversación, tu procesador (aprovechando las instrucciones avanzadas y la aceleración gráfica de macOS) realiza las operaciones matemáticas sobre esos pesos:
 
-En cambio, **en Apple Silicon la memoria es unificada**:
-- La CPU, la tarjeta gráfica y el motor neuronal comparten físicamente el mismo banco de memoria ultrarrápida.
-- Si tu Mac tiene 16 GB, 36 GB o 64 GB, **la tarjeta gráfica puede utilizar casi toda esa memoria directamente** para cargar modelos de IA a velocidades pasmosas.
+- **El sistema operativo macOS:** reserva habitualmente entre 3 y 4 GB de RAM para gestionar el escritorio, tus ventanas, la pantalla y las aplicaciones abiertas.
+- **La memoria restante:** queda disponible como espacio de trabajo para cargar el modelo de lenguaje.
+- **Si tu Mac tiene 8 GB de RAM:** los modelos ideales son los de **3B** (que ocupan entre 2 y 2,5 GB cuantizados en Q4). Dejan suficiente margen para que el sistema respire con total fluidez.
+- **Si tu Mac tiene 16 GB de RAM:** puedes ejecutar con total tranquilidad modelos de **7B u 8B** (que ocupan entre 4,5 y 5,5 GB en Q4), obteniendo respuestas ricas y matizadas.
+- **Si tu Mac tiene 32 GB o más:** tienes margen para modelos intermedios de 14B o cuantizaciones más finas (Q8).
 
 ### ¿Qué modelo cabe exactamente en tu Mac?
 
-Usa la siguiente calculadora para seleccionar la configuración de tu equipo y ver el semáforo de compatibilidad:
+Usa la siguiente calculadora para seleccionar la memoria de tu equipo y ver el semáforo de compatibilidad:
 
 <CalculadoraMemoriaMac client:visible />
 
@@ -105,12 +104,11 @@ Vamos a instalar una aplicación visual para macOS que te permitirá chatear con
 <Pasos>
   <Paso numero={1} titulo="Averigua la memoria exacta de tu Mac">
     En la esquina superior izquierda de tu pantalla de Mac, haz clic en el icono de la manzana () y pulsa en **«Acerca de este Mac»**.
-    Anota qué chip tienes (ej. *Apple M2*) y cuánta memoria tiene (ej. *16 GB*).
-    {/* TODO(personalizar): Anotar el chip y memoria exactos del Mac del alumno cuando los confirme */}
+    Anota el procesador que tienes y cuánta memoria RAM indica (ej. *16 GB*).
   </Paso>
   <Paso numero={2} titulo="Descarga e instala LM Studio">
     Abre Safari y entra en <a href="https://lmstudio.ai" target="_blank" rel="noreferrer">lmstudio.ai</a>.
-    Haz clic en el botón verde **«Download for Mac (Apple Silicon)»**.
+    Haz clic en el botón de descarga para Mac (si te da a elegir arquitectura, selecciona la versión para procesadores Mac / Intel).
     Abre el archivo `.dmg` descargado y arrastra el icono de LM Studio a tu carpeta de Aplicaciones.
   </Paso>
   <Paso numero={3} titulo="Busca y descarga un modelo equilibrado">
@@ -124,7 +122,7 @@ Vamos a instalar una aplicación visual para macOS que te permitirá chatear con
     2. En el desplegable superior, selecciona el modelo que acabas de descargar.
     3. **Desactiva el Wi-Fi de tu Mac** desde la barra de menús.
     4. Escribe: *«Explícame brevemente el ciclo vital del musgo»*.
-    Comprueba cómo el modelo empieza a escribir inmediatamente a 20 o 30 tokens por segundo, de forma totalmente privada y autónoma en tu propio procesador.
+    Comprueba cómo el modelo empieza a escribir inmediatamente a buen ritmo de palabras por segundo, de forma totalmente privada y autónoma en tu propio procesador.
   </Paso>
 </Pasos>
 
@@ -139,7 +137,7 @@ Vamos a instalar una aplicación visual para macOS que te permitirá chatear con
 >
 Con los datos de tu propio Mac y lo aprendido en esta lección, redacta un breve informe de tres líneas contestando a estas preguntas:
 
-1. **¿Qué chip y cuánta memoria RAM unificada tiene tu equipo?**
+1. **¿Cuánta memoria RAM física tiene tu equipo y qué procesador utiliza?**
 2. **¿Qué modelo concreto (nombre y número de parámetros) y qué nivel de cuantización (Q4, Q8...) has elegido para tu uso diario?**
 3. **¿Por qué has descartado una versión a 16 bits sin cuantizar y por qué has descartado un modelo de 70B?**
 
@@ -158,11 +156,11 @@ Guarda esta receta: será la configuración de referencia que utilizaremos en el
     },
     {
       termino: "Formato GGUF",
-      definicion: "Formato de archivo binario optimizado para almacenar modelos de lenguaje cuantizados y permitir su carga directa y ultrarrápida en memoria RAM/VRAM en arquitecturas domésticas."
+      definicion: "Formato de archivo binario optimizado para almacenar modelos de lenguaje cuantizados y permitir su carga directa y ultrarrápida en memoria RAM en arquitecturas de ordenadores personales."
     },
     {
-      termino: "Memoria Unificada",
-      definicion: "Arquitectura de hardware de Apple Silicon donde la CPU, la GPU y el motor neuronal comparten un único espacio físico de memoria de alta velocidad, permitiendo a la tarjeta gráfica utilizar decenas de gigabytes de RAM para IA."
+      termino: "Memoria RAM disponible",
+      definicion: "Espacio de memoria de trabajo rápida de tu ordenador donde se carga el modelo para que el procesador pueda consultar sus pesos matemáticos de manera inmediata durante la generación."
     },
     {
       termino: "Tokens por segundo (tok/s)",

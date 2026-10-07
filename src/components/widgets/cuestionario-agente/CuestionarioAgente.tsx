@@ -102,7 +102,7 @@ export default function CuestionarioAgente() {
         model: 'Llama 3.2 (3B) o Qwen 2.5 Coder (3B) vía Ollama',
         cost: '0 € (Completamente gratuito)',
         privacyNote: '100% Local en tu Mac. Sin conexión a internet.',
-        why: 'Para organizar archivos, renombrar y tareas de escritorio cotidianas sin gastar nada y sin conexión a internet, un modelo ligero local en tu Mac Apple Silicon vuela en velocidad y consume un mínimo de memoria RAM unificada.',
+        why: 'Para organizar archivos, renombrar y tareas de escritorio cotidianas sin gastar nada y sin conexión a internet, un modelo ligero local en tu Mac vuela en velocidad y consume un mínimo de memoria RAM.',
         command: 'opencode --model ollama/llama3.2',
       };
     }

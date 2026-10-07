@@ -42,7 +42,7 @@ export default function CalculadoraTamano() {
   // Raw weight size in Gigabytes: (params * 10^9 * bytes) / 10^9 = params * bytes
   const rawSizeGB = params * precision.bytesPerParam;
 
-  // Recommended unified RAM including 20% overhead for context window and OS
+  // Recommended RAM including 20% overhead for context window and OS
   const recommendedRamGB = useMemo(() => {
     return rawSizeGB * 1.25;
   }, [rawSizeGB]);
@@ -54,23 +54,23 @@ export default function CalculadoraTamano() {
         tier: 'Mac básico (8 GB RAM)',
         status: 'compatible',
         color: '#4ade80',
-        message: '¡Excelente! Cabe holgadamente en cualquier Mac con 8 GB de memoria unificada (MacBook Air M1/M2/M3 base).',
+        message: '¡Excelente! Cabe holgadamente en cualquier Mac con 8 GB de memoria RAM.',
       };
     }
     if (recommendedRamGB <= 13) {
       return {
-        tier: 'Mac estándar (16 GB / 18 GB RAM)',
+        tier: 'Mac estándar (16 GB RAM)',
         status: 'compatible',
         color: '#4ade80',
-        message: '¡Perfecto! Cabe sin problemas en un Mac de 16 GB o 18 GB, dejando margen para el sistema operativo.',
+        message: '¡Perfecto! Cabe sin problemas en un Mac con 16 GB de RAM, dejando margen para el sistema operativo.',
       };
     }
     if (recommendedRamGB <= 28) {
       return {
-        tier: 'Mac avanzado (32 GB / 36 GB RAM)',
+        tier: 'Mac avanzado (32 GB RAM)',
         status: 'pro',
         color: '#38bdf8',
-        message: 'Requiere un Mac con 32 GB o 36 GB de RAM unificada (MacBook Pro con chip M Pro/Max). En 16 GB provocaría saturación (swap).',
+        message: 'Requiere un Mac con 32 GB de RAM. En equipos de 16 GB provocaría saturación de memoria (swap al disco).',
       };
     }
     if (recommendedRamGB <= 54) {
@@ -78,7 +78,7 @@ export default function CalculadoraTamano() {
         tier: 'Mac profesional (64 GB RAM)',
         status: 'heavy',
         color: '#fb923c',
-        message: 'Requiere un Mac de 64 GB de memoria unificada (M Max). No cabe en ordenadores portátiles estándar.',
+        message: 'Requiere un Mac con 64 GB de memoria RAM. No cabe en ordenadores portátiles estándar.',
       };
     }
     if (recommendedRamGB <= 110) {
@@ -86,7 +86,7 @@ export default function CalculadoraTamano() {
         tier: 'Estación de trabajo (128 GB RAM)',
         status: 'workstation',
         color: '#f87171',
-        message: 'Requiere un Mac Studio con chip M Ultra (128 GB RAM) o un servidor especializado con varias tarjetas gráficas.',
+        message: 'Requiere una estación de trabajo con 128 GB de RAM o un servidor especializado con varias tarjetas aceleradoras.',
       };
     }
     return {

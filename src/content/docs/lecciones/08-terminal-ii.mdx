@@ -60,9 +60,9 @@ Compruébalo con esta animación paso a paso:
 
 <AnimacionPath client:visible />
 
-<Callout tipo="info" titulo="¿Por qué en Apple Silicon las herramientas viven en /opt/homebrew?">
-En los Mac modernos con chips M1, M2, M3 o M4, Homebrew instala todos sus programas en la carpeta `/opt/homebrew/bin` para mantenerlos separados y limpios de las herramientas antiguas de Intel (que vivían en `/usr/local/bin`). 
-Al instalar Homebrew por primera vez, el instalador te pedirá añadir esa carpeta a tu `$PATH` para que el sistema la encuentre de inmediato.
+<Callout tipo="info" titulo="¿Dónde guarda Homebrew tus programas en el Mac?">
+En tu Mac, Homebrew instala sus programas habitualmente en `/usr/local/bin` (o en `/usr/local/opt`). Esta carpeta contiene las herramientas que vayas incorporando (como `ollama`, `git` o utilidades de Python).
+Al instalar Homebrew por primera vez, el instalador se asegura de que esa ruta esté incluida en tu `$PATH` para que el sistema encuentre cualquier comando nuevo de inmediato.
 </Callout>
 
 ---

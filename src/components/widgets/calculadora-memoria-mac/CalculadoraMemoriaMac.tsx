@@ -9,40 +9,37 @@ interface LocalModel {
 
 const LOCAL_MODELS: LocalModel[] = [
   { name: 'Llama 3.2 1B (Q4_K_M)', sizeGb: 0.9, params: '1B', recommendedRole: 'Respuestas instantáneas y clasificación ultraligera' },
-  { name: 'Llama 3.2 3B (Q4_K_M)', sizeGb: 2.1, params: '3B', recommendedRole: 'Excelente en portátiles con 8 GB; redacta con agilidad' },
+  { name: 'Llama 3.2 3B (Q4_K_M)', sizeGb: 2.1, params: '3B', recommendedRole: 'Excelente en equipos con 8 GB; redacta con agilidad' },
   { name: 'Qwen 2.5 7B (Q4_K_M)', sizeGb: 4.6, params: '7B', recommendedRole: 'Gran comprensión del español, resúmenes y matemáticas' },
   { name: 'Llama 3.1 8B (Q4_K_M)', sizeGb: 5.1, params: '8B', recommendedRole: 'El rey indiscutible: equilibrio perfecto en 16 GB de RAM' },
   { name: 'Qwen 2.5 14B (Q4_K_M)', sizeGb: 9.3, params: '14B', recommendedRole: 'Redacción más matizada y lógica formal avanzada' },
   { name: 'Mistral Small 24B (Q4_K_M)', sizeGb: 14.8, params: '24B', recommendedRole: 'Nivel semiprofesional en razonamiento' },
   { name: 'Qwen 2.5 32B (Q4_K_M)', sizeGb: 20.2, params: '32B', recommendedRole: 'Casi indistinguible de modelos gigantescos en precisión' },
-  { name: 'Llama 3.3 70B (Q4_K_M)', sizeGb: 43.0, params: '70B', recommendedRole: 'Máxima potencia local para Macs con 64 GB o 128 GB' },
+  { name: 'Llama 3.3 70B (Q4_K_M)', sizeGb: 43.0, params: '70B', recommendedRole: 'Máxima potencia local para Macs con 64 GB de RAM o más' },
 ];
 
-const RAM_OPTIONS = [8, 16, 24, 32, 36, 48, 64, 128];
-const CHIP_OPTIONS = ['M1 / M2 / M3 / M4 (Base)', 'M Pro', 'M Max', 'M Ultra'];
+const RAM_OPTIONS = [8, 16, 24, 32, 48, 64];
+const CHIP_OPTIONS = ['Intel Core i5', 'Intel Core i7', 'Intel Core i9 / Xeon'];
 
 export default function CalculadoraMemoriaMac() {
   const [ram, setRam] = useState<number>(16);
-  const [chip, setChip] = useState<string>('M1 / M2 / M3 / M4 (Base)');
+  const [chip, setChip] = useState<string>('Intel Core i7');
   const titleId = useId();
 
   // macOS system overhead (OS + Finder + basic browser): ~3.5 GB
   const osReserveGb = 3.5;
   const availableVram = Math.max(0, ram - osReserveGb);
 
-  // Speed estimates based on chip family and model size
+  // Speed estimates based on CPU family and model size
   const speedEstimate = useMemo(() => {
-    if (chip.includes('Ultra')) {
-      return 'Velocidad extraordinaria (40 a 70 tok/s en 8B; ~30 tok/s en 70B).';
+    if (chip.includes('i9') || chip.includes('Xeon')) {
+      return 'Velocidad ágil con múltiples hilos paralelos (15 a 25 tok/s en 3B; 10 a 16 tok/s en 8B).';
     }
-    if (chip.includes('Max')) {
-      return 'Velocidad muy alta (35 a 55 tok/s en 8B; ~18 tok/s en 70B).';
+    if (chip.includes('i7')) {
+      return 'Velocidad fluida y cómoda para lectura (12 a 20 tok/s en 3B; 8 a 14 tok/s en 8B).';
     }
-    if (chip.includes('Pro')) {
-      return 'Velocidad ágil y fluida (25 a 35 tok/s en 8B; ~14 tok/s en 14B).';
-    }
-    // Base chip
-    return 'Velocidad cómoda para lectura (20 a 30 tok/s en 3B; 14 a 18 tok/s en 8B).';
+    // Core i5
+    return 'Velocidad adecuada para lectura y consultas pausadas (8 a 14 tok/s en 3B; 5 a 10 tok/s en 8B).';
   }, [chip]);
 
   return (
@@ -94,7 +91,7 @@ export default function CalculadoraMemoriaMac() {
               color: 'var(--sl-color-white, #f8fafc)',
             }}
           >
-            ¿Qué modelo cabe en mi Mac? (Apple Silicon)
+            ¿Qué modelo cabe en mi Mac? (Presupuesto de RAM)
           </h3>
         </div>
 
@@ -108,7 +105,7 @@ export default function CalculadoraMemoriaMac() {
             color: 'var(--sl-color-text, #e2e8f0)',
           }}
         >
-          Memoria Unificada
+          Memoria RAM
         </div>
       </div>
 
@@ -166,7 +163,7 @@ export default function CalculadoraMemoriaMac() {
             htmlFor="chip-select"
             style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#f8fafc', marginBottom: '0.4rem' }}
           >
-            Gama de procesador Apple:
+            Procesador de tu Mac:
           </label>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
             {CHIP_OPTIONS.map((c) => (

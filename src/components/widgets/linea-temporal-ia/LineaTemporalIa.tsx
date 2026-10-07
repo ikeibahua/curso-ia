@@ -14,7 +14,7 @@ interface Milestone {
 
 const MILESTONES: Milestone[] = [
   {
-    id: 'm1',
+    id: 'hito-1',
     year: '2017',
     title: 'El Mecanismo de Atención',
     subtitle: 'Nace la arquitectura Transformer',
@@ -25,7 +25,7 @@ const MILESTONES: Milestone[] = [
     biologicalAnalogy: 'La aparición de los primeros ojos compuestos en el Cámbrico: en lugar de sentir el entorno por contacto químico ciego, el organismo capta todo el campo visual a la vez.',
   },
   {
-    id: 'm2',
+    id: 'hito-2',
     year: '2020–2022',
     title: 'Escala y Diálogo Natural',
     subtitle: 'De GPT-3 al lanzamiento de ChatGPT',
@@ -36,18 +36,18 @@ const MILESTONES: Milestone[] = [
     biologicalAnalogy: 'El salto evolutivo hacia la neocorteza cerebral en mamíferos: una gran expansión de tejido neuronal indiferenciado que permite plasticidad y aprendizaje adaptativo.',
   },
   {
-    id: 'm3',
+    id: 'hito-3',
     year: '2023–2024',
     title: 'Multimodalidad y Modelos Locales',
     subtitle: 'Ojos, voz y modelos que caben en tu Mac',
     badge: 'Eficiencia y Sentidos',
     badgeColor: '#10b981',
-    description: 'Los modelos integran imágenes, audio y texto en la misma red. A la vez, técnicas de cuantización (L06) permiten que modelos pequeños (Llama, Qwen) corran a gran velocidad en la memoria unificada de un Mac sin internet.',
+    description: 'Los modelos integran imágenes, audio y texto en la misma red. A la vez, técnicas de cuantización (L06) permiten que modelos pequeños (Llama, Qwen) corran a gran velocidad en la memoria RAM de tu propio Mac sin internet.',
     userImpact: 'Puedes enseñar fotos de una flor desconocida al modelo y ejecutar agentes privados sin pagar cuotas mensuales ni depender de la nube.',
     biologicalAnalogy: 'La integración sensorial del tálamo: vista, oído y tacto convergen en una misma representación del mundo físico.',
   },
   {
-    id: 'm4',
+    id: 'hito-4',
     year: '2024–2025',
     title: 'El Razonamiento Deliberado',
     subtitle: 'Modelos con cadena de pensamiento (*Thinking*)',
@@ -58,7 +58,7 @@ const MILESTONES: Milestone[] = [
     biologicalAnalogy: 'La deliberación consciente prefrontal: el animal no reacciona por reflejo instintivo inmediato; se detiene a sopesar opciones antes de dar el salto.',
   },
   {
-    id: 'm5',
+    id: 'hito-5',
     year: '2025–2026',
     title: 'Agentes, Protocolo MCP y Fabricación',
     subtitle: 'La IA sale de la pantalla y actúa en el mundo',
@@ -71,7 +71,7 @@ const MILESTONES: Milestone[] = [
 ];
 
 export default function LineaTemporalIa() {
-  const [selectedId, setSelectedId] = useState<string>('m5');
+  const [selectedId, setSelectedId] = useState<string>('hito-5');
   const titleId = useId();
 
   const currentMilestone = MILESTONES.find((m) => m.id === selectedId) || MILESTONES[4];

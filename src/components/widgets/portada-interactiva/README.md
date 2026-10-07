@@ -18,3 +18,4 @@ Componentes interactivos y animados desarrollados para la página de inicio del 
 - Controles accesibles con teclado (`Tab`, `Enter`, `Espacio`).
 - Atributos ARIA (`role="tab"`, `aria-selected`, `aria-controls`, `aria-live="polite"`).
 - Respeta `prefers-reduced-motion` anulando animaciones automáticas cuando está habilitado.
+

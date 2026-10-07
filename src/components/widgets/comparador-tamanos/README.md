@@ -5,7 +5,7 @@ Visualizador comparativo de las diferentes escalas de modelos de lenguaje (de 1B
 ## Propósito
 Explicar de manera visual el tamaño relativo en órdenes de magnitud de los modelos de inteligencia artificial abiertos y de frontera:
 - 1B-3B: Modelos ultraligeros para teléfonos.
-- 7B-9B: El rey del uso personal en Mac con Apple Silicon.
+- 7B-9B: El rey del uso personal en ordenadores Mac (8-16 GB RAM).
 - 14B-32B: Gama media alta para código y lógica técnica.
 - 70B: Estándar profesional de alta capacidad.
 - MoE (*Mixture of Experts*): La arquitectura de activación dispersa.

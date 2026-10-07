@@ -33,7 +33,7 @@ const PARES_PRECALCULADOS: ParPrecalculado[] = [
     id: 'campo-distinto',
     titulo: 'Dominios completamente diferentes',
     fraseA: 'La fotosíntesis transforma el dióxido de carbono en glucosa.',
-    fraseB: 'El sistema operativo del Mac gestiona la memoria unificada.',
+    fraseB: 'El sistema operativo del Mac gestiona la memoria del ordenador.',
     similitud: 16,
     explicacion: 'Los vectores apuntan a polos opuestos del espacio multidimensional: uno a bioquímica vegetal y otro a arquitectura de computadores.',
     tipo: 'distinto',

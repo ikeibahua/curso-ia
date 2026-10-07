@@ -94,11 +94,11 @@ export const GLOSARIO_COMPLETO: TerminoGlosario[] = [
     analogia: 'Un vencejo común: ligero, con masa corporal mínima y un metabolismo extraordinariamente eficiente para maniobrar rápido.',
   },
   {
-    id: 'memoria-unificada',
-    termino: 'Memoria unificada',
+    id: 'memoria-ram',
+    termino: 'Memoria RAM',
     categoria: 'Terminal',
-    definicion: 'Arquitectura de hardware de Apple Silicon en macOS donde la CPU y la GPU comparten el mismo módulo físico de memoria RAM a velocidad ultra-rápida.',
-    analogia: 'Un sistema vascular común en un árbol que distribuye la savia elaborada a todas las ramas sin necesidad de estaciones de bombeo separadas.',
+    definicion: 'Memoria de trabajo de acceso ultrarrápido donde tu Mac carga el sistema operativo y los pesos del modelo de IA para operar sin depender del disco duro.',
+    analogia: 'La mesa de laboratorio o cuaderno de campo abierto: el espacio físico donde colocas las muestras que estás examinando en este instante preciso.',
   },
   {
     id: 'terminal',
