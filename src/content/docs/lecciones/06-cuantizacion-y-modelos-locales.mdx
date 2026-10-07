@@ -69,6 +69,12 @@ Para ejecutar inteligencia artificial en local en tu propio Mac, el factor deter
 
 Cuando abres un modelo en local (a través de herramientas como LM Studio u Ollama), el archivo comprimido en GGUF se carga en la memoria RAM principal de tu Mac. Durante la conversación, tu procesador (aprovechando las instrucciones avanzadas y la aceleración gráfica de macOS) realiza las operaciones matemáticas sobre esos pesos:
 
+<Callout tipo="truco" titulo="El superpoder del Mac: la Memoria Unificada">
+En los ordenadores PC tradicionales, la memoria de la tarjeta gráfica (VRAM) está físicamente separada de la memoria RAM del sistema. En cambio, en los Mac modernos con chips **Apple Silicon (M1, M2, M3, M4)**, la memoria es **unificada**: el procesador (CPU) y la tarjeta gráfica (GPU) comparten el mismo banco de memoria de altísima velocidad. 
+
+Esto significa que tu Mac puede dedicar prácticamente toda su memoria RAM disponible a ejecutar la red neuronal con aceleración gráfica mediante la tecnología Metal de Apple, sin necesidad de comprar carísimas tarjetas gráficas dedicadas.
+</Callout>
+
 - **El sistema operativo macOS:** reserva habitualmente entre 3 y 4 GB de RAM para gestionar el escritorio, tus ventanas, la pantalla y las aplicaciones abiertas.
 - **La memoria restante:** queda disponible como espacio de trabajo para cargar el modelo de lenguaje.
 - **Si tu Mac tiene 8 GB de RAM:** los modelos ideales son los de **3B** (que ocupan entre 2 y 2,5 GB cuantizados en Q4). Dejan suficiente margen para que el sistema respire con total fluidez.
@@ -99,7 +105,7 @@ Ejecutar modelos en tu propio Mac no sustituye a la nube; son dos herramientas c
 
 ## Práctica en tu Mac: Instalar tu primer modelo con LM Studio
 
-Vamos a instalar una aplicación visual para macOS que te permitirá chatear con modelos locales sin escribir una sola línea de código en la terminal (la terminal la exploraremos a fondo a partir de la siguiente lección):
+Vamos a instalar una aplicación visual para macOS que te permitirá chatear con modelos locales sin escribir una sola línea de código en la terminal (la terminal la exploraremos a fondo a partir de la siguiente lección, donde también instalaremos **Ollama** para dar servicio a agentes):
 
 <Pasos>
   <Paso numero={1} titulo="Averigua la memoria exacta de tu Mac">
