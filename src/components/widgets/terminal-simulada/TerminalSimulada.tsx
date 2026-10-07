@@ -113,12 +113,14 @@ export default function TerminalSimulada() {
   const [activeMissionIdx, setActiveMissionIdx] = useState<number>(0);
   const [completedMissions, setCompletedMissions] = useState<boolean[]>([false, false, false, false, false]);
 
-  const terminalEndRef = useRef<HTMLDivElement>(null);
+  const terminalBodyRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const titleId = useId();
 
   useEffect(() => {
-    terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (terminalBodyRef.current) {
+      terminalBodyRef.current.scrollTop = terminalBodyRef.current.scrollHeight;
+    }
   }, [history]);
 
   // Current folder node reference
@@ -310,6 +312,7 @@ export default function TerminalSimulada() {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
+      e.preventDefault();
       executeCommand(inputVal);
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
@@ -480,6 +483,7 @@ export default function TerminalSimulada() {
 
           {/* Área de texto de la terminal */}
           <div
+            ref={terminalBodyRef}
             style={{
               padding: '0.85rem',
               minHeight: '260px',
@@ -491,7 +495,7 @@ export default function TerminalSimulada() {
               color: '#f3f4f6',
               whiteSpace: 'pre-wrap',
             }}
-            onClick={() => inputRef.current?.focus()}
+            onClick={() => inputRef.current?.focus({ preventScroll: true })}
           >
             {history.map((line, i) => (
               <div key={i} style={{ marginBottom: '0.2rem', color: line.startsWith('alumno@') ? '#60a5fa' : line.startsWith('zsh:') ? '#f87171' : '#e5e7eb' }}>
@@ -520,11 +524,9 @@ export default function TerminalSimulada() {
                   fontSize: 'inherit',
                   padding: 0,
                 }}
-                autoFocus
                 aria-label="Línea de comandos de la terminal simulada"
               />
             </div>
-            <div ref={terminalEndRef} />
           </div>
         </div>
 
