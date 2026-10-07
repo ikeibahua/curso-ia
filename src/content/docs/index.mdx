@@ -1,9 +1,10 @@
 ---
-title: Cuaderno de campo — Inteligencia Artificial
-description: Una guía práctica y cercana para entender la IA, experimentar con modelos en tu Mac y crear tus propios agentes.
+title: 'Cuaderno de campo: Inteligencia Artificial'
+description: 'Guía práctica, interactiva y cercana para entender los modelos de lenguaje, experimentar en tu propio Mac y construir agentes autónomos con rigor científico.'
 template: splash
 hero:
-  tagline: Una guía práctica, paso a paso y sin rodeos para entender la IA, experimentar con modelos en tu propio Mac y automatizar tu día a día.
+  title: 'Cuaderno de campo: Inteligencia Artificial'
+  tagline: 'De la observación natural a los modelos de lenguaje. Un recorrido autodirigido para entender la IA, experimentar en tu propio Mac sin gastar un euro y construir tus propias herramientas.'
   actions:
     - text: Empezar con la Lección 01
       link: /curso-ia/lecciones/01-que-es-un-llm/
@@ -19,29 +20,100 @@ hero:
       variant: minimal
 ---
 
+import HeroAnimado from '../../components/widgets/portada-interactiva/HeroAnimado';
+import ProbadorTokensMini from '../../components/widgets/portada-interactiva/ProbadorTokensMini';
+import ExploradorRutas from '../../components/widgets/portada-interactiva/ExploradorRutas';
+import Callout from '../../components/ui/Callout.astro';
 import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<div class="portada-intro-badge">
+  <span>🌿 Cuaderno de Campo Digital · Edición Personalizada para macOS</span>
+</div>
+
+## De la biología a los modelos de lenguaje
+
+Si has dedicado tu vida a la observación metódica de la naturaleza, a clasificar especies en un ecosistema y a entender cómo la información fluye por los organismos vivos, la inteligencia artificial no es un artefacto extraño: es **un territorio nuevo que explorar con la misma mirada científica**.
+
+Este cuaderno está diseñado para que avances **a tu propio ritmo, sin prisas y sin tecnicismos vacíos**. En lugar de aburridas fórmulas matemáticas o jerga publicitaria, aquí encontrarás explicaciones claras, analogías botánicas honestas y, sobre todo, **prácticas reales en tu propio ordenador**.
+
+---
+
+## 1. El Ecosistema de la IA: Del ADN al Agente
+
+A continuación tienes el mapa conceptual interactivo del curso. Observa cómo los conceptos evolucionan desde la unidad básica de información (el token) hasta un organismo digital completo capaz de interactuar con tus archivos:
+
+<HeroAnimado client:load />
+
+---
+
+## 2. Tu primer experimento en 10 segundos
+
+No necesitas instalar nada todavía para ver cómo "piensa" un modelo. Escribe una frase o prueba uno de los ejemplos botánicos para observar en vivo cómo el texto se descompone en unidades numéricas:
+
+<ProbadorTokensMini client:visible />
+
+---
+
+## 3. Brújula de Campo: Elige tu sendero
+
+El curso consta de 21 lecciones organizadas en 4 bloques. Puedes seguir el orden pedagógico natural de principio a fin, o utilizar esta brújula para explorar la senda que más te interese hoy:
+
+<ExploradorRutas client:visible />
+
+---
 
 ## Los 4 bloques del cuaderno
 
 <CardGrid stagger>
   <Card title="Bloque 1: Fundamentos y modelos (Lecciones 01 a 07)" icon="open-book">
-    Qué es un token, cómo predice un modelo, los espacios de embeddings, la atención del Transformer, pesos y parámetros (70B), y cómo ejecutar modelos cuantizados en local en tu Mac con Ollama.
+    Descubre la anatomía de un LLM: qué son los tokens, cómo se mapea el significado en coordenadas de embeddings, la atención selectiva del Transformer, el significado de los parámetros (70B) y cómo ejecutar modelos cuantizados en local en tu Mac con **Ollama**.
+    
+    [Ver Lección 01: ¿Qué es un LLM? →](/curso-ia/lecciones/01-que-es-un-llm/)
   </Card>
+
   <Card title="Bloque 2: La terminal sin miedo (Lecciones 08 a 09)" icon="laptop">
-    Perder el miedo a la línea de comandos en macOS: moverte por carpetas, instalar herramientas seguras con Homebrew y proteger tus claves secretas de API en variables de entorno.
+    Desmitifica la línea de comandos de macOS con explicaciones claras y sin peligro: aprende a moverte por carpetas, instalar herramientas de código abierto con **Homebrew** y salvaguardar tus claves privadas en variables de entorno.
+    
+    [Ver Lección 08: Terminal I: Perder el miedo →](/curso-ia/lecciones/07-terminal-i/)
   </Card>
+
   <Card title="Bloque 3: Agentes, herramientas y contexto (Lecciones 10 a 18)" icon="puzzle">
-    La anatomía del bucle perceptivo, el protocolo estándar MCP, directrices en archivos `.md`, agentes de código y escritorio (OpenCode y Claude Code), RAG sobre documentos propios, ciberseguridad y fabricación 3D en FreeCAD.
+    Pasa de chatear con un modelo a colaborar con un agente: el bucle perceptivo, el protocolo estándar **MCP**, memorias e instrucciones en Markdown, agentes de programación (**OpenCode**, Claude Code), **RAG** sobre tus propios documentos y diseño 3D en **FreeCAD**.
+    
+    [Ver Lección 10: Anatomía de un agente →](/curso-ia/lecciones/09-anatomia-de-un-agente/)
   </Card>
+
   <Card title="Bloque 4: Proyectos y futuro (Lecciones 19 a 21)" icon="rocket">
-    De la teoría a la práctica: diseña tu proyecto personal descargable, descubre las tendencias del futuro (EU AI Act, razonamiento deliberado) y un tutorial guiado para montar un agente autónomo siempre activo.
+    Lleva el conocimiento a tus proyectos personales: diseña tu ficha de automatización con red de seguridad, conoce las tendencias clave (razonamiento deliberado, legislación europea) y monta un agente supervisor siempre activo en tu Mac.
+    
+    [Ver Lección 19: Automatización y proyecto final →](/curso-ia/lecciones/17-automatizacion-y-proyecto-final/)
   </Card>
 </CardGrid>
 
 ---
 
-## Filosofía del curso
+## Los cuatro principios de este cuaderno
 
-- **Diseñado para ti:** Con explicaciones claras en español, sin jerga innecesaria y con analogías honestas de biología de campo.
-- **Tu Mac como laboratorio:** Prácticas reales pensadas para macOS y Apple Silicon, priorizando herramientas gratuitas de código abierto y modelos locales de coste cero.
-- **El humano siempre al mando:** Aprende a supervisar con criterio, proteger tu privacidad y disponer siempre de una red de seguridad infalible para deshacer cualquier cambio.
+<Callout tipo="truco" titulo="1. Tu Mac es tu laboratorio (100% Privado)">
+Todas las prácticas principales del curso están pensadas para ejecutarse en local en tu Mac con procesador Apple Silicon. Tus documentos, tus notas y tus experimentos se quedan en tu disco duro, sin necesidad de enviar información personal a servidores ajenos.
+</Callout>
+
+<Callout tipo="nota" titulo="2. Coste cero y herramientas abiertas">
+Priorizamos herramientas gratuitas de código abierto (Ollama, Homebrew, FreeCAD, Python). No necesitas pagar costosas suscripciones mensuales para aprender y crear proyectos potentes en tu ordenador.
+</Callout>
+
+<Callout tipo="ojo" titulo="3. Analogías de campo con frontera explícita">
+Las analogías con la biología, la botánica y los ecosistemas son bienvenidas porque te ayudan a anclar los conceptos nuevos en conocimientos que ya posees. Pero siempre señalamos con honestidad dónde deja de valer la analogía para evitar falsas ilusiones.
+</Callout>
+
+<Callout tipo="peligro" titulo="4. El humano siempre al mando">
+Un agente de IA es una herramienta de asistencia, no un sustituto de tu criterio. En cada lección aprenderás a supervisar las acciones del modelo, establecer límites de seguridad y contar siempre con una vía sencilla para deshacer cualquier cambio.
+</Callout>
+
+---
+
+## Herramientas de consulta continua
+
+- 📖 **[Glosario Maestro (Herbario)](/curso-ia/glosario/):** Más de 35 conceptos técnicos explicados con definición exacta, analogía biológica y enlaces directos a las lecciones donde se aplican.
+- 🗂️ **[Guía de Recursos y Plantillas](/curso-ia/recursos/):** Enlaces oficiales verificados, instaladores oficiales y plantillas Markdown descargables para tus propios proyectos.
+- 🔍 **Buscador global instantáneo:** Pulsa `⌘K` (Cmd + K) en cualquier momento para encontrar cualquier concepto, herramienta o comando en todo el cuaderno.
